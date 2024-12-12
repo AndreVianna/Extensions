@@ -292,7 +292,7 @@ public sealed class RunnerTests : IDisposable {
 
         var runner = new Runner(1, workflow) {
             OnExecutingNode = (wf, node, _) => {
-                wf.Map.Should().BeSameAs(context);
+                wf.Context.Should().BeSameAs(context);
                 return Task.FromResult(node != secondNode);
             },
         };
@@ -342,7 +342,7 @@ public sealed class RunnerTests : IDisposable {
 
         var runner = new Runner(1, workflow) {
             OnNodeExecuted = (wf, node, _, _) => {
-                wf.Map.Should().BeSameAs(context);
+                wf.Context.Should().BeSameAs(context);
                 return Task.FromResult(node != secondNode);
             },
         };

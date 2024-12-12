@@ -1,7 +1,7 @@
 ﻿namespace DotNetToolbox.Graph.Nodes;
 
 public sealed class ActionNode : ActionNode<ActionNode> {
-    private ActionNode(string? tag, string? name, Func<Map, CancellationToken, Task>? execute, IServiceProvider services)
+    private ActionNode(string? tag, string? name, Func<IMap, CancellationToken, Task>? execute, IServiceProvider services)
         : base(tag, services) {
         Name = name ?? Name;
         Label = name ?? "action";
@@ -13,23 +13,23 @@ public sealed class ActionNode : ActionNode<ActionNode> {
     public ActionNode(string? tag, string? name, IServiceProvider services)
         : this(tag, name, null, services) {
     }
-    public ActionNode(Func<Map, CancellationToken, Task> execute, IServiceProvider services)
+    public ActionNode(Func<IMap, CancellationToken, Task> execute, IServiceProvider services)
         : this(null, null, execute, services) {
     }
-    public ActionNode(string? tag, Func<Map, CancellationToken, Task> execute, IServiceProvider services)
+    public ActionNode(string? tag, Func<IMap, CancellationToken, Task> execute, IServiceProvider services)
         : this(tag, null, execute, services) {
         Tag = IsNotNullOrWhiteSpace(tag);
     }
-    public ActionNode(Action<Map> execute, IServiceProvider services)
+    public ActionNode(Action<IMap> execute, IServiceProvider services)
         : this(null, null, (ctx, ct) => Task.Run(() => execute(ctx), ct), services) {
     }
-    public ActionNode(string? tag, Action<Map> execute, IServiceProvider services)
+    public ActionNode(string? tag, Action<IMap> execute, IServiceProvider services)
         : this(tag, null, (ctx, ct) => Task.Run(() => execute(ctx), ct), services) {
     }
 
-    private readonly Func<Map, CancellationToken, Task> _execute;
+    private readonly Func<IMap, CancellationToken, Task> _execute;
 
-    protected override Task Execute(Map context, CancellationToken ct = default)
+    protected override Task Execute(IMap context, CancellationToken ct = default)
         => _execute(context, ct);
 
     public static TNode Create<TNode>(IServiceProvider services, params object[] args)
@@ -50,11 +50,11 @@ public abstract class ActionNode<TNode>(string? tag, IServiceProvider services)
     public IRetryPolicy Retry { get; set; } = services.GetService<IRetryPolicy>()
                                            ?? RetryPolicy.Default;
 
-    protected sealed override Task<INode?> SelectPath(Map context, CancellationToken ct = default)
+    protected sealed override Task<INode?> SelectPath(IMap context, CancellationToken ct = default)
         => Task.FromResult(Next);
 
-    protected sealed override Task UpdateState(Map context, CancellationToken ct = default)
+    protected sealed override Task UpdateState(IMap context, CancellationToken ct = default)
         => Retry.Execute(Execute, context, ct);
 
-    protected abstract Task Execute(Map context, CancellationToken ct = default);
+    protected abstract Task Execute(IMap context, CancellationToken ct = default);
 }

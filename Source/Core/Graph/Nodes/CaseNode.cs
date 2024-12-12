@@ -1,7 +1,7 @@
 ﻿namespace DotNetToolbox.Graph.Nodes;
 
 public sealed class CaseNode : CaseNode<CaseNode> {
-    private CaseNode(string? tag, string? name, Func<Map, CancellationToken, Task<string>>? select, IServiceProvider services)
+    private CaseNode(string? tag, string? name, Func<IMap, CancellationToken, Task<string>>? select, IServiceProvider services)
         : base(tag, services) {
         Name = name ?? Name;
         Label = name ?? "case";
@@ -13,22 +13,22 @@ public sealed class CaseNode : CaseNode<CaseNode> {
     public CaseNode(string? tag, string? name, IServiceProvider services)
         : this(tag, name, null, services) {
     }
-    public CaseNode(Func<Map, CancellationToken, Task<string>> select, IServiceProvider services)
+    public CaseNode(Func<IMap, CancellationToken, Task<string>> select, IServiceProvider services)
         : this(null, null, select, services) {
     }
-    public CaseNode(string? tag, Func<Map, CancellationToken, Task<string>> select, IServiceProvider services)
+    public CaseNode(string? tag, Func<IMap, CancellationToken, Task<string>> select, IServiceProvider services)
         : this(tag, null, select, services) {
     }
-    public CaseNode(Func<Map, string> select, IServiceProvider services)
+    public CaseNode(Func<IMap, string> select, IServiceProvider services)
         : this(null, null, (ctx, ct) => Task.Run(() => select(ctx), ct), services) {
     }
-    public CaseNode(string? tag, Func<Map, string> select, IServiceProvider services)
+    public CaseNode(string? tag, Func<IMap, string> select, IServiceProvider services)
         : this(tag, null, (ctx, ct) => Task.Run(() => select(ctx), ct), services) {
     }
 
-    private readonly Func<Map, CancellationToken, Task<string>> _select;
+    private readonly Func<IMap, CancellationToken, Task<string>> _select;
 
-    protected override Task<string> Select(Map context, CancellationToken ct = default) => _select(context, ct);
+    protected override Task<string> Select(IMap context, CancellationToken ct = default) => _select(context, ct);
 }
 
 public abstract class CaseNode<TNode>(string? tag, IServiceProvider services)
@@ -52,7 +52,7 @@ public abstract class CaseNode<TNode>(string? tag, IServiceProvider services)
             => current + choice.Validate(visited);
     }
 
-    protected override async Task<INode?> SelectPath(Map context, CancellationToken ct = default) {
+    protected override async Task<INode?> SelectPath(IMap context, CancellationToken ct = default) {
         ct.ThrowIfCancellationRequested();
         var key = await Select(context, ct);
         var choice = Choices.GetValueOrDefault(key)
@@ -61,9 +61,9 @@ public abstract class CaseNode<TNode>(string? tag, IServiceProvider services)
         return await choice.Run(context, ct);
     }
 
-    protected abstract Task<string> Select(Map context, CancellationToken ct = default);
+    protected abstract Task<string> Select(IMap context, CancellationToken ct = default);
 
-    protected sealed override Task UpdateState(Map context, CancellationToken ct = default)
+    protected sealed override Task UpdateState(IMap context, CancellationToken ct = default)
         => Task.CompletedTask;
 
     public sealed override void ConnectTo(INode? next) {

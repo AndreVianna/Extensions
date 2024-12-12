@@ -28,6 +28,8 @@ global using Microsoft.Extensions.Logging.Abstractions;
 global using NUlid;
 
 global using RadLine;
+global using RadLine.Commands;
+global using RadLine.Prompts;
 
 global using Spectre.Console;
 

@@ -6,7 +6,7 @@ public partial class NodeTests {
         public async Task ComplexWorkflow_WithMultipleNodeTypes_ExecutesCorrectly() {
             using var context = new Map();
             var start = CreateComplexWorkflow();
-            var workflow = new Workflow(start, context);
+            var workflow = new Workflow("1", start, context);
 
             await workflow.Run();
 
@@ -68,7 +68,7 @@ public partial class NodeTests {
             public IReadOnlyList<TimeSpan> Delays { get; } = [];
             public byte MaxRetries => 3;
 
-            public Task Execute(Func<Map, CancellationToken, Task> action, Map ctx, CancellationToken ct = default) {
+            public Task Execute(Func<IMap, CancellationToken, Task> action, IMap ctx, CancellationToken ct = default) {
                 onExecute();
                 return action(ctx, ct);
             }

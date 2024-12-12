@@ -10,5 +10,5 @@ public interface INode {
 
     void ConnectTo(INode? next);
     Result Validate(ISet<INode>? visited = null);
-    Task<INode?> Run(Map context, CancellationToken ct = default);
+    Task<INode?> Run(IMap context, CancellationToken ct = default);
 }

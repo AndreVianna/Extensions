@@ -114,7 +114,7 @@ public partial class NodeTests {
 
         private sealed class TestRetryPolicy(byte maxRetries = RetryPolicy.DefaultMaximumRetries, uint failedTries = 0)
             : RetryPolicy(maxRetries) {
-            protected override async Task<bool> TryExecute(Func<Map, CancellationToken, Task> action, Map ctx, CancellationToken ct) {
+            protected override async Task<bool> TryExecute(Func<IMap, CancellationToken, Task> action, IMap ctx, CancellationToken ct) {
                 TryCount++;
                 await action(ctx, ct);
                 return TryCount > failedTries;

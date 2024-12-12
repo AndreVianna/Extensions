@@ -41,13 +41,13 @@ public abstract class Node<TNode>
 
     protected virtual Result IsValid(ISet<INode> visited) => Success();
 
-    public async Task<INode?> Run(Map context, CancellationToken ct = default) {
+    public async Task<INode?> Run(IMap context, CancellationToken ct = default) {
         await UpdateState(context, ct);
         return await SelectPath(context, ct);
     }
 
-    protected abstract Task UpdateState(Map context, CancellationToken ct = default);
-    protected abstract Task<INode?> SelectPath(Map context, CancellationToken ct = default);
+    protected abstract Task UpdateState(IMap context, CancellationToken ct = default);
+    protected abstract Task<INode?> SelectPath(IMap context, CancellationToken ct = default);
 
     public override int GetHashCode() => HashCode.Combine(Id, Tag ?? string.Empty);
 }

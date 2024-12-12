@@ -49,7 +49,7 @@ public abstract class RetryPolicy<TPolicy>
         return delays;
     }
 
-    public async Task Execute(Func<Map, CancellationToken, Task> action, Map ctx, CancellationToken ct = default) {
+    public async Task Execute(Func<IMap, CancellationToken, Task> action, IMap ctx, CancellationToken ct = default) {
         var attempts = 0;
         while (true) {
             attempts++;
@@ -71,7 +71,7 @@ public abstract class RetryPolicy<TPolicy>
         }
     }
 
-    protected virtual async Task<bool> TryExecute(Func<Map, CancellationToken, Task> action, Map ctx, CancellationToken ct) {
+    protected virtual async Task<bool> TryExecute(Func<IMap, CancellationToken, Task> action, IMap ctx, CancellationToken ct) {
         await action(ctx, ct);
         return true;
     }

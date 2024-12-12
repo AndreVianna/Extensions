@@ -1,12 +1,12 @@
 ﻿namespace DotNetToolbox.Environment;
 
-public class SelectionPromptBuilder(string prompt, IOutput output)
-    : SelectionPromptBuilder<string, string>(prompt, value => value, output);
+public class SelectionPromptBuilder(string prompt)
+    : SelectionPromptBuilder<string, string>(prompt, value => value);
 
-public class SelectionPromptBuilder<TValue>(string prompt, Func<TValue, object> selectKey, IOutput output)
-    : SelectionPromptBuilder<TValue, object>(prompt, selectKey, output);
+public class SelectionPromptBuilder<TValue>(string prompt, Func<TValue, object> selectKey)
+    : SelectionPromptBuilder<TValue, object>(prompt, selectKey);
 
-public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TKey> selectKey, IOutput output)
+public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TKey> selectKey)
     : ISelectionPromptBuilder<TValue, TKey>
     where TKey : notnull {
     private record Choice(TValue? Value, TKey Key, string Text, ChoicePosition Position);
@@ -39,7 +39,7 @@ public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TK
         return this;
     }
 
-    private SelectionPromptBuilder<TValue, TKey> AddChoice(TValue? choice, TKey key, string? text, bool isDefault, ChoicePosition position = ChoicePosition.Sorted) {
+    private SelectionPromptBuilder<TValue, TKey> AddChoice(TValue? choice, TKey key, string? text, bool isDefault, ChoicePosition position = default) {
         if (_choices.Any(c => c.Key.Equals(IsNotNull(key)))) throw new InvalidOperationException("Choice key must be unique.");
         text ??= string.Empty;
         if (_choices.Any(c => c.Text.Equals(text, StringComparison.Ordinal))) throw new InvalidOperationException("Choice text must be unique.");
@@ -64,25 +64,25 @@ public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TK
         }
     }
 
-    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, string text, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, string text, ChoicePosition position = default)
         => AddChoice(default, key, text, isDefault: true, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, TValue choice, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, TValue choice, ChoicePosition position = default)
         => AddChoice(choice, key, _displayAs(choice), isDefault: true, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TValue choice, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TValue choice, ChoicePosition position = default)
         => AddChoice(choice, _selectKey(choice), _displayAs(choice), isDefault: true, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, string text, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, string text, ChoicePosition position = default)
         => AddChoice(default, key, text, isDefault: false, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, TValue choice, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, TValue choice, ChoicePosition position = default)
         => AddChoice(choice, key, _displayAs(choice), isDefault: false, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddChoice(TValue choice, ChoicePosition position = ChoicePosition.Sorted)
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TValue choice, ChoicePosition position = default)
         => AddChoice(choice, _selectKey(choice), _displayAs(choice), isDefault: false, position);
 
-    public SelectionPromptBuilder<TValue, TKey> AddChoices(IEnumerable<TValue> choices, ChoicePosition position = ChoicePosition.Sorted) {
+    public SelectionPromptBuilder<TValue, TKey> AddChoices(IEnumerable<TValue> choices, ChoicePosition position = default) {
         choices = position == ChoicePosition.AtStart ? choices.Reverse() : choices;
         foreach (var choice in choices) AddChoice(choice, position);
         return this;
@@ -94,14 +94,14 @@ public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TK
         var prompt = new SelectionPrompt<int>();
         prompt.UseConverter(i => _choices[i].Text);
         prompt.AddChoices(_choices.Select((_, i) => i));
-        var defaultText = _choices.First(i => i.Key.Equals(_defaultKey));
+        var defaultText = _choices.Find(i => i.Key.Equals(_defaultKey));
         var isQuestion = _prompt.EndsWith('?');
         _prompt = HasDefault ? $"{_prompt} [blue]({defaultText})[/]" : _prompt;
         prompt.Title(_prompt);
         var result = await prompt.ShowAsync(AnsiConsole.Console, ct);
         var resultText = prompt.Converter?.Invoke(result) ?? string.Empty;
         var separator = isQuestion ? string.Empty : ":";
-        if (_showResult) output.WriteLine($"{_prompt}{separator} [green]{resultText}[/]");
+        if (_showResult) AnsiConsole.WriteLine($"{_prompt}{separator} [green]{resultText}[/]");
         return _choices[result].Value!;
     }
 }

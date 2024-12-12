@@ -42,40 +42,19 @@ public class Map(IEnumerable<KeyValuePair<string, object>>? source = null)
         }
         return result;
     }
-    public TValue GetValue<TValue>(string key, TValue defaultValue)
-        where TValue : notnull
+    public TValue? GetValueAsOrDefault<TValue>(string key, TValue? defaultValue = default)
         => TryGetValueAs<TValue>(key, out var value)
                ? value
                : defaultValue;
 
-    public TValue? GetValueAs<TValue>(string key)
-        where TValue : class
-        => TryGetValueAs<TValue>(key, out var value)
-            ? value
-            : default;
-
-    public List<TValue> GetList<TValue>(string key)
-        => TryGetList<TValue>(key, out var value)
-               ? value
-               : [];
-
-    public List<TValue> GetRequiredList<TValue>(string key)
-        => TryGetList<TValue>(key, out var list)
-               ? list
-               : throw new InvalidCastException("The value does not exist or does not match the requested type.");
-
-    public TValue GetRequiredValueAs<TValue>(string key)
-        => TryGetValueAs<TValue>(key, out var value)
-               ? value
-               : throw new InvalidCastException("The value does not exist or does not match the requested type.");
-
-    public bool TryGetList<TValue>(string key, out List<TValue> value) {
-        value = [];
-        if (!TryGetValueAs<List<object>>(key, out var list))
-            return false;
-        value = list.OfType<TValue>().ToList();
-        return list.Count == 0 || value.Count != 0;
-    }
+    public TValue GetValueAs<TValue>(string key)
+        => !TryGetValue(key, out var value)
+               ? throw new InvalidOperationException($"The value for key '{key}' was not found.")
+               : value switch {
+                   TValue result => result,
+                   not null when value.GetType().IsAssignableTo(typeof(TValue)) => (TValue)value,
+                   _ => throw new InvalidCastException($"The value for key '{key}' cannot be converted to '{typeof(TValue).Name}'."),
+               };
 
     public bool TryGetValueAs<TValue>(string key, [MaybeNullWhen(false)] out TValue value) {
         value = default;
@@ -84,8 +63,7 @@ public class Map(IEnumerable<KeyValuePair<string, object>>? source = null)
             case TValue result:
                 value = result;
                 return true;
-            case not null when obj.GetType()
-                                  .IsAssignableTo(typeof(TValue)):
+            case not null when obj.GetType().IsAssignableTo(typeof(TValue)):
                 value = (TValue)obj;
                 return true;
             default: return false;
@@ -148,6 +126,12 @@ public class Map<TValue>
         => TryGetValue(key, out var value)
                ? value
                : defaultValue;
+    public TValue GetValue(string key)
+        => TryGetValue(key, out var value)
+               ? value
+               : throw new InvalidOperationException($"The value for key '{key}' was not found.");
+    public bool TryGetValue(string key, [MaybeNullWhen(false)] out TValue value)
+        => _data.TryGetValue(key, out value);
 
     public ICollection<string> Keys => _data.Keys;
     public ICollection<TValue> Values => _data.Values;
@@ -174,8 +158,6 @@ public class Map<TValue>
         }
     }
 
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out TValue value)
-        => _data.TryGetValue(key, out value);
     public bool ContainsKey(string key)
         => _data.ContainsKey(key);
 

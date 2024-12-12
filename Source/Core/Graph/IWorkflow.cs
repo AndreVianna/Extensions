@@ -1,9 +1,12 @@
 ﻿
 namespace DotNetToolbox.Graph;
 
-public interface IWorkflow {
+public interface IWorkflow : IWorkflow<Map>;
+
+public interface IWorkflow<out TContext>
+    where TContext : IMap {
     string Id { get; }
-    Map Map { get; }
+    TContext Context { get; }
     INode StartNode { get; }
 
     Result Validate();

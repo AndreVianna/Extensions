@@ -23,10 +23,10 @@ public abstract class ExitNode<TNode>(string? tag, IServiceProvider services)
     : Node<TNode>(tag, services),
       IExitNode
     where TNode : ExitNode<TNode> {
-    protected override Task<INode?> SelectPath(Map context, CancellationToken ct = default)
+    protected override Task<INode?> SelectPath(IMap context, CancellationToken ct = default)
         => Task.FromResult<INode?>(null);
 
-    protected override Task UpdateState(Map context, CancellationToken ct = default)
+    protected override Task UpdateState(IMap context, CancellationToken ct = default)
         => Task.CompletedTask;
 
     public override void ConnectTo(INode? next)

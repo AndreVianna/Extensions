@@ -1,19 +1,14 @@
 ﻿namespace DotNetToolbox.Graph;
 
-public class Workflow(string id,
-                      INode start,
-                      Map context,
-                      IDateTimeProvider? dateTime = null,
-                      ILoggerFactory? loggerFactory = null)
-    : IWorkflow {
-    private uint _runCount;
-
-    public Workflow(INode start,
+public class Workflow
+    : Workflow<Map>,
+      IWorkflow {
+    public Workflow(string id,
+                    INode start,
                     Map context,
-                    IStringGuidProvider guid,
                     IDateTimeProvider? dateTime = null,
                     ILoggerFactory? loggerFactory = null)
-        : this(guid.CreateSortable(),
+        : base(id,
                start,
                context,
                dateTime,
@@ -24,16 +19,36 @@ public class Workflow(string id,
                     Map context,
                     IDateTimeProvider? dateTime = null,
                     ILoggerFactory? loggerFactory = null)
-        : this(start,
+        : base(start,
                context,
-               StringGuidProvider.Default,
+               dateTime,
+               loggerFactory) {
+    }
+}
+
+public class Workflow<TContext>(string id,
+                      INode start,
+                      TContext context,
+                      IDateTimeProvider? dateTime = null,
+                      ILoggerFactory? loggerFactory = null)
+    : IWorkflow<TContext>
+    where TContext : IMap {
+    private uint _runCount;
+
+    public Workflow(INode start,
+                    TContext context,
+                    IDateTimeProvider? dateTime = null,
+                    ILoggerFactory? loggerFactory = null)
+        : this(StringGuidProvider.Default.CreateSortable(),
+               start,
+               context,
                dateTime,
                loggerFactory) {
     }
 
     public string Id { get; } = id;
     public INode StartNode { get; } = IsNotNull(start);
-    public Map Map { get; } = IsNotNull(context);
+    public TContext Context { get; } = IsNotNull(context);
 
     public Result Validate() => ValidateNode(StartNode);
 
@@ -60,7 +75,7 @@ public class Workflow(string id,
     }
 
     public Task Run(CancellationToken ct = default) {
-        var runner = new Runner(++_runCount, this, dateTime, loggerFactory);
+        var runner = new Runner<TContext>(++_runCount, (IWorkflow<TContext>)this, dateTime, loggerFactory);
         return runner.Run(ct);
     }
 }

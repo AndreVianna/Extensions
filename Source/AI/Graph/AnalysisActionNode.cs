@@ -2,7 +2,7 @@
 
 public class AnalysisActionNode(string tag, IServiceProvider services)
     : ActionNode<AnalysisActionNode>(tag, services) {
-    protected override async System.Threading.Tasks.Task Execute(Map context, CancellationToken ct = default) {
+    protected override async System.Threading.Tasks.Task Execute(IMap context, CancellationToken ct = default) {
         var input = context["AnalysisInput"] as string
                  ?? throw new InvalidOperationException("Analysis input not found in context");
 

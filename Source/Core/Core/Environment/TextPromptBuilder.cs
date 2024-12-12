@@ -1,100 +1,83 @@
-﻿namespace DotNetToolbox.Environment;
+namespace DotNetToolbox.Environment;
 
-public class TextPromptBuilder<TValue>(string prompt, IOutput output)
-    : ITextPromptBuilder<TValue> {
-    private readonly List<TValue> _choices = [];
-    private string _prompt = IsNotNullOrWhiteSpace(prompt);
-    private bool _addLineBreak;
-    private bool _isRequired = true;
-    private Func<TValue, Result>? _validator;
-    private Func<TValue, string>? _converter;
-    private char? _maskChar;
-    private TValue? _defaultValue;
+public class TextPromptBuilder(string prompt, string defaultValue)
+    : ITextPromptBuilder {
+    private uint _maxLines;
+    private Func<string, Result>? _validator;
 
-    [MemberNotNullWhen(true, nameof(_defaultValue))]
-    private bool HasDefault { get; set; }
-
-    public TextPromptBuilder<TValue> ConvertWith(Func<TValue, string> converter) {
-        _converter = converter;
-        return this;
+    public TextPromptBuilder(string prompt)
+        : this(prompt, string.Empty) {
     }
 
-    public TextPromptBuilder<TValue> WithDefault(TValue defaultValue) {
-        if (defaultValue is null) return this;
-        _defaultValue = defaultValue;
-        HasDefault = _defaultValue is not null
-                  && (_defaultValue is not string text || !string.IsNullOrEmpty(text));
-        return this;
+    public TextPromptBuilder()
+        : this(string.Empty, string.Empty) {
     }
 
-    public TextPromptBuilder<TValue> StartAnswerOnANewLine() {
-        _addLineBreak = true;
-        return this;
-    }
-
-    public TextPromptBuilder<TValue> UseMask(char? maskChar) {
-        _maskChar = maskChar ?? '*';
-        return this;
-    }
-
-    public TextPromptBuilder<TValue> AddValidation(Func<TValue, Result> validate) {
+    public TextPromptBuilder AddValidation(Func<string, Result> validate) {
         var oldValidator = _validator;
         _validator = value => {
-            var result = oldValidator is null ? Result.Success() : oldValidator(value);
+            var result = oldValidator?.Invoke(value) ?? Result.Success();
             result += validate(value);
             return result;
         };
         return this;
     }
 
-    public TextPromptBuilder<TValue> ShowOptionalFlag() {
-        _isRequired = false;
+    public TextPromptBuilder MaximumNumberOfLines(uint lines) {
+        _maxLines = lines;
         return this;
     }
 
-    public TextPromptBuilder<TValue> AddChoices(IEnumerable<TValue> choices) {
-        _choices.AddRange(choices);
-        return this;
+    public string Show() => ShowAsync().GetAwaiter().GetResult();
+
+    public async Task<string> ShowAsync(CancellationToken ct = default) {
+        var firstLine = new Markup("[yellow]>[/]");
+        var otherLines = new Markup("[yellow]|[/]");
+        var editor = new TextEditor {
+            MaximumNumberOfLines = _maxLines,
+            PromptPrefix = new PromptPrefix(firstLine, otherLines),
+            Text = defaultValue,
+            Validator = BuildValidator(),
+        };
+
+        var formattedPrompt = FormatPrompt(editor);
+        var result = string.Empty;
+        while (editor.State == TextEditorState.Active) {
+            AnsiConsole.WriteLine(formattedPrompt);
+            result = await editor.ReadText(ct) ?? result;
+            if (editor.State is not TextEditorState.Invalid) continue;
+            AnsiConsole.WriteLine(editor.ErrorMessage);
+            AnsiConsole.WriteLine("[yellow]Please try again.[/]");
+            AnsiConsole.WriteLine();
+            editor.ResetState();
+        }
+
+        return result;
     }
 
-    public TextPromptBuilder<TValue> AddChoices(TValue choice, params TValue[] otherChoices)
-        => AddChoices([choice, .. otherChoices]);
+    private string FormatPrompt(TextEditor editor) {
+        var formatedPrompt = $"[teal]{prompt}[/]";
+        if (_maxLines != 1) {
+            formatedPrompt += $"{System.Environment.NewLine}[gray]Press ENTER to insert a new line, CTRL+ENTER to submit, and ESCAPE to cancel.[/]";
+            editor.KeyBindings.Add<NewLineCommand>(ConsoleKey.Enter);
+            editor.KeyBindings.Add<SubmitCommand>(ConsoleKey.Enter, ConsoleModifiers.Control);
+        }
+        else {
+            formatedPrompt += $"{System.Environment.NewLine}[gray]Press ENTER to submit and ESCAPE to cancel.[/]";
+        }
 
-    private Func<TValue, ValidationResult> BuildValidator()
-        => value => {
-            var result = _validator?.Invoke(value) ?? Result.Success();
+        return formatedPrompt;
+    }
+
+    private Func<string, ValidationResult>? BuildValidator()
+        => _validator is null ? null : value => {
+            var result = _validator(value);
             if (result.IsSuccess) return ValidationResult.Success();
             if (result.Errors.Count == 1) return ValidationResult.Error($"[red]{result.Errors[0].Message}[/]");
             var errors = new StringBuilder();
-            errors.AppendLine("[red]The entry is invalid.[/]");
+            errors.AppendLine("[red]The input value is invalid.[/]");
             foreach (var item in result.Errors)
                 errors.AppendLine($"[red] - {item.Message}[/]");
             return ValidationResult.Error(errors.ToString());
         };
-
-    public TValue Show() => ShowAsync().GetAwaiter().GetResult();
-
-    public Task<TValue> ShowAsync(CancellationToken ct = default) {
-        _prompt = $"[teal]{_prompt}[/]";
-        if (!_isRequired) _prompt = "[green](optional)[/] " + _prompt;
-        if (_addLineBreak) _prompt += $"{output.NewLine}{output.Prompt}";
-        var prompt = new TextPrompt<TValue>(_prompt);
-        prompt.AllowEmpty().ChoicesStyle(new(foreground: Color.Blue));
-        if (_maskChar is not null) prompt = prompt.Secret(_maskChar);
-        if (HasDefault) prompt.DefaultValue(_defaultValue);
-        if (_choices.Count > 0) {
-            prompt.AddChoices(_choices);
-            prompt.ShowChoices();
-            AddValidation(ValidateChoices);
-        }
-        if (_converter is not null) prompt.Converter = _converter;
-        if (_validator is not null) prompt.Validator = BuildValidator();
-
-        return prompt.ShowAsync(AnsiConsole.Console, ct);
-    }
-
-    private Result ValidateChoices(TValue value)
-        => _choices.Count == 0 || _choices.Contains(value)
-               ? Result.Success()
-               : Result.Invalid("Please select one of the available options");
 }

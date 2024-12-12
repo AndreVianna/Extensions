@@ -405,7 +405,7 @@ public sealed class WorkflowGraphTests {
     // ReSharper disable once ClassNeverInstantiated.Local - Test class
     private sealed class CustomAction(string? tag, IServiceProvider services)
                 : ActionNode<CustomAction>(tag, services) {
-        protected override Task Execute(Map context, CancellationToken ct = default)
+        protected override Task Execute(IMap context, CancellationToken ct = default)
             => Task.CompletedTask;
     }
 }

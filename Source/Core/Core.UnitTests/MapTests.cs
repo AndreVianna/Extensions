@@ -32,7 +32,7 @@ public class MapTests {
         var map = new Map(new Dictionary<string, object> { { "key", 123 } });
 
         // Act
-        var value = map.GetValue("key", 0);
+        var value = map.GetValueOrDefault("key", 0);
 
         // Assert
         value.Should().Be(123);

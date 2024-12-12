@@ -1,6 +1,7 @@
 ﻿namespace DotNetToolbox.Graph;
 
-public interface IRunner {
+public interface IRunner<out TContext>
+    where TContext : IMap {
     public string WorkflowId { get; }
     public uint Id { get; }
     public bool IsRunning { get; }
@@ -12,8 +13,8 @@ public interface IRunner {
 
     Task Run(CancellationToken ct = default);
 
-    Func<IWorkflow, CancellationToken, Task>? OnStartingWorkflow { set; }
-    Func<IWorkflow, INode, CancellationToken, Task<bool>>? OnExecutingNode { set; }
-    Func<IWorkflow, INode, INode?, CancellationToken, Task<bool>>? OnNodeExecuted { set; }
-    Func<IWorkflow, CancellationToken, Task>? OnWorkflowEnded { set; }
+    Func<IWorkflow<TContext>, CancellationToken, Task>? OnStartingWorkflow { set; }
+    Func<IWorkflow<TContext>, INode, CancellationToken, Task<bool>>? OnExecutingNode { set; }
+    Func<IWorkflow<TContext>, INode, INode?, CancellationToken, Task<bool>>? OnNodeExecuted { set; }
+    Func<IWorkflow<TContext>, CancellationToken, Task>? OnWorkflowEnded { set; }
 }
