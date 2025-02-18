@@ -41,7 +41,7 @@ public abstract class CaseNode<TNode>(string? tag, IServiceProvider services)
     protected override Result IsValid(ISet<INode> visited) {
         var result = base.IsValid(visited);
         if (Choices.Count == 0)
-            result += new ValidationError("The case node has no choices.", Token?.ToSource());
+            result += new OperationError("The case node has no choices.", Token?.ToSource());
         var choices = Choices.Values
                              .Where(c => c is not null)
                              .Cast<INode>()

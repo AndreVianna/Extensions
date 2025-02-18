@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.AI.Tools;
+﻿using DotNetToolbox.Validation;
+
+namespace DotNetToolbox.AI.Tools;
 
 public class ToolArgument
     : Map, IValidatable {

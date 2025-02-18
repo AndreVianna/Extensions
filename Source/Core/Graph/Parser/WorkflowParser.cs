@@ -206,7 +206,7 @@ public sealed class WorkflowParser {
     private void AddError(string? message, Token? token = null) {
         var source = (token ?? _tokens.Current).ToSource();
         message ??= "Unknown error.";
-        _errors.Add(new ValidationError(message, source));
+        _errors.Add(new OperationError(message, source));
     }
 
     private int CountToken(TokenType type) {

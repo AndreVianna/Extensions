@@ -1,3 +1,5 @@
+using DotNetToolbox.Validation;
+
 namespace DotNetToolbox.Data.Storages;
 
 public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
@@ -115,7 +117,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         foreach (var key in keys) {
             var item = FindByKey(key);
             if (item is null) {
-                result += new ValidationError($"Item with key {key} not found.", nameof(keys));
+                result += new OperationError($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             setItem(item);
@@ -240,7 +242,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new ValidationError($"Item with key {key} not found.", nameof(keys));
+                result += new OperationError($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             setItem(item);
@@ -253,7 +255,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new ValidationError($"Item with key {key} not found.", nameof(keys));
+                result += new OperationError($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             await setItem(item, ct);
@@ -267,7 +269,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new ValidationError($"Item with key {key} not found.", nameof(keys));
+                result += new OperationError($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             Data.Remove(item);
@@ -408,7 +410,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     private Result TryRemove(Expression<Func<TItem, bool>> predicate) {
         var itemToRemove = Data.AsQueryable().FirstOrDefault(predicate);
         if (itemToRemove is null)
-            return new ValidationError("Item not found.", nameof(predicate));
+            return new OperationError("Item not found.", nameof(predicate));
         Data.Remove(itemToRemove);
         return Result.Success();
     }
@@ -581,7 +583,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     private async Task<Result> TryRemoveAsync(Expression<Func<TItem, bool>> predicate, CancellationToken ct = default) {
         var itemToRemove = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
         if (itemToRemove is null)
-            return new ValidationError("Item not found.", nameof(predicate));
+            return new OperationError("Item not found.", nameof(predicate));
         Data.Remove(itemToRemove);
         return Result.Success();
     }

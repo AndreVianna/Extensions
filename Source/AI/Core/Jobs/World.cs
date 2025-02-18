@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.AI.Jobs;
+﻿using DotNetToolbox.Validation;
+
+namespace DotNetToolbox.AI.Jobs;
 
 public class World(IDateTimeProvider? dateTime = null)
     : Map,

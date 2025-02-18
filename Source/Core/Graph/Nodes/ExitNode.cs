@@ -30,7 +30,7 @@ public abstract class ExitNode<TNode>(string? tag, IServiceProvider services)
         => Task.CompletedTask;
 
     public override void ConnectTo(INode? next)
-        => throw new ValidationException("An exit node cannot be connected to another node.", Token?.ToSource() ?? Tag ?? $"{Id}");
+        => throw new OperationException("An exit node cannot be connected to another node.", Token?.ToSource() ?? Tag ?? $"{Id}");
 
     public abstract int ExitCode { get; }
 }

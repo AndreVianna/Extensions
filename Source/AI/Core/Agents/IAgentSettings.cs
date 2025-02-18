@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.AI.Agents;
+﻿using DotNetToolbox.Validation;
+
+namespace DotNetToolbox.AI.Agents;
 
 public interface IAgentSettings : IValidatable {
     public static readonly JsonSerializerOptions SerializerOptions = new() {

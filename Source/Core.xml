@@ -1,0 +1,4020 @@
+<root name="Core"> 
+  <file name="DotNetToolbox.Core.csproj"><![CDATA[ 
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>DotNetToolbox</RootNamespace>
+    <PackageId>DotNetToolbox.Core</PackageId>
+    <Title>DotNetToolbox Core Library</Title>
+    <Version>9.0.0</Version>
+    <Authors>Andre Vianna</Authors>
+    <Company>D0tN3tC0d3r5</Company>
+    <PackageTags>DotNet;Toolbox;Core;Common;Library;Pagination;DateTime;FileSystem;Results;Validation;Azure;GUID</PackageTags>
+    <PackageProjectUrl>https://github.com/D0tN3tC0d3r5/DotNetToolbox</PackageProjectUrl>
+    <Description>A versatile C# library for .NET 8, designed to enhance development by providing a range of utilities and patterns. It simplifies complex tasks and improves code testability.</Description>
+    <Copyright>© Andre Vianna 2023</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>
+      DotNetToolbox.Core Version 9.0.0
+
+      Stable release of the DotNetToolbox.Core library, a comprehensive suite of utilities and patterns designed to enhance .NET 8 development. This library provides developers with a robust set of tools to simplify complex tasks, improve testability, and streamline everyday coding activities.
+    </PackageReleaseNotes>
+    <Product>DotNetToolbox.Core</Product>
+    <PackageOutputPath>pkgs\$(Configuration)</PackageOutputPath>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <AssemblyName>DotNetToolbox.Core</AssemblyName>
+    <Deterministic>false</Deterministic>
+    <AssemblyVersion>9.0.0.*</AssemblyVersion>
+    <FileVersion>9.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>DotNetToolbox.snk</AssemblyOriginatorKeyFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <NoWarn>$(NoWarn);DV2001;DV2002;CS8002</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="pkgs\**" />
+    <EmbeddedResource Remove="pkgs\**" />
+    <None Remove="pkgs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\icon.png">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="README.md">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\..\LICENSE">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="NUlid" Version="1.7.2" />
+    <PackageReference Include="RadLine" Version="0.8.1-local.3" />
+    <PackageReference Include="Spectre.Console" Version="0.49.2-preview.0.69" />
+    <PackageReference Include="Spectre.Console.Analyzer" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).UnitTests" PublicKey="00240000048000009400000006020000002400005253413100040000010001003d1638cec9e06e22b1e23f1d95d51a425705c4148223b9907aea57442c94edbac4002079cb033dac4db6fe167d36f0a2674bbd95b729eb3130456a967859a5f7b12aa661f1e91f7106524560014fbe3744d5aaba8102cf396bb3ff4481bf7f4b13dfc4259342e76d306dae2ebcd8df7bc170309cd9d69277090e05f513681daf" />
+  </ItemGroup>
+
+</Project>
+  ]]></file> 
+  <file name="GlobalUsings.cs"><![CDATA[ 
+// Global using directives
+
+global using System.Collections;
+global using System.Collections.Async.Generic;
+global using System.Collections.Concurrent;
+global using System.Diagnostics;
+global using System.Diagnostics.CodeAnalysis;
+global using System.Globalization;
+global using System.Net;
+global using System.Numerics;
+global using System.Reflection;
+global using System.Runtime.CompilerServices;
+global using System.Text;
+global using System.Text.Json;
+global using System.Text.RegularExpressions;
+
+global using DotNetToolbox;
+global using DotNetToolbox.Environment;
+global using DotNetToolbox.Results;
+global using DotNetToolbox.Sequencers;
+global using DotNetToolbox.Singleton;
+
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Logging.Abstractions;
+
+global using NUlid;
+
+global using RadLine;
+global using RadLine.Commands;
+global using RadLine.Prompts;
+
+global using Spectre.Console;
+
+global using static System.Ensure;
+global using static DotNetToolbox.Constants.Messages;
+
+global using Syntax = System.Diagnostics.CodeAnalysis.StringSyntaxAttribute;
+  ]]></file> 
+  <file name="IMap.cs"><![CDATA[ 
+﻿namespace DotNetToolbox;
+
+public interface IMap
+    : IMap<object> {
+    TValue GetValueAs<TValue>(string key);
+    TValue? GetValueAsOrDefault<TValue>(string key, TValue? defaultValue = default);
+    bool TryGetValueAs<TValue>(string key, [MaybeNullWhen(false)] out TValue value);
+}
+
+[SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "Does not apply")]
+public interface IMap<TValue>
+    : IDictionary<string, TValue>,
+      IDisposable {
+    bool Remove(string key, bool disposeValue = true);
+    TValue? GetValueOrDefault(string key, TValue? defaultValue = default);
+    TValue GetValue(string key);
+}
+  ]]></file> 
+  <file name="IPack.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System;
+
+public interface IPack<out TFirst, out TSecond, out TThird>
+    : IPack<TFirst, TSecond> {
+    TThird Third { get; }
+}
+
+public interface IPack<out TFirst, out TSecond> {
+    TFirst First { get; }
+    TSecond Second { get; }
+}
+  ]]></file> 
+  <file name="Map.cs"><![CDATA[ 
+﻿namespace DotNetToolbox;
+
+public class Map(IEnumerable<KeyValuePair<string, object>>? source = null)
+    : Map<object>(source),
+      IMap {
+    public static Map Empty() => [];
+    public static Map<TValue> Empty<TValue>()
+        where TValue : notnull
+        => [];
+
+    public static Map FromValue(string key, object value)
+        => new() { [key] = value };
+
+    public static Map FromMap(IEnumerable<KeyValuePair<string, object>> dict)
+        => new(dict);
+    public static Map<TValue> FromMap<TValue>(IEnumerable<KeyValuePair<string, TValue>> dict)
+        where TValue : notnull
+        => new(dict);
+    public static Map FromList(IEnumerable<object> list, Func<object, string> keySelector)
+        => new(list.ToDictionary(keySelector));
+    public static Map<TValue> FromList<TValue>(IEnumerable<TValue> list, Func<TValue, string> keySelector)
+        where TValue : notnull
+        => new(list.ToDictionary(keySelector));
+    public static Map<Map<string>> FromTable(IEnumerable<IEnumerable<string>> table) {
+        var rows = table.ToArray(r => r.ToArray());
+        if (rows.Length < 2 || rows[0].Length == 0) return Empty<Map<string>>();
+        var result = new Map<Map<string>>();
+        var headers = new Map<string>();
+        foreach (var col in rows[0]) {
+            var header = col.Split(':');
+            headers[header[0]] = header.Length > 1 ? header[1] : string.Empty;
+        }
+        result["Header"] = FromMap(headers);
+        for (var row = 1; row < rows.Length; row++) {
+            var rowMap = new Map<string>();
+            for (var col = 0; col < rows[row].Length; col++) {
+                var cell = rows[row][col];
+                var header = headers.ElementAtOrDefault(col).Key;
+                rowMap[header] = cell;
+            }
+            result[row.ToString()] = rowMap;
+        }
+        return result;
+    }
+    public TValue? GetValueAsOrDefault<TValue>(string key, TValue? defaultValue = default)
+        => TryGetValueAs<TValue>(key, out var value)
+               ? value
+               : defaultValue;
+
+    public TValue GetValueAs<TValue>(string key)
+        => !TryGetValue(key, out var value)
+               ? throw new InvalidOperationException($"The value for key '{key}' was not found.")
+               : value switch {
+                   TValue result => result,
+                   not null when value.GetType().IsAssignableTo(typeof(TValue)) => (TValue)value,
+                   _ => throw new InvalidCastException($"The value for key '{key}' cannot be converted to '{typeof(TValue).Name}'."),
+               };
+
+    public bool TryGetValueAs<TValue>(string key, [MaybeNullWhen(false)] out TValue value) {
+        value = default;
+        if (!TryGetValue(key, out var obj)) return false;
+        switch (obj) {
+            case TValue result:
+                value = result;
+                return true;
+            case not null when obj.GetType().IsAssignableTo(typeof(TValue)):
+                value = (TValue)obj;
+                return true;
+            default: return false;
+        }
+    }
+}
+
+public class Map<TValue>
+    : MapBase,
+      IMap<TValue> {
+    private readonly ConcurrentDictionary<string, TValue> _data = [];
+
+    private readonly HashSet<string> _myKeys = [];
+    private bool _isDisposed;
+
+    public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool isDisposing) {
+        if (_isDisposed) return;
+        if (isDisposing)
+            foreach (var key in _myKeys) Remove(key);
+        _isDisposed = true;
+    }
+
+    public Map(IEnumerable<KeyValuePair<string, TValue>>? source = null) {
+        _data = source switch {
+            Map<TValue> map => map._data,
+            not null => new(source),
+            _ => _data,
+        };
+        _myKeys.AddRange(_data.Keys);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_data).GetEnumerator();
+    public IEnumerator<KeyValuePair<string, TValue>> GetEnumerator() => _data.GetEnumerator();
+
+    public bool IsReadOnly => false;
+    public int Count => _data.Count;
+
+    [AllowNull]
+    public TValue this[string key] {
+        get => _data[key];
+        set {
+            lock (_data) {
+#pragma warning disable IDE0011 // Add braces
+                if (value is null) Remove(key);
+#pragma warning restore IDE0011 // Add braces
+                else {
+                    if (_data.TryGetValue(key, out var item) && item is IDisposable) Remove(key);
+                    _data[key] = value;
+                }
+            }
+        }
+    }
+
+    public TValue? GetValueOrDefault(string key, TValue? defaultValue = default)
+        => TryGetValue(key, out var value)
+               ? value
+               : defaultValue;
+    public TValue GetValue(string key)
+        => TryGetValue(key, out var value)
+               ? value
+               : throw new InvalidOperationException($"The value for key '{key}' was not found.");
+    public bool TryGetValue(string key, [MaybeNullWhen(false)] out TValue value)
+        => _data.TryGetValue(key, out value);
+
+    public ICollection<string> Keys => _data.Keys;
+    public ICollection<TValue> Values => _data.Values;
+    public void Clear() {
+        foreach (var myKey in _myKeys) Remove(myKey);
+    }
+
+    public void Add(string key, TValue value)
+        => _data.AddOrUpdate(key,
+                             k => {
+                                 if (!ContainsKey(k)) _myKeys.Add(k);
+                                 return this[k] = IsNotNull(value);
+                             },
+                             (k, _) => this[k] = IsNotNull(value));
+
+    public bool Remove(string key) => Remove(key, true);
+    public bool Remove(string key, bool disposeValue) {
+        lock (_data) {
+            var removed = _data.TryRemove(key, out var value);
+            if (!removed || !_myKeys.Contains(key)) return removed;
+            _myKeys.Remove(key);
+            if (disposeValue && value is IDisposable disposable) disposable.Dispose();
+            return removed;
+        }
+    }
+
+    public bool ContainsKey(string key)
+        => _data.ContainsKey(key);
+
+    public void Add(KeyValuePair<string, TValue> item) => Add(item.Key, item.Value);
+    bool ICollection<KeyValuePair<string, TValue>>.Contains(KeyValuePair<string, TValue> item)
+        => ContainsKey(item.Key)
+        && (this[item.Key]?.Equals(item.Value) ?? false);
+    bool ICollection<KeyValuePair<string, TValue>>.Remove(KeyValuePair<string, TValue> item)
+        => Remove(item.Key);
+
+    protected override void ToText(StringBuilder builder, string? name = null, uint level = 0) {
+        if (Keys.Count == 0) return;
+        var indent = new string(' ', (int)level * 4);
+        if (!string.IsNullOrWhiteSpace(name)) builder.Append($"{name}:");
+        if (Keys.Count == 0) builder.AppendLine(" [Empty]");
+        builder.AppendLine();
+        foreach (var key in Keys) {
+            var myKeyMarker = _myKeys.Contains(key) ? "*" : string.Empty;
+            builder.Append($"{indent}- {myKeyMarker}");
+            BuildItem(builder, key, this[key], level);
+        }
+    }
+
+    public override string ToString() {
+        var builder = new StringBuilder();
+        ToText(builder);
+        return builder.ToString();
+    }
+
+    void ICollection<KeyValuePair<string, TValue>>.CopyTo(KeyValuePair<string, TValue>[] array, int index)
+        => _data.ToArray().CopyTo(array, index);
+}
+  ]]></file> 
+  <file name="MapBase.cs"><![CDATA[ 
+﻿namespace DotNetToolbox;
+
+public abstract class MapBase {
+    protected abstract void ToText(StringBuilder builder, string? name = null, uint level = 0);
+
+    protected static void BuildItem(StringBuilder builder, string key, object? value, uint level) {
+        switch (value) {
+            case null:
+                builder.AppendLine($"{key}: null");
+                return;
+            case MapBase contextBase:
+                contextBase.ToText(builder, key, level + 1);
+                return;
+            case string:
+                builder.AppendLine($"{key}: {value}");
+                return;
+            case IEnumerable items:
+                var counter = 1;
+                builder.AppendLine($"{key}:");
+                foreach (var item in items)
+                    BuildItem(builder, $"{counter++} => ", item, level);
+                return;
+            case not null when value.GetType().IsClass:
+                builder.AppendLine($"{key}: {JsonSerializer.Serialize(value)}");
+                return;
+            default:
+                builder.AppendLine($"{key}: {value}");
+                return;
+        }
+    }
+}
+  ]]></file> 
+  <file name="Pack.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System;
+
+public record Pack<TFirst, TSecond>(TFirst First, TSecond Second)
+    : IPack<TFirst, TSecond>;
+
+public record Pack<TFirst, TSecond, TThird>(TFirst First, TSecond Second, TThird Third)
+    : Pack<TFirst, TSecond>(First, Second), IPack<TFirst, TSecond, TThird>;
+  ]]></file> 
+  <file name="StringExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static class StringExtensions {
+    public static string? TrimStart(this string? source, string? value)
+        => string.IsNullOrEmpty(source)
+        || string.IsNullOrEmpty(value)
+        || value.Length > source.Length
+        || !source.StartsWith(value)
+                   ? source
+                   : source[value.Length..];
+
+    public static string? TrimEnd(this string? source, string? value)
+        => string.IsNullOrEmpty(source)
+        || string.IsNullOrEmpty(value)
+        || value.Length > source.Length
+        || !source.EndsWith(value)
+               ? source
+               : source[..^value.Length];
+
+    public static string? Trim(this string? source, string? value)
+        => source?.TrimStart(value).TrimEnd(value);
+}
+
+public static class HashSetExtensions {
+    public static void AddRange<TValue>(this HashSet<TValue> source, IEnumerable<TValue> values) {
+        foreach (var value in values)
+            source.Add(value);
+    }
+}
+  ]]></file> 
+  <folder name="Collections"> 
+    <file name="IndexedItem.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Collections;
+
+public record Indexed<TValue> {
+    public Indexed(int index, TValue value) {
+        Index = index < 0 ? 0 : index;
+        Value = value;
+    }
+
+    public int Index { get; init; }
+    public TValue Value { get; init; }
+
+    public void Deconstruct(out int index, out TValue value) {
+        index = Index;
+        value = Value;
+    }
+}
+
+public record IndexedItem<TValue> : Indexed<TValue> {
+    public IndexedItem(int index, TValue value, bool isLast)
+        : base(index, value) {
+        IsLast = isLast;
+    }
+
+    public bool IsFirst => Index == 0;
+    public bool IsLast { get; init; }
+
+    public void Deconstruct(out int index, out TValue value, out bool isLast) {
+        index = Index;
+        value = Value;
+        isLast = IsLast;
+    }
+}
+    ]]></file> 
+    <folder name="Async"> 
+      <folder name="Generic"> 
+        <file name="AsyncEnumerable.cs"><![CDATA[ 
+// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Collections.Async.Generic;
+
+public static class AsyncEnumerable {
+    public static IAsyncEnumerable<TItem> Empty<TItem>()
+        => new AsyncEnumerable<TItem>();
+}
+
+public class AsyncEnumerable<TItem>(IEnumerable<TItem>? data = null)
+    : IAsyncEnumerable<TItem> {
+    private readonly IEnumerable<TItem> _data = data ?? [];
+
+    public IAsyncEnumerator<TItem> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        => new AsyncEnumerator<TItem>(_data.GetEnumerator(), cancellationToken);
+}
+        ]]></file> 
+        <file name="AsyncEnumerator.cs"><![CDATA[ 
+// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Collections.Async.Generic;
+
+public static class AsyncEnumerator {
+    public static IAsyncEnumerator<TItem> Empty<TItem>()
+        => new AsyncEnumerator<TItem>(Enumerable.Empty<TItem>().GetEnumerator());
+}
+
+public sealed class AsyncEnumerator<TItem>(IEnumerator<TItem> enumerator, CancellationToken cancellationToken = default)
+    : IAsyncEnumerator<TItem> {
+    //object IAsyncEnumerator.Current => Current!;
+    public TItem Current => enumerator.Current;
+
+    public ValueTask<bool> MoveNextAsync()
+        => ValueTask.FromResult(!cancellationToken.IsCancellationRequested && enumerator.MoveNext());
+
+    public ValueTask DisposeAsync() {
+        enumerator.Dispose();
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
+    }
+
+    ~AsyncEnumerator()
+        => enumerator.Dispose();
+}
+        ]]></file> 
+      </folder> 
+    </folder> 
+    <folder name="Generic"> 
+      <file name="Dictionary.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System.Collections.Generic;
+
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "<Pending>")]
+public static class Dictionary {
+    public static Dictionary<TKey, TValue> Empty<TKey, TValue>()
+        where TKey : notnull
+        => [];
+}
+      ]]></file> 
+      <file name="EnumerableExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Collections.Generic;
+
+public static class EnumerableExtensions {
+    public static IAsyncEnumerable<TItem> ToAsyncEnumerable<TItem>(this IEnumerable<TItem> source)
+        => new AsyncEnumerable<TItem>(source);
+
+    public static IAsyncEnumerator<TItem> GetAsyncEnumerator<TItem>(this IEnumerable<TItem> source, CancellationToken cancellationToken = default)
+        => source.ToAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
+
+    #region Projections
+
+    public static IEnumerable<TItem> As<TItem>(this IEnumerable source)
+        => source.Cast<TItem>();
+    public static IEnumerable<TNewItem> As<TItem, TNewItem>(this IEnumerable source, Func<TItem, TNewItem> convertTo)
+        => source.As<TItem>().Select(convertTo);
+    public static TItem[] ToArray<TItem>(this IEnumerable source)
+        => [.. IsNotNull(source).As<TItem>()];
+    public static TNewItem[] ToArray<TItem, TNewItem>(this IEnumerable<TItem> source, Func<TItem, TNewItem> convertTo)
+        => [.. IsNotNull(source).Select(convertTo)];
+    public static List<TItem> ToList<TItem>(this IEnumerable source)
+        => [.. IsNotNull(source).Cast<TItem>()];
+    public static List<TNewItem> ToList<TItem, TNewItem>(this IEnumerable<TItem> source, Func<TItem, TNewItem> convertTo)
+        => [.. IsNotNull(source).Select(convertTo)];
+    public static HashSet<TItem> ToHashSet<TItem>(this IEnumerable source)
+        => [.. IsNotNull(source).Cast<TItem>()];
+    public static HashSet<TNewItem> ToHashSet<TItem, TNewItem>(this IEnumerable<TItem> source, Func<TItem, TNewItem> convertTo)
+        => [.. IsNotNull(source).Select(convertTo)];
+    public static Dictionary<TKey, TNewValue> ToDictionary<TKey, TValue, TNewValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TNewValue> convertToValue)
+        where TKey : notnull
+        => IsNotNull(source).ToDictionary(i => i.Key, i => convertToValue(i.Value));
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TValue> convertToValue)
+        where TKey : notnull
+        => IsNotNull(source).ToDictionary(i => i.Key, i => convertToValue(i.Value));
+
+    #endregion
+
+    #region Indexed
+
+    public static IEnumerable<Indexed<TItem>> AsIndexed<TItem>(this IEnumerable source)
+        => source.Cast<TItem>().AsIndexed();
+    public static IEnumerable<Indexed<TItem>> AsIndexed<TItem>(this IEnumerable<TItem> source)
+        => source.AsIndexed(i => i);
+    public static IEnumerable<Indexed<TNewItem>> AsIndexed<TItem, TNewItem>(this IEnumerable<TItem> source, Func<TItem, TNewItem> convertTo)
+        => source.Select((v, i) => new Indexed<TNewItem>(i, convertTo(v)));
+    public static List<IndexedItem<TItem>> ToIndexedList<TItem>(this IEnumerable source)
+        => source.Cast<TItem>().ToIndexedList();
+    public static List<IndexedItem<TItem>> ToIndexedList<TItem>(this IEnumerable<TItem> source)
+        => source.ToIndexedList(i => i);
+    public static List<IndexedItem<TNewItem>> ToIndexedList<TItem, TNewItem>(this IEnumerable<TItem> source, Func<TItem, TNewItem> convertTo) {
+        using var enumerator = source.GetEnumerator();
+        var list = new List<IndexedItem<TNewItem>>();
+        var index = 0;
+        var hasNext = enumerator.MoveNext();
+        while (hasNext) {
+            var value = convertTo(enumerator.Current);
+            hasNext = enumerator.MoveNext();
+            list.Add(new(index++, value, !hasNext));
+        }
+        return list;
+    }
+
+    #endregion
+
+    #region ForEach
+
+    public static void ForEach<TItem>(this IEnumerable source, Action<TItem> action) {
+        using var enumerator = source.Cast<TItem>().GetEnumerator();
+        while (enumerator.MoveNext())
+            action(enumerator.Current);
+    }
+
+    public static void ForEach<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Action<TKey, TValue> action)
+        where TKey : notnull {
+        using var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+            action(enumerator.Current.Key, enumerator.Current.Value);
+    }
+
+#endregion
+}
+      ]]></file> 
+    </folder> 
+  </folder> 
+  <folder name="Constants"> 
+    <file name="Messages.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Constants;
+
+public static class Messages {
+    public static CompositeFormat MustBeNull { get; } = CompositeFormat.Parse("Value must be null.");
+    public static CompositeFormat MustBeEmpty { get; } = CompositeFormat.Parse("Value must be empty.");
+    public static CompositeFormat MustBeEmptyOrWhiteSpace { get; } = CompositeFormat.Parse("Value must be empty or white space.");
+    public static CompositeFormat ValueIsValid { get; } = CompositeFormat.Parse("Value is valid.");
+    public static CompositeFormat MustBeValid { get; } = CompositeFormat.Parse("Value must be valid.");
+    public static CompositeFormat MustBeAValidEmail { get; } = CompositeFormat.Parse("Value must be a valid email.");
+    public static CompositeFormat MustBeAValidPassword { get; } = CompositeFormat.Parse("Value must be a valid password.");
+    public static CompositeFormat CollectionMustBeEmpty { get; } = CompositeFormat.Parse("The collection must be empty.");
+    public static CompositeFormat CollectionMustContainInvalid { get; } = CompositeFormat.Parse("The collection must contain invalid element(s).");
+    public static CompositeFormat CollectionMustContainNull { get; } = CompositeFormat.Parse("The collection must contain null element(s).");
+
+    public static CompositeFormat MustBeAfter { get; } = CompositeFormat.Parse("Value must be after {0}. Found: {1}.");
+    public static CompositeFormat MustBeBefore { get; } = CompositeFormat.Parse("Value must be before {0}. Found: {1}.");
+    public static CompositeFormat MustBeEqualTo { get; } = CompositeFormat.Parse("Value must be equal to {0}. Found: {1}.");
+    public static CompositeFormat MustBeGraterThan { get; } = CompositeFormat.Parse("Value must be greater than {0}. Found: {1}.");
+    public static CompositeFormat MustBeIn { get; } = CompositeFormat.Parse("Value must be one of these: '{0}'. Found: {1}.");
+    public static CompositeFormat MustBeLessThan { get; } = CompositeFormat.Parse("Value must be less than {0}. Found: {1}.");
+    public static CompositeFormat MustContain { get; } = CompositeFormat.Parse("Value must contain '{0}'.");
+    public static CompositeFormat MustContainValue { get; } = CompositeFormat.Parse("Value must contain the value '{0}'.");
+    public static CompositeFormat MustContainKey { get; } = CompositeFormat.Parse("Value must contain the key '{0}'.");
+    public static CompositeFormat MustHaveACountOf { get; } = CompositeFormat.Parse("Value count must be {0}. Found: {1}.");
+    public static CompositeFormat MustHaveALengthOf { get; } = CompositeFormat.Parse("Value length must be {0}. Found: {1}.");
+    public static CompositeFormat MustHaveAMaximumCountOf { get; } = CompositeFormat.Parse("Value maximum count must be {0}. Found: {1}.");
+    public static CompositeFormat MustHaveAMaximumLengthOf { get; } = CompositeFormat.Parse("Value maximum length must be {0}. Found: {1}.");
+    public static CompositeFormat MustHaveAMinimumCountOf { get; } = CompositeFormat.Parse("Value minimum count must be {0}. Found: {1}.");
+    public static CompositeFormat MustHaveAMinimumLengthOf { get; } = CompositeFormat.Parse("Value minimum length must be {0}. Found: {1}.");
+    public static CompositeFormat MustBeOfType { get; } = CompositeFormat.Parse("Value must be of type '{0}'. Found: '{1}'.");
+
+    public static string InvertMessage(string message)
+        => message switch {
+            _ when message.Contains(" cannot ") => message.Replace(" cannot ", " must "),
+            _ when message.Contains(" must ") => message.Replace(" must ", " cannot "),
+            _ when message.Contains(" is not ") => message.Replace(" is not ", " is "),
+            _ when message.Contains(" is ") => message.Replace(" is ", " is not "),
+            _ when message.Contains(" does not contain ") => message.Replace(" does not contain ", " contains "),
+            _ when message.Contains(" contains ") => message.Replace(" contains ", " does not contain "),
+            _ => message,
+        };
+    public static CompositeFormat InvertMessage(CompositeFormat message)
+        => message switch {
+            _ when message.Format.Contains(" cannot ") => CompositeFormat.Parse(message.Format.Replace(" cannot ", " must ")),
+            _ when message.Format.Contains(" must ") => CompositeFormat.Parse(message.Format.Replace(" must ", " cannot ")),
+            _ when message.Format.Contains(" is not ") => CompositeFormat.Parse(message.Format.Replace(" is not ", " is ")),
+            _ when message.Format.Contains(" is ") => CompositeFormat.Parse(message.Format.Replace(" is ", " is not ")),
+            _ when message.Format.Contains(" does not contain ") => CompositeFormat.Parse(message.Format.Replace(" does not contain ", " contains ")),
+            _ when message.Format.Contains(" contains ") => CompositeFormat.Parse(message.Format.Replace(" contains ", " does not contain ")),
+            _ => message,
+        };
+}
+    ]]></file> 
+  </folder> 
+  <folder name="DependencyInjection"> 
+    <file name="ServiceCollectionExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class ServiceCollectionExtensions {
+    public static IServiceCollection SetEnvironment(this IServiceCollection services,
+            string? name = null,
+            IAssemblyDescriptor? assemblyDescriptor = null,
+            IDateTimeProvider? dateTimeProvider = null,
+            IGuidProvider? guidProvider = null,
+            IFileSystemAccessor? fileSystem = null,
+            IInput? input = null,
+            IOutput? output = null) {
+        SetEnvironmentServices(services,
+                               assemblyDescriptor,
+                               dateTimeProvider,
+                               guidProvider,
+                               fileSystem,
+                               input,
+                               output);
+        services.TryAddSingleton((Func<IServiceProvider, IApplicationEnvironment>)(prv => new ApplicationEnvironment(prv, name)));
+        return services;
+    }
+
+    public static IServiceCollection AddAssemblyDescriptor(this IServiceCollection services, IAssemblyDescriptor? descriptor = null) {
+        services.TryAddSingleton(descriptor ?? AssemblyDescriptor.Default);
+        return services;
+    }
+
+    public static IServiceCollection SetDateTimeProvider(this IServiceCollection services, IDateTimeProvider? provider = null) {
+        services.TryAddSingleton(provider ?? DateTimeProvider.Default);
+        return services;
+    }
+
+    public static IServiceCollection SetGuidProvider(this IServiceCollection services, IGuidProvider? provider = null) {
+        services.TryAddSingleton(provider ?? GuidProvider.Default);
+        return services;
+    }
+
+    public static IServiceCollection SetFileSystemAccessor(this IServiceCollection services, IFileSystemAccessor? provider = null) {
+        services.TryAddSingleton(provider ?? FileSystemAccessor.Default);
+        return services;
+    }
+
+    public static IServiceCollection SetConsoleInput(this IServiceCollection services, IInput? provider = null) {
+        services.TryAddSingleton(provider ?? ConsoleInput.Default);
+        return services;
+    }
+
+    public static IServiceCollection SetConsoleOutput(this IServiceCollection services, IOutput? provider = null) {
+        services.TryAddSingleton(provider ?? ConsoleOutput.Default);
+        return services;
+    }
+
+    private static void SetEnvironmentServices(this IServiceCollection services,
+                                               IAssemblyDescriptor? assemblyDescriptor = null,
+                                               IDateTimeProvider? dateTimeProvider = null,
+                                               IGuidProvider? guidProvider = null,
+                                               IFileSystemAccessor? fileSystem = null,
+                                               IInput? input = null,
+                                               IOutput? output = null) {
+        services.AddAssemblyDescriptor(assemblyDescriptor);
+        services.SetDateTimeProvider(dateTimeProvider);
+        services.SetGuidProvider(guidProvider);
+        services.SetFileSystemAccessor(fileSystem);
+        services.SetConsoleInput(input);
+        services.SetConsoleOutput(output);
+    }
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Domain"> 
+    <folder name="Models"> 
+      <file name="Entity.cs"><![CDATA[ 
+﻿
+namespace DotNetToolbox.Domain.Models;
+
+public abstract class Entity<TEntity, TKey>
+    : IEntity<TKey>
+    where TEntity : Entity<TEntity, TKey>, new()
+    where TKey : notnull {
+    public TKey Id { get; set; } = default!;
+
+    public virtual Result Validate(IMap? context = null)
+        => Result.Success();
+}
+      ]]></file> 
+      <file name="EntityAction.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public enum EntityAction {
+    Insert,
+    Update,
+    Delete,
+}
+      ]]></file> 
+      <file name="IChangeTracker.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface IChangeTracker
+    : ITrackChange;
+      ]]></file> 
+      <file name="IEntity.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface IEntity;
+
+public interface IEntity<TKey>
+    : IEntity,
+      IValidatable
+    where TKey : notnull {
+    TKey Id { get; set; }
+}
+      ]]></file> 
+      <file name="IHaveHistory.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface IHaveHistory<TChangeTracker>
+    where TChangeTracker : ITrackChange {
+    List<TChangeTracker> History { get; }
+}
+      ]]></file> 
+      <file name="ITrackAuthor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackAuthor {
+    string Author { get; }
+}      ]]></file> 
+      <file name="ITrackChange.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackChange {
+    DateTimeOffset DateTime { get; }
+    EntityAction Action { get; }
+}
+      ]]></file> 
+      <file name="ITrackedEntity.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackedEntity<TEntity, TChangeTracker>
+    : IHaveHistory<TChangeTracker>,
+      IEntity
+    where TEntity : ITrackedEntity<TEntity, TChangeTracker>, IEntity
+    where TChangeTracker : ITrackChange;
+      ]]></file> 
+      <file name="ITrackLocation.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackLocation {
+    string Location { get; }
+}      ]]></file> 
+      <file name="ITrackNetworkAddress.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackNetworkAddress {
+    string NetworkAddress { get; }
+}      ]]></file> 
+      <file name="ITrackState.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface ITrackState
+    : ITrackState<object>;
+
+public interface ITrackState<out TState>
+    : ITrackChange {
+    TState? State { get; }
+}
+      ]]></file> 
+      <file name="IValueObject.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public interface IValueObject;
+      ]]></file> 
+      <file name="KeySequencer.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Domain.Models;
+
+public abstract class KeySequencer<TKey>(TKey start)
+    : Sequencer<KeySequencer<TKey>, TKey>(start)
+    where TKey : IEquatable<TKey>, IComparable<TKey>;
+      ]]></file> 
+    </folder> 
+  </folder> 
+  <folder name="Environment"> 
+    <file name="ApplicationEnvironment.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public class ApplicationEnvironment(IServiceProvider services, string? name = null, IAssemblyDescriptor? assembly = null, IOperatingSystem? os = null)
+    : IApplicationEnvironment {
+    public virtual string Name { get; } = name ?? string.Empty;
+    public virtual IAssemblyDescriptor Assembly { get; } = assembly ?? services.GetRequiredService<IAssemblyDescriptor>();
+    public virtual IOperatingSystem OperatingSystem { get; } = os ?? new OperatingSystem(services);
+}
+    ]]></file> 
+    <file name="AssemblyAccessor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for Assembly functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class AssemblyAccessor : HasDefault<AssemblyAccessor>, IAssemblyAccessor {
+    public virtual IAssemblyDescriptor GetExecutingAssembly()
+        => new AssemblyDescriptor(Assembly.GetExecutingAssembly());
+
+    public virtual IAssemblyDescriptor? GetEntryAssembly() {
+        var assembly = Assembly.GetEntryAssembly();
+        return assembly is null ? null : new AssemblyDescriptor(assembly);
+    }
+
+    public virtual IAssemblyDescriptor? GetDeclaringAssembly(Type type) {
+        var assembly = Assembly.GetAssembly(type);
+        return assembly is null ? null : new AssemblyDescriptor(assembly);
+    }
+
+    public virtual IAssemblyDescriptor? GetDeclaringAssembly<TType>()
+        => GetDeclaringAssembly(typeof(TType));
+
+    public virtual IAssemblyDescriptor GetCallingAssembly()
+        => new AssemblyDescriptor(Assembly.GetCallingAssembly());
+}
+    ]]></file> 
+    <file name="AssemblyDescriptor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for Assembly functionality.")]
+public class AssemblyDescriptor
+    : HasDefault<AssemblyDescriptor>, IAssemblyDescriptor {
+    private readonly Assembly _assembly;
+
+    public AssemblyDescriptor() {
+        _assembly = Assembly.GetEntryAssembly()!;
+    }
+
+    internal AssemblyDescriptor(Assembly assembly) {
+        _assembly = assembly;
+    }
+
+    public virtual string Name => _assembly.GetName().Name!;
+    public virtual string FullName => _assembly.FullName!;
+    public virtual Version Version => _assembly.GetName().Version!;
+    public virtual CultureInfo? CultureInfo => _assembly.GetName().CultureInfo;
+    public virtual string? PublicKey {
+        get {
+            var bytes = _assembly.GetName().GetPublicKey();
+            return bytes is null ? null : Encoding.UTF8.GetString(bytes);
+        }
+    }
+    public virtual string? PublicKeyToken {
+        get {
+            var bytes = _assembly.GetName().GetPublicKeyToken();
+            return bytes is null ? null : Encoding.UTF8.GetString(bytes);
+        }
+    }
+
+    public virtual string RuntimeVersion => _assembly.ImageRuntimeVersion;
+    public virtual string Location => _assembly.Location;
+    public virtual MethodInfo? EntryPoint => _assembly.EntryPoint;
+    public virtual Module ManifestModule => _assembly.ManifestModule;
+    public virtual IEnumerable<Attribute> GetCustomAttributes()
+        => _assembly.GetCustomAttributes();
+    public virtual IEnumerable<Attribute> GetCustomAttributes(Type attributeType)
+        => _assembly.GetCustomAttributes(attributeType);
+    public virtual IEnumerable<Attribute> GetCustomAttributes<TAttribute>()
+        where TAttribute : Attribute
+        => _assembly.GetCustomAttributes<TAttribute>();
+    public virtual TAttribute? GetCustomAttribute<TAttribute>()
+        where TAttribute : Attribute
+        => _assembly.GetCustomAttribute<TAttribute>();
+    public virtual Attribute? GetCustomAttribute(Type attributeType)
+        => _assembly.GetCustomAttribute(attributeType);
+    public virtual IEnumerable<TypeInfo> DefinedTypes => _assembly.DefinedTypes;
+    public virtual IEnumerable<Type> ExportedTypes => _assembly.ExportedTypes;
+    public virtual IEnumerable<Module> Modules => _assembly.Modules;
+}
+    ]]></file> 
+    <file name="ChoicePosition.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public enum ChoicePosition {
+    AtEnd,
+    Sorted,
+    AtStart,
+};
+    ]]></file> 
+    <file name="ConsoleInput.cs"><![CDATA[ 
+﻿
+namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for Console functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class ConsoleInput
+    : HasDefault<ConsoleInput>,
+      IInput {
+    public virtual Encoding Encoding {
+        get => Console.InputEncoding;
+        set => Console.InputEncoding = value;
+    }
+
+    public virtual TextReader Reader => Console.In;
+
+    public virtual int Read() => Reader.Read();
+    public virtual ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
+    public virtual string ReadLine()
+        => ReadLineAsync().GetAwaiter().GetResult();
+    public virtual Task<string> ReadLineAsync(CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<string>();
+        return builder.ShowAsync(ct);
+    }
+    public virtual string ReadText()
+        => ReadTextAsync().GetAwaiter().GetResult();
+    public virtual Task<string> ReadTextAsync(CancellationToken ct = default) {
+        var builder = new TextPromptBuilder();
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual bool Confirm(string prompt, bool defaultChoice = true)
+        => ConfirmAsync(prompt, defaultChoice).GetAwaiter().GetResult();
+
+    public virtual Task<bool> ConfirmAsync(string prompt, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<bool>(prompt);
+        builder.AddChoices(true, false);
+        builder.ConvertWith(value => value ? "y" : "n");
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<bool> ConfirmAsync(string prompt, bool defaultChoice, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<bool>(prompt, defaultChoice);
+        builder.AddChoices(true, false);
+        builder.ConvertWith(value => value ? "y" : "n");
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual TValue Prompt<TValue>(string prompt)
+        => PromptAsync<TValue>(prompt).GetAwaiter().GetResult();
+    public virtual TValue Prompt<TValue>(string prompt, TValue defaultValue)
+        => PromptAsync(prompt, defaultValue).GetAwaiter().GetResult();
+    public virtual TValue Prompt<TValue>(string prompt, IEnumerable<TValue> choices)
+        => PromptAsync(prompt, choices).GetAwaiter().GetResult();
+    public virtual TValue Prompt<TValue>(string prompt, TValue defaultChoice, IEnumerable<TValue> otherChoices)
+        => PromptAsync(prompt, defaultChoice, otherChoices).GetAwaiter().GetResult();
+
+    public virtual Task<TValue> PromptAsync<TValue>(string prompt, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<TValue>(prompt);
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<TValue> PromptAsync<TValue>(string prompt, TValue defaultValue, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<TValue>(prompt, defaultValue);
+        builder.ShowOptionalFlag();
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<TValue> PromptAsync<TValue>(string prompt, IEnumerable<TValue> choices, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<TValue>(prompt);
+        builder.AddChoices(choices);
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<TValue> PromptAsync<TValue>(string prompt, TValue defaultChoice, IEnumerable<TValue> otherChoices, CancellationToken ct = default) {
+        var builder = new ValuePromptBuilder<TValue>(prompt, defaultChoice);
+        builder.ShowOptionalFlag();
+        builder.AddChoices([defaultChoice, .. otherChoices]);
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual TValue? SelectOne<TValue>(string prompt, Func<TValue, object> selectKey, params TValue[] choices)
+        => SelectOneAsync(prompt, selectKey, choices).GetAwaiter().GetResult();
+    public virtual TValue? SelectOne<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, params TValue[] otherChoices)
+        => SelectOneAsync(prompt, selectKey, defaultChoice, otherChoices).GetAwaiter().GetResult();
+    public virtual Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, CancellationToken ct = default)
+        => SelectOneAsync(prompt, selectKey, [], ct);
+    public virtual Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, CancellationToken ct = default)
+        => SelectOneAsync(prompt, selectKey, defaultChoice, [], ct);
+    public virtual Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue[] choices, CancellationToken ct = default) {
+        var builder = new SelectionPromptBuilder<TValue>(prompt, selectKey);
+        if (choices.Length < 2) throw new ArgumentException("At least two choices must be provided.", nameof(choices));
+        builder.AddChoices(choices);
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, TValue[] otherChoices, CancellationToken ct = default) {
+        var builder = new SelectionPromptBuilder<TValue>(prompt, selectKey);
+        builder.AddDefaultChoice(defaultChoice);
+        if (otherChoices.Length < 1) throw new ArgumentException("At least two choices must be provided.", nameof(otherChoices));
+        builder.AddChoices(otherChoices);
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual string Ask(string prompt)
+        => AskAsync(prompt).GetAwaiter().GetResult();
+    public virtual string Ask(string prompt, string defaultValue)
+        => AskAsync(prompt, defaultValue).GetAwaiter().GetResult();
+    public virtual Task<string> AskAsync(string prompt, CancellationToken ct = default)
+        => AskAsync(prompt, string.Empty, ct);
+    public virtual Task<string> AskAsync(string prompt, string defaultValue, CancellationToken ct = default) {
+        var builder = new TextPromptBuilder(prompt, defaultValue);
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual string Prompt(string prompt)
+        => PromptAsync<string>(prompt).GetAwaiter().GetResult();
+    public virtual string Prompt(string prompt, string defaultValue)
+        => PromptAsync(prompt, defaultValue).GetAwaiter().GetResult();
+    public virtual string Prompt(string prompt, IEnumerable<string> choices)
+        => PromptAsync(prompt, choices).GetAwaiter().GetResult();
+    public virtual string Prompt(string prompt, string defaultChoice, IEnumerable<string> otherChoices)
+        => PromptAsync(prompt, defaultChoice, otherChoices).GetAwaiter().GetResult();
+    public virtual Task<string> PromptAsync(string prompt, CancellationToken ct = default)
+        => PromptAsync<string>(prompt, ct);
+    public virtual Task<string> PromptAsync(string prompt, string defaultValue, CancellationToken ct = default)
+        => PromptAsync<string>(prompt, defaultValue, ct);
+    public virtual Task<string> PromptAsync(string prompt, IEnumerable<string> choices, CancellationToken ct = default)
+        => PromptAsync<string>(prompt, choices, ct);
+    public virtual Task<string> PromptAsync(string prompt, string defaultChoice, IEnumerable<string> otherChoices, CancellationToken ct = default)
+        => PromptAsync<string>(prompt, defaultChoice, otherChoices, ct);
+
+    public virtual string? SelectOne(string prompt, params string[] choices)
+        => SelectOneAsync(prompt, choices).GetAwaiter().GetResult();
+    public virtual string? SelectOne(string prompt, string defaultChoice, params string[] otherChoices)
+        => SelectOneAsync(prompt, defaultChoice, otherChoices).GetAwaiter().GetResult();
+    public virtual Task<string?> SelectOneAsync(string prompt, CancellationToken ct = default)
+        => SelectOneAsync(prompt, [], ct);
+    public virtual Task<string?> SelectOneAsync(string prompt, string defaultChoice, CancellationToken ct = default)
+        => SelectOneAsync(prompt, defaultChoice, [], ct);
+    public virtual Task<string?> SelectOneAsync(string prompt, string[] choices, CancellationToken ct = default) {
+        var builder = new SelectionPromptBuilder(prompt);
+        if (choices.Length < 2) throw new ArgumentException("At least two choices must be provided.", nameof(choices));
+        builder.AddChoices(choices);
+        return builder.ShowAsync(ct);
+    }
+    public virtual Task<string?> SelectOneAsync(string prompt, string defaultChoice, string[] otherChoices, CancellationToken ct = default) {
+        var builder = new SelectionPromptBuilder(prompt);
+        builder.AddDefaultChoice(defaultChoice);
+        if (otherChoices.Length < 1) throw new ArgumentException("At least two choices must be provided.", nameof(otherChoices));
+        builder.AddChoices(otherChoices);
+        return builder.ShowAsync(ct);
+    }
+
+    public virtual TextPromptBuilder BuildTextPrompt(string prompt)
+        => new(prompt);
+    public virtual ValuePromptBuilder<TValue> BuildInlinePrompt<TValue>(string prompt)
+        => new(prompt);
+
+    public virtual SelectionPromptBuilder BuildSelectionPrompt(string prompt)
+        => new(prompt);
+    public virtual SelectionPromptBuilder<TValue> BuildSelectionPrompt<TValue>(string prompt, Func<TValue, object> selectKey)
+        => new(prompt, selectKey);
+    public virtual SelectionPromptBuilder<TValue, TKey> BuildSelectionPrompt<TValue, TKey>(string prompt, Func<TValue, TKey> selectKey)
+        where TKey : notnull
+        => new(prompt, selectKey);
+}
+    ]]></file> 
+    <file name="ConsoleOutput.cs"><![CDATA[ 
+﻿using Spectre.Console.Rendering;
+
+namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for Console functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class ConsoleOutput
+    : HasDefault<ConsoleOutput>,
+      IOutput {
+    public virtual string Prompt { get; set; } = "> ";
+
+    public virtual Encoding Encoding {
+        get => Console.OutputEncoding;
+        set => Console.OutputEncoding = value;
+    }
+
+    public virtual ConsoleColor ForegroundColor {
+        get => Console.ForegroundColor;
+        set => Console.ForegroundColor = value;
+    }
+    public virtual ConsoleColor BackgroundColor {
+        get => Console.BackgroundColor;
+        set => Console.BackgroundColor = value;
+    }
+
+    public virtual TextWriter Writer => Console.Out;
+    public virtual TextWriter ErrorWriter => Console.Error;
+
+    public virtual void ResetColor() => Console.ResetColor();
+    public virtual void ClearScreen() => Console.Clear();
+
+    public virtual void Write(bool value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(ulong value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(uint value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(long value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(int value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(float value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(double value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(decimal value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(char value)
+        => AnsiConsole.Write(value);
+    public virtual void Write(string value)
+        => AnsiConsole.Markup(value);
+    public virtual void Write([Syntax(Syntax.CompositeFormat)] string format, params object?[] args)
+        => AnsiConsole.Markup(format, args!);
+    public virtual void Write(object? value) {
+        if (value is IRenderable text) AnsiConsole.Write(text);
+        else Write($"{value}");
+    }
+    public virtual void Write(StringBuilder? builder)
+        => AnsiConsole.Markup(builder?.ToString() ?? string.Empty);
+    public virtual void Write(char[]? buffer)
+        => AnsiConsole.Markup(new(buffer));
+    public virtual void Write(char[] buffer, int index, int count)
+        => AnsiConsole.Markup(new(buffer), index, count);
+
+    public virtual void WritePrompt()
+        => AnsiConsole.Markup(Prompt);
+    public virtual string NewLine => System.Environment.NewLine;
+
+    public virtual void WriteLine()
+        => AnsiConsole.WriteLine();
+    public virtual void WriteLine(bool value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(ulong value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(uint value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(long value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(int value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(float value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(double value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(decimal value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(char value)
+        => AnsiConsole.WriteLine(value);
+    public virtual void WriteLine(string value)
+        => AnsiConsole.MarkupLine(value);
+    public virtual void WriteLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args)
+        => AnsiConsole.MarkupLine(format, args!);
+    public virtual void WriteLine(object? value) {
+        if (value is IRenderable widget) AnsiConsole.Write(widget);
+        else Write($"{value}");
+    }
+    public virtual void WriteLine(StringBuilder? builder)
+        => AnsiConsole.MarkupLine(builder?.ToString() ?? string.Empty);
+    public virtual void WriteLine(char[]? buffer)
+        => AnsiConsole.MarkupLine(new(buffer));
+    public virtual void WriteLine(char[] buffer, int index, int count)
+        => AnsiConsole.MarkupLine(new(buffer), index, count);
+
+    public virtual void WriteOnANewLine(bool value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(uint value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(ulong value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(int value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(long value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(float value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(double value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(decimal value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(char value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(string value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args) {
+        WriteLine();
+        Write(format, args);
+    }
+    public virtual void WriteOnANewLine(object? value) {
+        WriteLine();
+        Write(value);
+    }
+    public virtual void WriteOnANewLine(StringBuilder? builder) {
+        WriteLine();
+        Write(builder);
+    }
+    public virtual void WriteOnANewLine(char[]? buffer) {
+        WriteLine();
+        Write(buffer);
+    }
+    public virtual void WriteOnANewLine(char[] buffer, int index, int count) {
+        WriteLine();
+        Write(buffer, index, count);
+    }
+
+#if DEBUG
+    private const ExceptionFormats _exceptionFormat = ExceptionFormats.ShowLinks;
+#endif
+
+    public virtual void WriteError(Exception exception) {
+        WriteLine();
+#if DEBUG
+        AnsiConsole.WriteException(exception, _exceptionFormat);
+#else
+        WriteLine($"[bold red]An error has occurred! {exception.Message}[/]");
+#endif
+        WriteLine();
+    }
+
+    public virtual void WriteError(Exception exception, string message) {
+        WriteLine();
+        WriteLine($"[bold red]An error has occurred!  {IsNotNullOrWhiteSpace(message)}[/]");
+#if DEBUG
+        AnsiConsole.WriteException(exception, _exceptionFormat);
+#endif
+        WriteLine();
+    }
+
+    public virtual void WriteError(string message) {
+        WriteLine();
+        WriteLine($"[bold red]An error has occurred! {IsNotNullOrWhiteSpace(message)}[/]");
+        WriteLine();
+    }
+}
+    ]]></file> 
+    <file name="DateTimeProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class DateTimeProvider : HasDefault<DateTimeProvider>, IDateTimeProvider {
+    public virtual DateTimeOffset Now => DateTimeOffset.Now;
+    public virtual DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
+    public virtual TimeOnly TimeOfDay => TimeOnly.FromDateTime(DateTime.Now);
+
+    public virtual DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+    public virtual DateOnly UtcToday => DateOnly.FromDateTime(UtcNow.DateTime);
+    public virtual TimeOnly UtcTimeOfDay => TimeOnly.FromDateTime(UtcNow.DateTime);
+
+    public virtual DateTimeOffset Minimum => DateTimeOffset.MinValue;
+    public virtual DateTimeOffset Maximum => DateTimeOffset.MaxValue;
+    public virtual DateTimeOffset UnixEpoch => DateTimeOffset.UnixEpoch;
+
+    public virtual DateTimeOffset FromFileTime(long fileTime) => DateTimeOffset.FromFileTime(fileTime);
+    public virtual DateTimeOffset FromUnixTimeMilliseconds(long ms) => DateTimeOffset.FromUnixTimeMilliseconds(ms);
+    public virtual DateTimeOffset FromUnixTimeSeconds(long s) => DateTimeOffset.FromUnixTimeSeconds(s);
+
+    public virtual DateTimeOffset Parse(string s) => DateTimeOffset.Parse(s);
+    public virtual bool TryParse(string s, out DateTimeOffset result)
+        => DateTimeOffset.TryParse(s, out result);
+
+    public virtual DateTimeOffset ParseExact(string s, [Syntax(Syntax.DateTimeFormat)] string format)
+        => DateTimeOffset.ParseExact(s, format, null, DateTimeStyles.None);
+    public virtual bool TryParseExact(
+        string s,
+        [Syntax(Syntax.DateTimeFormat)] string format,
+        out DateTimeOffset result)
+        => DateTimeOffset.TryParseExact(s, format, null, DateTimeStyles.None, out result);
+}
+    ]]></file> 
+    <file name="FileSystemAccessor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class FileSystemAccessor : HasDefault<FileSystemAccessor>, IFileSystemAccessor {
+    public virtual char DirectorySeparatorChar => Path.DirectorySeparatorChar;
+    public virtual string CombinePath(params string[] paths) => Path.Combine(paths);
+    public virtual string[] GetFilePath(string filePath)
+        => [.. Path.GetDirectoryName(filePath)?.Split(DirectorySeparatorChar) ?? [], GetFileName(filePath, true)];
+    public virtual string GetFileName(string filePath, bool includeExtension = false)
+        => includeExtension
+               ? Path.GetFileName(filePath)
+               : Path.GetFileNameWithoutExtension(filePath);
+    public virtual string GetFileExtension(string filePath, bool includeDot = true)
+        => includeDot
+               ? Path.GetExtension(filePath)
+               : Path.GetExtension(filePath).TrimStart('.');
+
+    public virtual string CurrentFolder {
+        get => Directory.GetCurrentDirectory();
+        set => Directory.SetCurrentDirectory(value);
+    }
+
+    public virtual bool FolderExists(string folderPath)
+        => Directory.Exists(folderPath);
+
+    private static readonly EnumerationOptions _defaultEnumerationOptions = new();
+    private static IEnumerable<string> GetFileSystemEntries(string baseFolder, SearchTarget target, string searchPattern = "*", EnumerationOptions? enumerationOptions = null) {
+        baseFolder += IsNotNullOrWhiteSpace(baseFolder)[^1] is '\\' or '/' ? string.Empty : '\\';
+        var list = target switch {
+            SearchTarget.File => Directory.EnumerateFiles(baseFolder, searchPattern, enumerationOptions ?? _defaultEnumerationOptions),
+            SearchTarget.Folder => Directory.EnumerateDirectories(baseFolder, searchPattern, enumerationOptions ?? _defaultEnumerationOptions),
+            _ => Directory.EnumerateFileSystemEntries(baseFolder, searchPattern, enumerationOptions ?? _defaultEnumerationOptions),
+        };
+        return list.Select(f => f[baseFolder.Length..]);
+    }
+
+    private enum SearchTarget {
+        Both,
+        File,
+        Folder,
+    }
+
+    public virtual IEnumerable<string> GetEntries(string baseFolder)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Both);
+
+    public virtual IEnumerable<string> GetEntries(string baseFolder, string searchPattern)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Both, searchPattern);
+    public virtual IEnumerable<string> GetEntries(string baseFolder, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Both, enumerationOptions: enumerationOptions);
+    public virtual IEnumerable<string> GetEntries(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Both, searchPattern, enumerationOptions);
+    public virtual IEnumerable<string> GetFiles(string baseFolder)
+        => GetFileSystemEntries(baseFolder, SearchTarget.File);
+    public virtual IEnumerable<string> GetFiles(string baseFolder, string searchPattern)
+        => GetFileSystemEntries(baseFolder, SearchTarget.File, searchPattern);
+    public virtual IEnumerable<string> GetFiles(string baseFolder, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.File, enumerationOptions: enumerationOptions);
+    public virtual IEnumerable<string> GetFiles(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.File, searchPattern, enumerationOptions);
+    public virtual IEnumerable<string> GetFolders(string baseFolder)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Folder);
+    public virtual IEnumerable<string> GetFolders(string baseFolder, string searchPattern)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Folder, searchPattern);
+    public virtual IEnumerable<string> GetFolders(string baseFolder, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Folder, enumerationOptions: enumerationOptions);
+    public virtual IEnumerable<string> GetFolders(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions)
+        => GetFileSystemEntries(baseFolder, SearchTarget.Folder, searchPattern, enumerationOptions);
+
+    public virtual char FolderSeparator => Path.DirectorySeparatorChar;
+    public virtual void CreateFolder(string folderPath)
+        => Directory.CreateDirectory(folderPath);
+    public virtual void DeleteFolder(string folderPath, bool includeAllContent = false)
+        => Directory.Delete(folderPath, includeAllContent);
+
+    public virtual bool FileExists(string filePath) => File.Exists(filePath);
+    public virtual void MoveFile(string sourcePath, string targetPath, bool overwrite = false) => File.Move(sourcePath, targetPath, overwrite);
+    public virtual void CopyFile(string sourcePath, string targetPath, bool overwrite = false) => File.Copy(sourcePath, targetPath, overwrite);
+    public virtual void DeleteFile(string sourcePath) => File.Delete(sourcePath);
+
+    public virtual Stream OpenFileAsReadOnly(string filePath, bool blockExternalAccess = true) => new FileStream(filePath, FileMode.Open, FileAccess.Read, blockExternalAccess ? FileShare.None : FileShare.ReadWrite);
+    public virtual Stream OpenOrCreateFile(string filePath, bool blockExternalAccess = true) => new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, blockExternalAccess ? FileShare.None : FileShare.Read);
+    public virtual Stream CreateNewOrOverwriteFile(string filePath, bool blockExternalAccess = true) => new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, blockExternalAccess ? FileShare.None : FileShare.Read);
+}
+    ]]></file> 
+    <file name="GuidProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class GuidProvider
+    : HasDefault<GuidProvider>,
+      IGuidProvider {
+    public virtual Guid Create() => Guid.NewGuid();
+    public virtual Guid Create(byte[] bytes) => new(bytes);
+    public virtual Guid Create(ReadOnlySpan<byte> bytes) => new(bytes);
+    public virtual Guid CreateSortable() => Ulid.NewUlid().ToGuid();
+    public virtual Guid CreateSortable(byte[] bytes) => new Ulid(bytes).ToGuid();
+    public virtual Guid CreateSortable(ReadOnlySpan<byte> bytes) => new Ulid(bytes).ToGuid();
+
+    public virtual Guid Parse(string input) => Guid.Parse(input);
+    public virtual Guid Parse(ReadOnlySpan<char> input) => Guid.Parse(input);
+    public virtual Guid Parse(string s, IFormatProvider? provider) => Guid.Parse(s, provider);
+    public virtual Guid Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Guid.Parse(s, provider);
+
+    public virtual Guid ParseExact(string input, [Syntax(Syntax.GuidFormat)] string format)
+        => Guid.ParseExact(input, format);
+    public virtual Guid ParseExact(ReadOnlySpan<char> input, [Syntax(Syntax.GuidFormat)] ReadOnlySpan<char> format)
+        => Guid.ParseExact(input, format);
+
+    public virtual bool TryParse([NotNullWhen(true)] string? input, out Guid result)
+        => Guid.TryParse(input, out result);
+    public virtual bool TryParse(ReadOnlySpan<char> input, out Guid result)
+        => Guid.TryParse(input, out result);
+    public virtual bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Guid result)
+        => Guid.TryParse(s, provider, out result);
+    public virtual bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Guid result)
+        => Guid.TryParse(s, provider, out result);
+
+    public virtual bool TryParseExact([NotNullWhen(true)] string? input, [NotNullWhen(true), Syntax(Syntax.GuidFormat)] string? format, out Guid result)
+        => Guid.TryParseExact(input, format, out result);
+    public virtual bool TryParseExact(ReadOnlySpan<char> input, [Syntax(Syntax.GuidFormat)] ReadOnlySpan<char> format, out Guid result)
+        => Guid.TryParseExact(input, format, out result);
+}
+    ]]></file> 
+    <file name="IApplicationEnvironment.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IApplicationEnvironment {
+    string Name { get; }
+    IAssemblyDescriptor Assembly { get; }
+    IOperatingSystem OperatingSystem { get; }
+}
+    ]]></file> 
+    <file name="IAssemblyAccessor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IAssemblyAccessor {
+    IAssemblyDescriptor GetExecutingAssembly();
+    IAssemblyDescriptor? GetEntryAssembly();
+    IAssemblyDescriptor? GetDeclaringAssembly(Type type);
+    IAssemblyDescriptor? GetDeclaringAssembly<TType>();
+    IAssemblyDescriptor GetCallingAssembly();
+}
+    ]]></file> 
+    <file name="IAssemblyDescriptor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IAssemblyDescriptor {
+    string Name { get; }
+    string FullName { get; }
+    Version Version { get; }
+    string RuntimeVersion { get; }
+    CultureInfo? CultureInfo { get; }
+    string? PublicKey { get; }
+    string? PublicKeyToken { get; }
+    string Location { get; }
+    MethodInfo? EntryPoint { get; }
+    Module ManifestModule { get; }
+    IEnumerable<Attribute> GetCustomAttributes();
+    IEnumerable<Attribute> GetCustomAttributes(Type attributeType);
+    IEnumerable<Attribute> GetCustomAttributes<TAttribute>()
+        where TAttribute : Attribute;
+    TAttribute? GetCustomAttribute<TAttribute>()
+        where TAttribute : Attribute;
+    Attribute? GetCustomAttribute(Type attributeType);
+    IEnumerable<TypeInfo> DefinedTypes { get; }
+    IEnumerable<Type> ExportedTypes { get; }
+    IEnumerable<Module> Modules { get; }
+}
+    ]]></file> 
+    <file name="IDateTimeProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IDateTimeProvider {
+    DateTimeOffset Maximum { get; }
+    DateTimeOffset Minimum { get; }
+    DateTimeOffset Now { get; }
+    TimeOnly TimeOfDay { get; }
+    DateOnly Today { get; }
+    DateTimeOffset UnixEpoch { get; }
+    DateTimeOffset UtcNow { get; }
+    TimeOnly UtcTimeOfDay { get; }
+    DateOnly UtcToday { get; }
+
+    DateTimeOffset FromFileTime(long fileTime);
+    DateTimeOffset FromUnixTimeMilliseconds(long ms);
+    DateTimeOffset FromUnixTimeSeconds(long s);
+    DateTimeOffset Parse(string s);
+    DateTimeOffset ParseExact(string s, [Syntax("DateTimeFormat")] string format);
+    bool TryParse(string s, out DateTimeOffset result);
+    bool TryParseExact(string s, [Syntax("DateTimeFormat")] string format, out DateTimeOffset result);
+}
+    ]]></file> 
+    <file name="IFileSystemAccessor.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IFileSystemAccessor {
+    char DirectorySeparatorChar { get; }
+
+    string CombinePath(params string[] paths);
+    void CopyFile(string sourcePath, string targetPath, bool overwrite = false);
+    void CreateFolder(string folderPath);
+    Stream CreateNewOrOverwriteFile(string filePath, bool blockExternalAccess = true);
+    void DeleteFile(string sourcePath);
+    void DeleteFolder(string folderPath, bool includeAllContent = false);
+    bool FileExists(string filePath);
+    string[] GetFilePath(string filePath);
+    string GetFileName(string filePath, bool includeExtension = false);
+    string GetFileExtension(string filePath, bool includeDot = true);
+    char FolderSeparator { get; }
+    string CurrentFolder { get; set; }
+    bool FolderExists(string folderPath);
+    IEnumerable<string> GetEntries(string baseFolder);
+    IEnumerable<string> GetEntries(string baseFolder, string searchPattern);
+    IEnumerable<string> GetEntries(string baseFolder, EnumerationOptions enumerationOptions);
+    IEnumerable<string> GetEntries(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions);
+    IEnumerable<string> GetFiles(string baseFolder);
+    IEnumerable<string> GetFiles(string baseFolder, string searchPattern);
+    IEnumerable<string> GetFiles(string baseFolder, EnumerationOptions enumerationOptions);
+    IEnumerable<string> GetFiles(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions);
+    IEnumerable<string> GetFolders(string baseFolder);
+    IEnumerable<string> GetFolders(string baseFolder, string searchPattern);
+    IEnumerable<string> GetFolders(string baseFolder, EnumerationOptions enumerationOptions);
+    IEnumerable<string> GetFolders(string baseFolder, string searchPattern, EnumerationOptions enumerationOptions);
+    void MoveFile(string sourcePath, string targetPath, bool overwrite = false);
+    Stream OpenFileAsReadOnly(string filePath, bool blockExternalAccess = true);
+    Stream OpenOrCreateFile(string filePath, bool blockExternalAccess = true);
+}
+    ]]></file> 
+    <file name="IGuidProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IGuidProvider {
+    Guid Create();
+    Guid Create(byte[] bytes);
+    Guid Create(ReadOnlySpan<byte> bytes);
+    Guid CreateSortable();
+    Guid CreateSortable(byte[] bytes);
+    Guid CreateSortable(ReadOnlySpan<byte> bytes);
+
+    Guid Parse(ReadOnlySpan<char> input);
+    Guid Parse(ReadOnlySpan<char> s, IFormatProvider? provider);
+    Guid Parse(string input);
+    Guid Parse(string s, IFormatProvider? provider);
+    Guid ParseExact(ReadOnlySpan<char> input, [Syntax("GuidFormat")] ReadOnlySpan<char> format);
+    Guid ParseExact(string input, [Syntax("GuidFormat")] string format);
+    bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Guid result);
+    bool TryParse(ReadOnlySpan<char> input, out Guid result);
+    bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Guid result);
+    bool TryParse([NotNullWhen(true)] string? input, out Guid result);
+    bool TryParseExact(ReadOnlySpan<char> input, [Syntax("GuidFormat")] ReadOnlySpan<char> format, out Guid result);
+    bool TryParseExact([NotNullWhen(true)] string? input, [NotNullWhen(true), Syntax("GuidFormat")] string? format, out Guid result);
+}
+    ]]></file> 
+    <file name="IInput.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IInput {
+    Encoding Encoding { get; set; }
+    TextReader Reader { get; }
+
+    TextPromptBuilder BuildTextPrompt(string prompt);
+    ValuePromptBuilder<TValue> BuildInlinePrompt<TValue>(string prompt);
+    SelectionPromptBuilder BuildSelectionPrompt(string prompt);
+    SelectionPromptBuilder<TValue> BuildSelectionPrompt<TValue>(string prompt, Func<TValue, object> selectKey);
+    SelectionPromptBuilder<TValue, TKey> BuildSelectionPrompt<TValue, TKey>(string prompt, Func<TValue, TKey> selectKey)
+        where TKey : notnull;
+
+    int Read();
+    ConsoleKeyInfo ReadKey(bool intercept = false);
+    string ReadLine();
+    Task<string> ReadLineAsync(CancellationToken ct = default);
+    string ReadText();
+    Task<string> ReadTextAsync(CancellationToken ct = default);
+
+    bool Confirm(string prompt, bool defaultChoice = true);
+    Task<bool> ConfirmAsync(string prompt, CancellationToken ct = default);
+    Task<bool> ConfirmAsync(string prompt, bool defaultChoice, CancellationToken ct = default);
+
+    string Ask(string prompt);
+    string Ask(string prompt, string defaultValue);
+    Task<string> AskAsync(string prompt, CancellationToken ct = default);
+    Task<string> AskAsync(string prompt, string defaultValue, CancellationToken ct = default);
+
+    TValue Prompt<TValue>(string prompt);
+    TValue Prompt<TValue>(string prompt, TValue defaultValue);
+    TValue Prompt<TValue>(string prompt, IEnumerable<TValue> choices);
+    TValue Prompt<TValue>(string prompt, TValue defaultChoice, IEnumerable<TValue> otherChoices);
+    Task<TValue> PromptAsync<TValue>(string prompt, CancellationToken ct = default);
+    Task<TValue> PromptAsync<TValue>(string prompt, TValue defaultValue, CancellationToken ct = default);
+    Task<TValue> PromptAsync<TValue>(string prompt, IEnumerable<TValue> choices, CancellationToken ct = default);
+    Task<TValue> PromptAsync<TValue>(string prompt, TValue defaultChoice, IEnumerable<TValue> otherChoices, CancellationToken ct = default);
+
+    string Prompt(string prompt);
+    string Prompt(string prompt, string defaultValue);
+    string Prompt(string prompt, IEnumerable<string> choices);
+    string Prompt(string prompt, string defaultChoice, IEnumerable<string> otherChoices);
+    Task<string> PromptAsync(string prompt, CancellationToken ct = default);
+    Task<string> PromptAsync(string prompt, string defaultValue, CancellationToken ct = default);
+    Task<string> PromptAsync(string prompt, IEnumerable<string> choices, CancellationToken ct = default);
+    Task<string> PromptAsync(string prompt, string defaultChoice, IEnumerable<string> otherChoices, CancellationToken ct = default);
+
+    TValue? SelectOne<TValue>(string prompt, Func<TValue, object> selectKey, params TValue[] choices);
+    TValue? SelectOne<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, params TValue[] otherChoices);
+    Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, CancellationToken ct = default);
+    Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, CancellationToken ct = default);
+    Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue[] choices, CancellationToken ct = default);
+    Task<TValue?> SelectOneAsync<TValue>(string prompt, Func<TValue, object> selectKey, TValue defaultChoice, TValue[] otherChoices, CancellationToken ct = default);
+    string? SelectOne(string prompt, params string[] choices);
+    string? SelectOne(string prompt, string defaultChoice, params string[] otherChoices);
+    Task<string?> SelectOneAsync(string prompt, string defaultChoice, CancellationToken ct = default);
+    Task<string?> SelectOneAsync(string prompt, CancellationToken ct = default);
+    Task<string?> SelectOneAsync(string prompt, string defaultChoice, string[] otherChoices, CancellationToken ct = default);
+    Task<string?> SelectOneAsync(string prompt, string[] choices, CancellationToken ct = default);
+}
+    ]]></file> 
+    <file name="ILinePromptBuilder.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IPromptBuilder
+    : ILinePromptBuilder<string>;
+
+public interface ILinePromptBuilder<TValue> {
+    ValuePromptBuilder<TValue> UseMask(char? maskChar);
+    ValuePromptBuilder<TValue> ConvertWith(Func<TValue, string> converter);
+    ValuePromptBuilder<TValue> AddChoices(IEnumerable<TValue> choices);
+    ValuePromptBuilder<TValue> AddChoices(TValue choice, params TValue[] otherChoices);
+    ValuePromptBuilder<TValue> ShowOptionalFlag();
+    ValuePromptBuilder<TValue> AddValidation(Func<TValue, Result> validate);
+    TValue Show();
+    Task<TValue> ShowAsync(CancellationToken ct = default);
+}
+    ]]></file> 
+    <file name="IOperatingSystem.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IOperatingSystem {
+    string Name { get; }
+    Version Version { get; }
+    string ServicePack { get; }
+    string EndOfLine { get; }
+    IDateTimeProvider DateTime { get; }
+    IFileSystemAccessor FileSystem { get; }
+    IGuidProvider Guid { get; }
+    IInput Input { get; }
+    IOutput Output { get; }
+}
+    ]]></file> 
+    <file name="IOutput.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IOutput {
+    string Prompt { get; set; }
+    ConsoleColor BackgroundColor { get; set; }
+    Encoding Encoding { get; set; }
+    TextWriter ErrorWriter { get; }
+    ConsoleColor ForegroundColor { get; set; }
+    TextWriter Writer { get; }
+
+    void ClearScreen();
+    void ResetColor();
+    void Write(bool value);
+    void Write(char value);
+    void Write(char[] buffer, int index, int count);
+    void Write(char[]? buffer);
+    void Write(decimal value);
+    void Write(double value);
+    void Write(float value);
+    void Write(int value);
+    void Write(long value);
+    void Write(string value);
+    void Write([Syntax(Syntax.CompositeFormat)] string format, params object?[] args);
+    void Write(object? value);
+    void Write(StringBuilder? builder);
+    void Write(uint value);
+    void Write(ulong value);
+    void WritePrompt();
+
+    string NewLine { get; }
+    void WriteLine();
+    void WriteLine(bool value);
+    void WriteLine(char value);
+    void WriteLine(char[] buffer, int index, int count);
+    void WriteLine(char[]? buffer);
+    void WriteLine(decimal value);
+    void WriteLine(double value);
+    void WriteLine(float value);
+    void WriteLine(int value);
+    void WriteLine(uint value);
+    void WriteLine(long value);
+    void WriteLine(ulong value);
+    void WriteLine(string value);
+    void WriteLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args);
+    void WriteLine(object? value);
+    void WriteLine(StringBuilder? builder);
+    void WriteOnANewLine(bool value);
+    void WriteOnANewLine(char value);
+    void WriteOnANewLine(char[] buffer, int index, int count);
+    void WriteOnANewLine(char[]? buffer);
+    void WriteOnANewLine(decimal value);
+    void WriteOnANewLine(double value);
+    void WriteOnANewLine(float value);
+    void WriteOnANewLine(int value);
+    void WriteOnANewLine(uint value);
+    void WriteOnANewLine(long value);
+    void WriteOnANewLine(ulong value);
+    void WriteOnANewLine(string value);
+    void WriteOnANewLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args);
+    void WriteOnANewLine(object? value);
+    void WriteOnANewLine(StringBuilder? builder);
+    void WriteError(Exception exception);
+    void WriteError(Exception exception, string message);
+    void WriteError(string message);
+}
+    ]]></file> 
+    <file name="ISelectionPromptBuilder.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface ISelectionPromptBuilder :
+    ISelectionPromptBuilder<string, uint>;
+
+public interface ISelectionPromptBuilder<TValue> :
+    ISelectionPromptBuilder<TValue, object>;
+
+public interface ISelectionPromptBuilder<TValue, TKey>
+    where TKey : notnull {
+    SelectionPromptBuilder<TValue, TKey> DisplayAs(Func<TValue, string> displayAs);
+    SelectionPromptBuilder<TValue, TKey> SetAsDefault(TKey defaultKey);
+    SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, string text, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, TValue choice, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TValue choice, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, string text, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, TValue choice, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddChoice(TValue choice, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> AddChoices(IEnumerable<TValue> choices, ChoicePosition position = default);
+    SelectionPromptBuilder<TValue, TKey> ShowResult();
+    TValue? Show();
+    Task<TValue?> ShowAsync(CancellationToken ct = default);
+}
+    ]]></file> 
+    <file name="IStringGuidProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public interface IStringGuidProvider {
+    string Create();
+    string Create(byte[] bytes);
+    string Create(ReadOnlySpan<byte> bytes);
+    string CreateSortable();
+    string CreateSortable(byte[] bytes);
+    string CreateSortable(ReadOnlySpan<byte> bytes);
+
+    string EnsureIsValid(ReadOnlySpan<char> input);
+    string EnsureIsValid(ReadOnlySpan<char> s, IFormatProvider? provider);
+    string EnsureIsValid(string input);
+    string EnsureIsValid(string s, IFormatProvider? provider);
+    string EnsureIsValid(ReadOnlySpan<char> input, [Syntax("GuidFormat")] ReadOnlySpan<char> format);
+    string EnsureIsValid(string input, [Syntax("GuidFormat")] string format);
+    bool IsValid(ReadOnlySpan<char> s, IFormatProvider? provider);
+    bool IsValid(ReadOnlySpan<char> input);
+    bool IsValid([NotNullWhen(true)] string? s, IFormatProvider? provider);
+    bool IsValid([NotNullWhen(true)] string? input);
+    bool IsValid(ReadOnlySpan<char> input, [Syntax("GuidFormat")] ReadOnlySpan<char> format);
+    bool IsValid([NotNullWhen(true)] string? input, [NotNullWhen(true), Syntax("GuidFormat")] string? format);
+}
+    ]]></file> 
+    <file name="ITextPromptBuilder.cs"><![CDATA[ 
+namespace DotNetToolbox.Environment;
+
+public interface ITextPromptBuilder {
+    string Show();
+    Task<string> ShowAsync(CancellationToken ct = default);
+}
+    ]]></file> 
+    <file name="OperatingSystem.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public class OperatingSystem(IServiceProvider services, string? name = null, Version? version = null, string? servicePack = null, string? eol = null)
+    : IOperatingSystem {
+    public virtual string Name { get; } = name ?? $"{System.Environment.OSVersion.Platform}";
+    public virtual Version Version { get; } = version ?? System.Environment.OSVersion.Version;
+    public virtual string ServicePack { get; } = servicePack ?? $"{System.Environment.OSVersion.ServicePack}";
+    public virtual string EndOfLine { get; } = eol ?? System.Environment.NewLine;
+    public virtual IOutput Output { get; } = services.GetRequiredService<IOutput>();
+    public virtual IInput Input { get; } = services.GetRequiredService<IInput>();
+    public virtual IDateTimeProvider DateTime { get; } = services.GetRequiredService<IDateTimeProvider>();
+    public virtual IGuidProvider Guid { get; } = services.GetRequiredService<IGuidProvider>();
+    public virtual IFileSystemAccessor FileSystem { get; } = services.GetRequiredService<IFileSystemAccessor>();
+}
+    ]]></file> 
+    <file name="OutputVerboseLevel.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public enum OutputVerboseLevel {
+    Trace = -2,
+    Debug = -1,
+    Default = 0,
+    Detailed = 1,
+    Warning = 2,
+    Error = 3,
+    Critical = 4,
+    Silent = 5,
+}
+    ]]></file> 
+    <file name="SelectionPromptBuilder.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public class SelectionPromptBuilder(string prompt)
+    : SelectionPromptBuilder<string, string>(prompt, value => value);
+
+public class SelectionPromptBuilder<TValue>(string prompt, Func<TValue, object> selectKey)
+    : SelectionPromptBuilder<TValue, object>(prompt, selectKey);
+
+public class SelectionPromptBuilder<TValue, TKey>(string prompt, Func<TValue, TKey> selectKey)
+    : ISelectionPromptBuilder<TValue, TKey>
+    where TKey : notnull {
+    private record Choice(TValue? Value, TKey Key, string Text, ChoicePosition Position);
+
+    private string _prompt = prompt;
+    private readonly Func<TValue, TKey> _selectKey = IsNotNull(selectKey);
+    private readonly List<Choice> _choices = [];
+
+    private Func<TValue, string> _displayAs = v => v?.ToString() ?? string.Empty;
+    private TKey _defaultKey = default!;
+    private bool _showResult;
+
+    [MemberNotNullWhen(true, nameof(_defaultKey))]
+    private bool HasDefault { get; set; }
+
+    public SelectionPromptBuilder<TValue, TKey> DisplayAs(Func<TValue, string>? displayAs = null) {
+        _displayAs = displayAs ?? _displayAs;
+        return this;
+    }
+
+    public SelectionPromptBuilder<TValue, TKey> ShowResult() {
+        _showResult = true;
+        return this;
+    }
+
+    public SelectionPromptBuilder<TValue, TKey> SetAsDefault(TKey defaultKey) {
+        if (!_choices.Any(c => c.Key.Equals(defaultKey))) throw new InvalidOperationException($"Choice with key '{defaultKey}' not found.");
+        _defaultKey = IsNotNull(defaultKey);
+        HasDefault = true;
+        return this;
+    }
+
+    private SelectionPromptBuilder<TValue, TKey> AddChoice(TValue? choice, TKey key, string? text, bool isDefault, ChoicePosition position = default) {
+        if (_choices.Any(c => c.Key.Equals(IsNotNull(key)))) throw new InvalidOperationException("Choice key must be unique.");
+        text ??= string.Empty;
+        if (_choices.Any(c => c.Text.Equals(text, StringComparison.Ordinal))) throw new InvalidOperationException("Choice text must be unique.");
+        var choiceIndex = position switch {
+            ChoicePosition.AtEnd => _choices.Count,
+            ChoicePosition.AtStart => 0,
+            _ => GetInsertIndex(),
+        };
+        _choices.Insert(choiceIndex, new(choice, key, text, position));
+        if (!isDefault) return this;
+        if (HasDefault) throw new InvalidOperationException("Default choice is already set.");
+        _defaultKey = key;
+        HasDefault = true;
+        return this;
+
+        int GetInsertIndex() {
+            var start = _choices.FindIndex(c => c.Position == ChoicePosition.Sorted);
+            if (start == -1) start = _choices.Count;
+            var sortedChoices = _choices.Where(c => c.Position == ChoicePosition.Sorted).ToList();
+            var insertAt = sortedChoices.FindIndex(c => string.CompareOrdinal(c.Text, text) > 0);
+            return insertAt == -1 ? start + sortedChoices.Count : start + insertAt;
+        }
+    }
+
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, string text, ChoicePosition position = default)
+        => AddChoice(default, key, text, isDefault: true, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TKey key, TValue choice, ChoicePosition position = default)
+        => AddChoice(choice, key, _displayAs(choice), isDefault: true, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddDefaultChoice(TValue choice, ChoicePosition position = default)
+        => AddChoice(choice, _selectKey(choice), _displayAs(choice), isDefault: true, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, string text, ChoicePosition position = default)
+        => AddChoice(default, key, text, isDefault: false, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TKey key, TValue choice, ChoicePosition position = default)
+        => AddChoice(choice, key, _displayAs(choice), isDefault: false, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddChoice(TValue choice, ChoicePosition position = default)
+        => AddChoice(choice, _selectKey(choice), _displayAs(choice), isDefault: false, position);
+
+    public SelectionPromptBuilder<TValue, TKey> AddChoices(IEnumerable<TValue> choices, ChoicePosition position = default) {
+        choices = position == ChoicePosition.AtStart ? choices.Reverse() : choices;
+        foreach (var choice in choices) AddChoice(choice, position);
+        return this;
+    }
+
+    public TValue? Show() => ShowAsync().GetAwaiter().GetResult();
+
+    public async Task<TValue?> ShowAsync(CancellationToken ct = default) {
+        var prompt = new SelectionPrompt<int>();
+        prompt.UseConverter(i => _choices[i].Text);
+        prompt.AddChoices(_choices.Select((_, i) => i));
+        var defaultText = _choices.Find(i => i.Key.Equals(_defaultKey));
+        var isQuestion = _prompt.EndsWith('?');
+        _prompt = HasDefault ? $"{_prompt} [blue]({defaultText})[/]" : _prompt;
+        prompt.Title(_prompt);
+        var result = await prompt.ShowAsync(AnsiConsole.Console, ct);
+        var resultText = prompt.Converter?.Invoke(result) ?? string.Empty;
+        var separator = isQuestion ? string.Empty : ":";
+        if (_showResult) AnsiConsole.WriteLine($"{_prompt}{separator} [green]{resultText}[/]");
+        return _choices[result].Value!;
+    }
+}
+    ]]></file> 
+    <file name="StringGuidProvider.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+[ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
+public class StringGuidProvider(IGuidProvider guid)
+    : HasDefault<StringGuidProvider>,
+      IStringGuidProvider {
+    public StringGuidProvider()
+        : this(GuidProvider.Default) {
+    }
+
+    public virtual string Create() => guid.Create().ToString();
+    public virtual string Create(byte[] bytes) => guid.Create(bytes).ToString();
+    public virtual string Create(ReadOnlySpan<byte> bytes) => guid.Create(bytes).ToString();
+    public virtual string CreateSortable() => guid.CreateSortable().ToString();
+    public virtual string CreateSortable(byte[] bytes) => guid.CreateSortable(bytes).ToString();
+    public virtual string CreateSortable(ReadOnlySpan<byte> bytes) => guid.CreateSortable(bytes).ToString();
+
+    public virtual string EnsureIsValid(string input) => guid.Parse(input).ToString();
+    public virtual string EnsureIsValid(ReadOnlySpan<char> input) => guid.Parse(input).ToString();
+    public virtual string EnsureIsValid(string s, IFormatProvider? provider) => guid.Parse(s, provider).ToString();
+    public virtual string EnsureIsValid(ReadOnlySpan<char> s, IFormatProvider? provider) => guid.Parse(s, provider).ToString();
+
+    public virtual string EnsureIsValid(string input, [Syntax(Syntax.GuidFormat)] string format)
+        => guid.ParseExact(input, format).ToString();
+    public virtual string EnsureIsValid(ReadOnlySpan<char> input, [Syntax(Syntax.GuidFormat)] ReadOnlySpan<char> format)
+        => guid.ParseExact(input, format).ToString();
+
+    public virtual bool IsValid([NotNullWhen(true)] string? input)
+        => guid.TryParse(input, out _);
+    public virtual bool IsValid(ReadOnlySpan<char> input)
+        => guid.TryParse(input, out _);
+    public virtual bool IsValid([NotNullWhen(true)] string? s, IFormatProvider? provider)
+        => guid.TryParse(s, provider, out _);
+    public virtual bool IsValid(ReadOnlySpan<char> s, IFormatProvider? provider)
+        => guid.TryParse(s, provider, out _);
+
+    public virtual bool IsValid([NotNullWhen(true)] string? input, [NotNullWhen(true), Syntax(Syntax.GuidFormat)] string? format)
+        => guid.TryParseExact(input, format, out _);
+    public virtual bool IsValid(ReadOnlySpan<char> input, [Syntax(Syntax.GuidFormat)] ReadOnlySpan<char> format)
+        => guid.TryParseExact(input, format, out _);
+}
+    ]]></file> 
+    <file name="TextPromptBuilder.cs"><![CDATA[ 
+namespace DotNetToolbox.Environment;
+
+public class TextPromptBuilder(string prompt, string defaultValue)
+    : ITextPromptBuilder {
+    private uint _maxLines;
+    private Func<string, Result>? _validator;
+
+    public TextPromptBuilder(string prompt)
+        : this(prompt, string.Empty) {
+    }
+
+    public TextPromptBuilder()
+        : this(string.Empty, string.Empty) {
+    }
+
+    public TextPromptBuilder AddValidation(Func<string, Result> validate) {
+        var oldValidator = _validator;
+        _validator = value => {
+            var result = oldValidator?.Invoke(value) ?? Result.Success();
+            result += validate(value);
+            return result;
+        };
+        return this;
+    }
+
+    public TextPromptBuilder MaximumNumberOfLines(uint lines) {
+        _maxLines = lines;
+        return this;
+    }
+
+    public string Show() => ShowAsync().GetAwaiter().GetResult();
+
+    public async Task<string> ShowAsync(CancellationToken ct = default) {
+        var firstLine = new Markup("[yellow]>[/]");
+        var otherLines = new Markup("[yellow]|[/]");
+        var editor = new TextEditor {
+            MaximumNumberOfLines = _maxLines,
+            PromptPrefix = new PromptPrefix(firstLine, otherLines),
+            Text = defaultValue,
+            Validator = BuildValidator(),
+        };
+
+        var formattedPrompt = FormatPrompt(editor);
+        var result = string.Empty;
+        while (editor.State == TextEditorState.Active) {
+            AnsiConsole.WriteLine(formattedPrompt);
+            result = await editor.ReadText(ct) ?? result;
+            if (editor.State is not TextEditorState.Invalid) continue;
+            AnsiConsole.WriteLine(editor.ErrorMessage);
+            AnsiConsole.WriteLine("[yellow]Please try again.[/]");
+            AnsiConsole.WriteLine();
+            editor.ResetState();
+        }
+
+        return result;
+    }
+
+    private string FormatPrompt(TextEditor editor) {
+        var formatedPrompt = $"[teal]{prompt}[/]";
+        if (_maxLines != 1) {
+            formatedPrompt += $"{System.Environment.NewLine}[gray]Press ENTER to insert a new line, CTRL+ENTER to submit, and ESCAPE to cancel.[/]";
+            editor.KeyBindings.Add<NewLineCommand>(ConsoleKey.Enter);
+            editor.KeyBindings.Add<SubmitCommand>(ConsoleKey.Enter, ConsoleModifiers.Control);
+        }
+        else {
+            formatedPrompt += $"{System.Environment.NewLine}[gray]Press ENTER to submit and ESCAPE to cancel.[/]";
+        }
+
+        return formatedPrompt;
+    }
+
+    private Func<string, ValidationResult>? BuildValidator()
+        => _validator is null ? null : value => {
+            var result = _validator(value);
+            if (result.IsSuccess) return ValidationResult.Success();
+            if (result.Errors.Count == 1) return ValidationResult.Error($"[red]{result.Errors[0].Message}[/]");
+            var errors = new StringBuilder();
+            errors.AppendLine("[red]The input value is invalid.[/]");
+            foreach (var item in result.Errors)
+                errors.AppendLine($"[red] - {item.Message}[/]");
+            return ValidationResult.Error(errors.ToString());
+        };
+}
+    ]]></file> 
+    <file name="ValuePromptBuilder.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Environment;
+
+public class ValuePromptBuilder<TValue>(string prompt)
+    : ILinePromptBuilder<TValue> {
+    private readonly List<TValue> _choices = [];
+    private string _prompt = IsNotNullOrWhiteSpace(prompt);
+    private bool _isRequired = true;
+    private Func<TValue, Result>? _validator;
+    private Func<TValue, string>? _converter;
+    private char? _maskChar;
+    private readonly TValue? _defaultValue;
+
+    [MemberNotNullWhen(true, nameof(_defaultValue))]
+    private bool HasDefault { get; }
+
+    public ValuePromptBuilder()
+        : this(string.Empty) {
+    }
+
+    public ValuePromptBuilder(string prompt, TValue defaultValue)
+        : this(prompt) {
+        _defaultValue = IsNotNull(defaultValue);
+        HasDefault = _defaultValue is not string text || !string.IsNullOrEmpty(text);
+    }
+
+    public ValuePromptBuilder<TValue> ConvertWith(Func<TValue, string> converter) {
+        _converter = converter;
+        return this;
+    }
+
+    public ValuePromptBuilder<TValue> UseMask(char? maskChar) {
+        _maskChar = maskChar ?? '*';
+        return this;
+    }
+
+    public ValuePromptBuilder<TValue> AddValidation(Func<TValue, Result> validate) {
+        var oldValidator = _validator;
+        _validator = value => {
+            var result = oldValidator is null ? Result.Success() : oldValidator(value);
+            result += validate(value);
+            return result;
+        };
+        return this;
+    }
+
+    public ValuePromptBuilder<TValue> ShowOptionalFlag() {
+        _isRequired = false;
+        return this;
+    }
+
+    public ValuePromptBuilder<TValue> AddChoices(IEnumerable<TValue> choices) {
+        _choices.AddRange(choices.Distinct());
+        return this;
+    }
+
+    public ValuePromptBuilder<TValue> AddChoices(TValue choice, params TValue[] otherChoices)
+        => AddChoices([choice, .. otherChoices]);
+
+    private Func<TValue, ValidationResult> BuildValidator()
+        => value => {
+            var result = _validator?.Invoke(value) ?? Result.Success();
+            if (result.IsSuccess) return ValidationResult.Success();
+            if (result.Errors.Count == 1) return ValidationResult.Error($"[red]{result.Errors[0].Message}[/]");
+            var errors = new StringBuilder();
+            errors.AppendLine("[red]The entry is invalid.[/]");
+            foreach (var item in result.Errors)
+                errors.AppendLine($"[red] - {item.Message}[/]");
+            return ValidationResult.Error(errors.ToString());
+        };
+
+    public TValue Show() => ShowAsync().GetAwaiter().GetResult();
+
+    public Task<TValue> ShowAsync(CancellationToken ct = default) {
+        _prompt = $"[teal]{_prompt}[/]";
+        if (!_isRequired) _prompt = "[green](optional)[/] " + _prompt;
+        var prompt = new TextPrompt<TValue>(_prompt);
+        prompt.AllowEmpty().ChoicesStyle(new(foreground: Color.Blue));
+        if (_maskChar is not null) prompt = prompt.Secret(_maskChar);
+        if (HasDefault) prompt.DefaultValue(_defaultValue);
+        if (_choices.Count > 0) {
+            prompt.AddChoices(_choices);
+            prompt.ShowChoices();
+            AddValidation(ValidateChoices);
+        }
+        if (_converter is not null) prompt.Converter = _converter;
+        if (_validator is not null) prompt.Validator = BuildValidator();
+
+        return prompt.ShowAsync(AnsiConsole.Console, ct);
+    }
+
+    private Result ValidateChoices(TValue value)
+        => _choices.Count == 0 || _choices.Contains(value)
+               ? Result.Success()
+               : Result.Invalid("Please select one of the available options");
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Pagination"> 
+    <file name="Chunk.cs"><![CDATA[ 
+﻿using static DotNetToolbox.Pagination.PaginationSettings;
+
+namespace DotNetToolbox.Pagination;
+
+[method: SetsRequiredMembers]
+public class Chunk<TItem>(IReadOnlyList<TItem> items, uint size = DefaultBlockSize)
+    : IChunk<TItem> {
+    [SetsRequiredMembers]
+    public Chunk() : this([]) {
+    }
+
+    public required IReadOnlyList<TItem> Items { get; init; } = IsNotNull(items);
+    public uint Size { get; init; } = size;
+}
+
+[method: SetsRequiredMembers]
+public class Chunk<TItem, TMarker>(IReadOnlyList<TItem> items, TMarker? marker, uint size = DefaultBlockSize)
+    : Chunk<TItem>(items, size)
+    , IChunk<TItem, TMarker> {
+    [SetsRequiredMembers]
+    public Chunk()
+        : this([], default!) {
+    }
+
+    public required TMarker? Marker { get; init; } = marker;
+}
+    ]]></file> 
+    <file name="IChunk.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Pagination;
+
+public interface IChunk<out TItem> {
+    uint Size { get; }
+    IReadOnlyList<TItem> Items { get; }
+};
+
+public interface IChunk<out TItem, out TMarker>
+    : IChunk<TItem> {
+    TMarker? Marker { get; }
+}
+    ]]></file> 
+    <file name="IPage.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Pagination;
+
+public interface IPage<out TItem> {
+    uint TotalCount { get; }
+    IReadOnlyList<TItem> Items { get; }
+    uint Index { get; }
+    uint Size { get; }
+}
+    ]]></file> 
+    <file name="Page.cs"><![CDATA[ 
+﻿using static DotNetToolbox.Pagination.PaginationSettings;
+
+namespace DotNetToolbox.Pagination;
+
+[method: SetsRequiredMembers]
+public class Page<TItem>(IReadOnlyList<TItem> items, uint index = 0, uint size = DefaultPageSize, uint totalCount = 0)
+    : IPage<TItem> {
+    [SetsRequiredMembers]
+    public Page() : this([]) {
+    }
+
+    public uint TotalCount { get; init; } = totalCount;
+    public required IReadOnlyList<TItem> Items { get; init; } = IsNotNull(items);
+    public uint Index { get; init; } = index;
+    public uint Size { get; init; } = size;
+}
+    ]]></file> 
+    <file name="PaginationSettings.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Pagination;
+
+public static class PaginationSettings {
+    public const uint MaxSize = 1_000;
+    public const uint MinSize = 1;
+    public const uint MaxCount = 1_000_000_000;
+    public const uint MaxIndex = 999_999_999;
+
+    public const uint DefaultBlockSize = 20;
+    public const uint DefaultPageSize = 20;
+}
+    ]]></file> 
+  </folder> 
+  <folder name="pkgs"> 
+  </folder> 
+  <folder name="Results"> 
+    <file name="CrudResult.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public record CrudResult : ResultBase<CrudResultType> {
+    private readonly CrudResultType _type = CrudResultType.Success;
+
+    public CrudResult() {
+    }
+
+    protected CrudResult(Exception exception)
+        : base(exception) {
+    }
+
+    protected CrudResult(CrudResultType type, IEnumerable<ValidationError>? errors = null)
+        : base(errors) {
+        _type = type;
+    }
+
+    public override CrudResultType Type => HasException
+        ? CrudResultType.Error
+        : HasErrors
+            ? CrudResultType.Invalid
+            : _type;
+
+    public bool IsSuccess => Type is CrudResultType.Success;
+    public bool IsInvalid => Type is CrudResultType.Invalid;
+    public bool IsFaulty => Type is CrudResultType.Error;
+    public bool WasNotFound => Type is CrudResultType.NotFound;
+    public bool HasConflict => Type is CrudResultType.Conflict;
+
+    public static CrudResult Success() => new(CrudResultType.Success);
+    public static CrudResult NotFound() => new(CrudResultType.NotFound);
+    public static CrudResult Conflict() => new(CrudResultType.Conflict);
+    public static CrudResult Invalid(Result result) => new(CrudResultType.Invalid, result.Errors);
+    public static CrudResult Error(string error) => Error(new Exception(error));
+    public static CrudResult Error(Exception exception) => new(exception);
+
+    public static Task<CrudResult> SuccessTask() => Task.FromResult(Success());
+    public static Task<CrudResult> NotFoundTask() => Task.FromResult(NotFound());
+    public static Task<CrudResult> ConflictTask() => Task.FromResult(Conflict());
+    public static Task<CrudResult> InvalidTask(Result result) => Task.FromResult(Invalid(result));
+    public static Task<CrudResult> ErrorTask(string error) => ErrorTask(new Exception(error));
+    public static Task<CrudResult> ErrorTask(Exception exception) => Task.FromResult(Error(exception));
+
+    public static implicit operator CrudResult(Exception exception) => new(exception);
+    public static implicit operator CrudResult(string error) => (Result)error;
+    public static implicit operator CrudResult(ValidationError error) => (Result)error;
+    public static implicit operator CrudResult(ValidationErrors errors) => (Result)errors;
+    public static implicit operator CrudResult(ValidationError[] errors) => (Result)errors;
+    public static implicit operator CrudResult(List<ValidationError> errors) => (Result)errors;
+    public static implicit operator CrudResult(HashSet<ValidationError> errors) => (Result)errors;
+    public static implicit operator CrudResult(Result result) => new(CrudResultType.Success, result.Errors);
+    public static implicit operator ValidationErrors(CrudResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](CrudResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(CrudResult result) => result.Exception;
+
+    public static CrudResult operator +(CrudResult left, Result right)
+        => left.HasException
+               ? left
+               : right.HasException
+                   ? new(right.Exception)
+                   : new(left._type, left.Errors.Union(right.Errors));
+
+    public static CrudResult<TValue> Success<TValue>(TValue value) => new(CrudResultType.Success, value);
+    public static CrudResult<TValue> NotFound<TValue>() => new(CrudResultType.NotFound);
+    public static CrudResult<TValue> Conflict<TValue>(TValue value) => new(CrudResultType.Conflict, value);
+    public static CrudResult<TValue> Invalid<TValue>(TValue? value, Result result) => new(CrudResultType.Invalid, value, result.Errors);
+    public static CrudResult<TValue> Error<TValue>(string error) => Error<TValue>(new Exception(error));
+    public static CrudResult<TValue> Error<TValue>(Exception exception) => new(exception);
+
+    public static Task<CrudResult<TValue>> SuccessTask<TValue>(TValue value) => Task.FromResult(Success(value));
+    public static Task<CrudResult<TValue>> NotFoundTask<TValue>() => Task.FromResult(NotFound<TValue>());
+    public static Task<CrudResult<TValue>> ConflictTask<TValue>(TValue value) => Task.FromResult(Conflict(value));
+    public static Task<CrudResult<TValue>> InvalidTask<TValue>(TValue? value, Result result) => Task.FromResult(Invalid(value, result));
+    public static Task<CrudResult<TValue>> ErrorTask<TValue>(string error) => ErrorTask<TValue>(new Exception(error));
+    public static Task<CrudResult<TValue>> ErrorTask<TValue>(Exception exception) => Task.FromResult(Error<TValue>(exception));
+}
+
+public record CrudResult<TValue> : CrudResult, IResult<CrudResultType, TValue> {
+    private readonly CrudResultType _type = CrudResultType.Success;
+
+    internal CrudResult(Exception exception)
+        : base(exception) {
+    }
+
+    internal CrudResult(CrudResultType type, TValue? value = default, IEnumerable<ValidationError>? errors = null)
+        : base(type, errors) {
+        _type = type;
+        Value = value;
+    }
+
+    public TValue? Value { get; init; }
+
+    public static implicit operator CrudResult<TValue>(TValue? value) => new(CrudResultType.Success, value);
+    public static implicit operator CrudResult<TValue>(Result<TValue> result) => new(CrudResultType.Success, result.Value, result.Errors);
+    public static implicit operator CrudResult<TValue>(Exception exception) => new(exception);
+    public static implicit operator CrudResult<TValue>(ValidationError error) => (ValidationErrors)error;
+    public static implicit operator CrudResult<TValue>(ValidationErrors errors) => new(CrudResultType.Success, default!, errors.AsEnumerable());
+    public static implicit operator CrudResult<TValue>(ValidationError[] errors) => (ValidationErrors)errors;
+    public static implicit operator CrudResult<TValue>(List<ValidationError> errors) => new ValidationErrors(errors);
+    public static implicit operator CrudResult<TValue>(HashSet<ValidationError> errors) => (ValidationErrors)errors;
+    public static implicit operator ValidationErrors(CrudResult<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](CrudResult<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(CrudResult<TValue> result) => result.Exception;
+    public static implicit operator TValue?(CrudResult<TValue> result) => result.Value;
+
+    public static CrudResult<TValue> operator +(CrudResult<TValue> left, Result right)
+        => left.HasException
+               ? left
+               : right.HasException
+                   ? new(right.Exception)
+                   : new(left._type, left.Value, left.Errors.Union(right.Errors));
+
+    public CrudResult<TNewValue> MapTo<TNewValue>(Func<TValue?, TNewValue?> map) {
+        try {
+            return HasException
+                ? Error<TNewValue>(Exception)
+                : Type is CrudResultType.NotFound
+                    ? NotFound<TNewValue>()
+                    : new(Type, map(Value), Errors);
+        }
+        catch (Exception ex) {
+            return Error<TNewValue>(ex);
+        }
+    }
+}
+    ]]></file> 
+    <file name="CrudResultType.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public enum CrudResultType : byte {
+    Invalid = 0, // The request validation failed.
+    NotFound = 1, // The requested resource was not found.
+    Conflict = 2, // A conflict has occured blocking the operation.
+    Success = 3, // The operation was successful.
+    Error = 255, // An internal error has occurred.
+}
+    ]]></file> 
+    <file name="HttpResult.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public record HttpResult : ResultBase<HttpResultType> {
+    private readonly HttpResultType _type = HttpResultType.Ok;
+
+    public HttpResult() {
+    }
+
+    protected HttpResult(Exception exception)
+        : base(exception) {
+    }
+
+    protected HttpResult(HttpResultType type, IEnumerable<ValidationError>? errors = default)
+        : base(errors) {
+        _type = type;
+    }
+
+    public override HttpResultType Type => HasException
+        ? HttpResultType.Error
+        : HasErrors
+            ? HttpResultType.BadRequest
+            : _type;
+
+    public bool IsSuccess => Type is HttpResultType.Ok or HttpResultType.Created;
+    public bool IsInvalid => Type is HttpResultType.BadRequest or HttpResultType.Unauthorized or HttpResultType.NotFound or HttpResultType.Conflict;
+
+    public bool IsOk => Type is HttpResultType.Ok;
+    public bool WasCreated => Type is HttpResultType.Created;
+
+    public bool IsBadRequest => Type is HttpResultType.BadRequest;
+    public bool IsUnauthorized => Type is HttpResultType.Unauthorized;
+    public bool WasNotFound => Type is HttpResultType.NotFound;
+    public bool HasConflict => Type is HttpResultType.Conflict;
+
+    public bool IsFaulty => Type is HttpResultType.Error;
+
+    public static HttpResult Ok() => new(HttpResultType.Ok);
+    public static HttpResult Created() => new(HttpResultType.Created);
+    public static HttpResult BadRequest(Result result) => new(HttpResultType.BadRequest, result.Errors);
+    public static HttpResult Unauthorized() => new(HttpResultType.Unauthorized);
+    public static HttpResult NotFound() => new(HttpResultType.NotFound);
+    public static HttpResult Conflict() => new(HttpResultType.Conflict);
+    public static HttpResult InternalError(string error) => InternalError(new Exception(error));
+    public static HttpResult InternalError(Exception exception) => new(exception);
+
+    public static Task<HttpResult> OkTask() => Task.FromResult(Ok());
+    public static Task<HttpResult> CreatedTask() => Task.FromResult(Created());
+    public static Task<HttpResult> BadRequestTask(Result result) => Task.FromResult(BadRequest(result));
+    public static Task<HttpResult> UnauthorizedTask() => Task.FromResult(Unauthorized());
+    public static Task<HttpResult> NotFoundTask() => Task.FromResult(NotFound());
+    public static Task<HttpResult> ConflictTask() => Task.FromResult(Conflict());
+    public static Task<HttpResult> InternalErrorTask(string error) => InternalErrorTask(new Exception(error));
+    public static Task<HttpResult> InternalErrorTask(Exception exception) => Task.FromResult(InternalError(exception));
+
+    public static implicit operator HttpResult(Exception exception) => new(exception);
+    public static implicit operator HttpResult(string error) => (Result)error;
+    public static implicit operator HttpResult(ValidationError error) => (Result)error;
+    public static implicit operator HttpResult(ValidationErrors errors) => (Result)errors;
+    public static implicit operator HttpResult(ValidationError[] errors) => (Result)errors;
+    public static implicit operator HttpResult(List<ValidationError> errors) => (Result)errors;
+    public static implicit operator HttpResult(HashSet<ValidationError> errors) => (Result)errors;
+    public static implicit operator HttpResult(Result result) => new(HttpResultType.Ok, result.Errors);
+    public static implicit operator ValidationErrors(HttpResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](HttpResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(HttpResult result) => result.Exception;
+
+    public static HttpResult operator +(HttpResult left, Result right)
+        => left.HasException
+               ? left
+               : right.HasException
+                   ? new(right.Exception)
+                   : new(left._type, left.Errors.Union(right.Errors));
+
+    public static HttpResult<TValue> Ok<TValue>(TValue value) => new(HttpResultType.Ok, IsNotNull(value));
+    public static HttpResult<TValue> Created<TValue>(TValue value) => new(HttpResultType.Created, IsNotNull(value));
+    public static HttpResult<TValue> BadRequest<TValue>(TValue? value, Result result) => new(HttpResultType.BadRequest, value, result.Errors);
+    public static HttpResult<TValue> BadRequest<TValue>(Result result) => new(HttpResultType.BadRequest, default, result.Errors);
+    public static HttpResult<TValue> Unauthorized<TValue>() => new(HttpResultType.Unauthorized);
+    public static HttpResult<TValue> NotFound<TValue>() => new(HttpResultType.NotFound);
+    public static HttpResult<TValue> Conflict<TValue>(TValue value) => new(HttpResultType.Conflict, IsNotNull(value));
+    public static HttpResult<TValue> InternalError<TValue>(string error) => InternalError<TValue>(new Exception(error));
+    public static HttpResult<TValue> InternalError<TValue>(Exception exception) => new(exception);
+
+    public static Task<HttpResult<TValue>> OkTask<TValue>(TValue value) => Task.FromResult(Ok(value));
+    public static Task<HttpResult<TValue>> CreatedTask<TValue>(TValue value) => Task.FromResult(Created(value));
+    public static Task<HttpResult<TValue>> BadRequestTask<TValue>(TValue? value, Result result) => Task.FromResult(BadRequest(value, result));
+    public static Task<HttpResult<TValue>> BadRequestTask<TValue>(Result result) => Task.FromResult(BadRequest<TValue>(result));
+    public static Task<HttpResult<TValue>> UnauthorizedTask<TValue>() => Task.FromResult(Unauthorized<TValue>());
+    public static Task<HttpResult<TValue>> NotFoundTask<TValue>() => Task.FromResult(NotFound<TValue>());
+    public static Task<HttpResult<TValue>> ConflictTask<TValue>(TValue value) => Task.FromResult(Conflict(value));
+    public static Task<HttpResult<TValue>> InternalErrorTask<TValue>(string error) => InternalErrorTask<TValue>(new Exception(error));
+    public static Task<HttpResult<TValue>> InternalErrorTask<TValue>(Exception exception) => Task.FromResult(InternalError<TValue>(exception));
+}
+
+public record HttpResult<TValue> : HttpResult, IResult<HttpResultType, TValue> {
+    private readonly HttpResultType _type = HttpResultType.Ok;
+
+    internal HttpResult(Exception exception)
+        : base(exception) {
+    }
+
+    internal HttpResult(HttpResultType type, TValue? value = default, IEnumerable<ValidationError>? errors = default)
+            : base(type, errors) {
+        _type = type;
+        Value = value;
+    }
+
+    public TValue? Value { get; init; }
+
+    public static implicit operator HttpResult<TValue>(TValue? value) => new(HttpResultType.Ok, value);
+    public static implicit operator HttpResult<TValue>(Result<TValue> result) => new(HttpResultType.Ok, result.Value, result.Errors);
+    public static implicit operator HttpResult<TValue>(Exception exception) => new(exception);
+    public static implicit operator HttpResult<TValue>(ValidationError error) => (ValidationErrors)error;
+    public static implicit operator HttpResult<TValue>(ValidationErrors errors) => new(HttpResultType.Ok, default!, errors.AsEnumerable());
+    public static implicit operator HttpResult<TValue>(ValidationError[] errors) => (ValidationErrors)errors;
+    public static implicit operator HttpResult<TValue>(List<ValidationError> errors) => new ValidationErrors(errors);
+    public static implicit operator HttpResult<TValue>(HashSet<ValidationError> errors) => (ValidationErrors)errors;
+    public static implicit operator ValidationErrors(HttpResult<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](HttpResult<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(HttpResult<TValue> result) => result.Exception;
+    public static implicit operator TValue?(HttpResult<TValue> result) => result.Value;
+
+    public static HttpResult<TValue> operator +(HttpResult<TValue> left, Result right)
+        => left.HasException
+               ? left
+               : right.HasException
+                   ? new(right.Exception)
+                   : new(left._type, left.Value, left.Errors.Union(right.Errors));
+
+    public HttpResult<TNewValue> MapTo<TNewValue>(Func<TValue?, TNewValue?> map) {
+        try {
+            return HasException
+                ? InternalError<TNewValue>(Exception)
+                : Type is HttpResultType.NotFound
+                    ? NotFound<TNewValue>()
+                    : new(Type, map(Value), Errors);
+        }
+        catch (Exception ex) {
+            return InternalError<TNewValue>(ex);
+        }
+    }
+}
+    ]]></file> 
+    <file name="HttpResultType.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public enum HttpResultType : ushort {
+    Ok = HttpStatusCode.OK, // 200
+    Created = HttpStatusCode.Created, // 201
+
+    BadRequest = HttpStatusCode.BadRequest, // 400
+    Unauthorized = HttpStatusCode.Unauthorized, // 401
+    NotFound = HttpStatusCode.NotFound, // 404
+    Conflict = HttpStatusCode.Conflict, // 409
+
+    Error = HttpStatusCode.InternalServerError, // 500
+}
+    ]]></file> 
+    <file name="IResult.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public interface IResult {
+    ValidationErrors Errors { get; }
+    Exception? Exception { get; }
+    bool HasErrors { get; }
+    [MemberNotNullWhen(true, nameof(Exception))]
+    bool HasException { get; }
+    void EnsureIsSuccess(string? message = null, string? source = null);
+}
+
+public interface IResult<out TType>
+    : IResult {
+    TType Type { get; }
+}
+
+public interface IResult<out TType, out TValue>
+    : IResult<TType> {
+    TValue? Value { get; }
+}
+    ]]></file> 
+    <file name="IValidatable.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public interface IValidatable {
+    Result Validate(IMap? context = null);
+}
+
+public interface IValidatableAsync {
+    Task<Result> Validate(IMap? context = null, CancellationToken token = default);
+}
+    ]]></file> 
+    <file name="Result.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public record Result : ResultBase<ResultType> {
+    public Result() {
+    }
+
+    protected Result(Exception exception)
+        : base(exception) {
+    }
+
+    protected Result(IEnumerable<ValidationError>? errors = null)
+        : base(errors) {
+    }
+
+    public override ResultType Type => HasException
+                                           ? ResultType.Error
+                                           : HasErrors
+                                               ? ResultType.Invalid
+                                               : ResultType.Success;
+
+    public bool IsFaulty => HasException;
+    public bool IsInvalid => !HasException && HasErrors;
+    public bool IsSuccess => !HasException && !HasErrors;
+
+    public void EnsureSuccess() {
+        if (HasException) throw Exception;
+        if (HasErrors) throw new ValidationException(Errors);
+    }
+
+    public static Result Success() => new();
+    public static Result Invalid(string message) => Invalid(message, string.Empty);
+    public static Result Invalid(string message, string source) => Invalid(new ValidationError(message, source));
+    public static Result Invalid(ValidationError error) => new([error]);
+    public static Result Invalid(Result result) => new((IEnumerable<ValidationError>)result.Errors);
+    public static Result Error(string message) => Error(new Exception(message));
+    public static Result Error(Exception exception) => new(exception);
+
+    public static Task<Result> SuccessTask() => Task.FromResult(Success());
+    public static Task<Result> InvalidTask(string message) => InvalidTask(message, string.Empty);
+    public static Task<Result> InvalidTask(string message, string source) => InvalidTask(new ValidationError(message, source));
+    public static Task<Result> InvalidTask(ValidationError result) => Task.FromResult(Invalid(result));
+    public static Task<Result> InvalidTask(Result result) => Task.FromResult(Invalid(result));
+    public static Task<Result> ErrorTask(string message) => ErrorTask(new Exception(message));
+    public static Task<Result> ErrorTask(Exception exception)
+        => Task.FromResult(Error(exception));
+
+    public static implicit operator Result(Exception exception) => new(exception);
+    public static implicit operator Result(string error) => (ValidationErrors)error;
+    public static implicit operator Result(ValidationError error) => (ValidationErrors)error;
+    public static implicit operator Result(ValidationErrors errors) => new(errors.AsEnumerable());
+    public static implicit operator Result(ValidationError[] errors) => (ValidationErrors)errors;
+    public static implicit operator Result(List<ValidationError> errors) => new ValidationErrors(errors);
+    public static implicit operator Result(HashSet<ValidationError> errors) => (ValidationErrors)errors;
+    public static implicit operator ValidationErrors(Result result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](Result result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(Result result) => result.Exception;
+
+    [return: NotNullIfNotNull(nameof(left))]
+    public static Result? operator +(Result? left, Result? right)
+        => left is null ? right :
+           right is null ? left :
+           left.HasException ? left :
+           right.HasException ? new(right.Exception) :
+           new(left.Errors.Union(right.Errors));
+    public static Result operator +(Result? left, ValidationErrors? right)
+        => left is null ? right ?? [] :
+           right is null ? left :
+           left.HasException ? left :
+           new(left.Errors.Union(right));
+    public static Result operator +(Result? left, ValidationError? right)
+        => left is null && right is null ? new() :
+           left is null ? right! :
+           right is null ? left :
+           left.HasException ? left :
+           new(left.Errors.Union([right]));
+
+    public virtual bool Equals(Result? other)
+        => other is not null
+        && Errors.SequenceEqual(other.Errors);
+
+    public override int GetHashCode()
+        => Errors.Aggregate(Array.Empty<ValidationError>().GetHashCode(), HashCode.Combine);
+
+    public static Result<TValue> Success<TValue>(TValue value) => new(value);
+    public static Result<TValue> Invalid<TValue>(TValue value, string message, string? source = null) => Invalid(value, new ValidationError(message, source));
+    public static Result<TValue> Invalid<TValue>(TValue value, Result result) => new(value, result.Errors);
+    public static Result<TValue> Invalid<TValue>(string message, string? source = null) => Invalid<TValue>(new ValidationError(message, source));
+    public static Result<TValue> Invalid<TValue>(Result result) => new(default!, result.Errors);
+    public static Result<TValue> Error<TValue>(string message) => Error<TValue>(new Exception(message));
+    public static Result<TValue> Error<TValue>(Exception exception) => new(exception);
+
+    public static Task<Result<TValue>> SuccessTask<TValue>(TValue value) => Task.FromResult(Success(value));
+    public static Task<Result<TValue>> InvalidTask<TValue>(TValue value, string message, string? source = null) => InvalidTask(value, new ValidationError(message, source));
+    public static Task<Result<TValue>> InvalidTask<TValue>(TValue value, Result result) => Task.FromResult(Invalid(value, result));
+    public static Task<Result<TValue>> InvalidTask<TValue>(string message, string? source = null) => InvalidTask<TValue>(new ValidationError(message, source));
+    public static Task<Result<TValue>> InvalidTask<TValue>(Result result) => Task.FromResult(Invalid<TValue>(result));
+    public static Task<Result<TValue>> ErrorTask<TValue>(string message) => ErrorTask<TValue>(new Exception(message));
+    public static Task<Result<TValue>> ErrorTask<TValue>(Exception exception)
+        => Task.FromResult(Error<TValue>(exception));
+}
+
+public record Result<TValue>
+    : Result,
+      IResult<ResultType, TValue> {
+    internal Result(Exception exception)
+        : base(exception) {
+    }
+
+    public Result(TValue value, IEnumerable<ValidationError>? errors = null)
+        : base(errors) {
+        Value = value;
+    }
+
+    public TValue Value { get; } = default!;
+
+    public static implicit operator Result<TValue>(TValue value) => new(value);
+    public static implicit operator Result<TValue>(Exception exception) => new(exception);
+    public static implicit operator Result<TValue>(ValidationError error) => (ValidationErrors)error;
+    public static implicit operator Result<TValue>(ValidationErrors errors) => new(default!, errors.AsEnumerable());
+    public static implicit operator Result<TValue>(ValidationError[] errors) => (ValidationErrors)errors;
+    public static implicit operator Result<TValue>(List<ValidationError> errors) => new ValidationErrors(errors);
+    public static implicit operator Result<TValue>(HashSet<ValidationError> errors) => (ValidationErrors)errors;
+    public static implicit operator ValidationErrors(Result<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](Result<TValue> result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(Result<TValue> result) => result.Exception;
+    public static implicit operator TValue(Result<TValue> result) => result.Value;
+
+    [return: NotNullIfNotNull(nameof(left))]
+    public static Result<TValue>? operator +(Result<TValue>? left, Result<TValue>? right)
+        => right is null ? left :
+           left is null ? right :
+           left.HasException ? left :
+           right.HasException ? new(right.Exception) :
+           new(left.Value ?? right.Value, left.Errors.Union(right.Errors));
+    public static Result<TValue> operator +(Result<TValue> left, ValidationError? right)
+        => right is null ? left :
+           left.HasException ? left :
+           new(left.Value, left.Errors.Union([right]));
+    public static Result<TValue> operator +(Result<TValue> left, ValidationErrors? right)
+        => right is null ? left :
+           left.HasException ? left :
+           new(left.Value, left.Errors.Union(right));
+    public static Result<TValue> operator +(Result<TValue> left, Result? right)
+        => right is null ? left :
+           left.HasException ? left :
+           right.HasException ? new(right.Exception) :
+           new(left.Value, left.Errors.Union(right.Errors));
+
+    public Result<TNewValue> MapTo<TNewValue>(Func<TValue, TNewValue> map) {
+        try {
+            return HasException
+                ? Error<TNewValue>(Exception)
+                : new(map(Value), Errors);
+        }
+        catch (Exception ex) {
+            return Error<TNewValue>(ex);
+        }
+    }
+}
+    ]]></file> 
+    <file name="ResultBase.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public abstract record ResultBase<TType>
+    : IResult<TType>
+    where TType : Enum {
+    protected ResultBase(Exception exception)
+        : this() {
+        Exception = IsNotNull(exception);
+    }
+
+    protected ResultBase(IEnumerable<ValidationError>? errors = null) {
+        Errors = new(errors ?? []);
+    }
+
+    public abstract TType Type { get; }
+    public Exception? Exception { get; }
+    public ValidationErrors Errors { get; }
+
+    public bool HasErrors => Errors.Count != 0;
+    [MemberNotNullWhen(true, nameof(Exception))]
+    public bool HasException => Exception is not null;
+
+    public void EnsureIsSuccess(string? message = null, string? source = null) {
+        if (Exception is not null)
+            throw new ValidationException(message ?? ValidationException.DefaultMessage, source ?? string.Empty, Exception);
+        if (HasErrors)
+            throw new ValidationException(message ?? ValidationException.DefaultMessage, source ?? string.Empty, [.. Errors]);
+    }
+
+    public virtual bool Equals(ResultBase<TType>? other)
+        => other is not null
+        && Equals(Type, other.Type)
+        && Errors.SequenceEqual(other.Errors)
+        && Equals(Exception, other.Exception);
+
+    public override int GetHashCode()
+        => HashCode.Combine(Type, Exception, Errors.Aggregate(Array.Empty<ValidationError>().GetHashCode(), HashCode.Combine));
+}
+    ]]></file> 
+    <file name="ResultType.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public enum ResultType : byte {
+    Invalid = 0, // The request validation failed.
+    Success = 1, // The operation was successful.
+    Error = 255, // An exception has occurred.
+}
+    ]]></file> 
+    <file name="SignInResult.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public record SignInResult : ResultBase<SignInResultType> {
+    private readonly SignInResultType _type = SignInResultType.Pending;
+    private readonly string? _token;
+    public SignInResult() {
+    }
+
+    private SignInResult(Exception exception)
+        : base(exception) {
+    }
+
+    private SignInResult(SignInResultType type, string? token = default, IEnumerable<ValidationError>? errors = default)
+        : base(errors) {
+        _type = type;
+        _token = token;
+    }
+
+    public override SignInResultType Type => HasException
+        ? SignInResultType.Error
+        : HasErrors
+            ? SignInResultType.Invalid
+            : _type;
+
+    public string? Token => !HasException && !HasErrors
+                                ? _token
+                                : null;
+
+    [MemberNotNullWhen(true, nameof(Token))]
+    public bool RequiresConfirmation => Type is SignInResultType.ConfirmationPending;
+    [MemberNotNullWhen(true, nameof(Token))]
+    public bool RequiresTwoFactor => Type is SignInResultType.TwoFactorRequired;
+    [MemberNotNullWhen(true, nameof(Token))]
+    public bool IsPending => Type is SignInResultType.Pending;
+    public bool IsSuccess => Type is SignInResultType.Success;
+    public bool IsInvalid => Type is SignInResultType.Invalid;
+    public bool IsLocked => Type is SignInResultType.Locked;
+    public bool IsBlocked => Type is SignInResultType.Blocked;
+    public bool IsFailure => Type is SignInResultType.Failed;
+
+    public static SignInResult Pending() => new();
+    [MemberNotNull(nameof(Token))]
+    public static SignInResult Success(string token) => new(SignInResultType.Success, IsNotNull(token));
+    [MemberNotNull(nameof(Token))]
+    public static SignInResult ConfirmationIsPending(string token) => new(SignInResultType.ConfirmationPending, IsNotNull(token));
+    [MemberNotNull(nameof(Token))]
+    public static SignInResult TwoFactorIsRequired(string token) => new(SignInResultType.TwoFactorRequired, IsNotNull(token));
+    public static SignInResult InvalidRequest(Result result) => new(SignInResultType.Invalid, errors: result.Errors);
+    public static SignInResult BlockedAccount() => new(SignInResultType.Blocked);
+    public static SignInResult LockedAccount() => new(SignInResultType.Locked);
+    public static SignInResult FailedAttempt() => new(SignInResultType.Failed);
+    public static SignInResult Error(string error) => Error(new Exception(error));
+    public static SignInResult Error(Exception exception) => new(exception);
+
+    public static Task<SignInResult> PendingTask() => Task.FromResult(Pending());
+    [MemberNotNull(nameof(Token))]
+    public static Task<SignInResult> SuccessTask(string token) => Task.FromResult(Success(token));
+    [MemberNotNull(nameof(Token))]
+    public static Task<SignInResult> ConfirmationIsPendingTask(string token) => Task.FromResult(ConfirmationIsPending(token));
+    [MemberNotNull(nameof(Token))]
+    public static Task<SignInResult> TwoFactorIsRequiredTask(string token) => Task.FromResult(TwoFactorIsRequired(token));
+    public static Task<SignInResult> InvalidTask(Result result) => Task.FromResult(InvalidRequest(result));
+    public static Task<SignInResult> BlockedAccountTask() => Task.FromResult(BlockedAccount());
+    public static Task<SignInResult> LockedAccountTask() => Task.FromResult(LockedAccount());
+    public static Task<SignInResult> FailedAttemptTask() => Task.FromResult(FailedAttempt());
+    public static Task<SignInResult> ErrorTask(string error) => ErrorTask(new Exception(error));
+    public static Task<SignInResult> ErrorTask(Exception exception) => Task.FromResult(Error(exception));
+
+    public static implicit operator SignInResult(Exception exception) => new(exception);
+    public static implicit operator SignInResult(ValidationError error) => (Result)error;
+    public static implicit operator SignInResult(ValidationErrors errors) => (Result)errors;
+    public static implicit operator SignInResult(ValidationError[] errors) => (Result)errors;
+    public static implicit operator SignInResult(List<ValidationError> errors) => (Result)errors;
+    public static implicit operator SignInResult(HashSet<ValidationError> errors) => (Result)errors;
+    public static implicit operator SignInResult(Result result) => new(SignInResultType.Success, errors: result.Errors);
+    public static implicit operator ValidationErrors(SignInResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator ValidationError[](SignInResult result) => result.HasException ? [] : [.. result.Errors];
+    public static implicit operator Exception?(SignInResult result) => result.Exception;
+
+    public static SignInResult operator +(SignInResult left, Result right)
+        => left.HasException
+               ? left
+               : right.HasException
+                   ? new(right.Exception)
+                   : new(left._type, left.Token, left.Errors.Union(right.Errors));
+}
+    ]]></file> 
+    <file name="SignInResultType.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public enum SignInResultType : byte {
+    Pending = 0, // The sign in was not processed.
+    Error = 1, // An internal error has occurred.
+    Invalid = 2, // request validation failed. No attempt was made.
+    Failed = 4, // attempt failed.
+    Blocked = 12, // account is blocked. (8 | 4) Counts as Failed.
+    Locked = 20, // account is locked. (16 | 4) Counts as Failed.
+    Success = 32, // attempt succeeded.
+    ConfirmationPending = 96, // attempt succeeded but email is not confirmed. (64 | 32).
+    TwoFactorRequired = 160, // attempt succeeded, but requires 2-factor authentication. (128 | 32).
+}
+    ]]></file> 
+    <file name="ValidationError.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+[DebuggerDisplay("""
+                 ValidationError: Message="{Message}, Source="{Source}""
+                 """)]
+public sealed record ValidationError {
+    private readonly string _formattedMessage;
+    public const string DefaultErrorMessage = "The value is invalid.";
+
+    public ValidationError()
+        : this(DefaultErrorMessage, string.Empty) {
+    }
+
+    public ValidationError(string message, string? source = null) {
+        Message = IsNotNullOrWhiteSpace(message).Trim();
+        Source = DefaultIfNull(source, string.Empty).Trim();
+        _formattedMessage = (string.IsNullOrEmpty(Source) ? string.Empty : $"{Source}: ")
+                          + Message;
+    }
+
+    public string Message { get; }
+    public string Source { get; }
+
+    public static implicit operator ValidationError(string message)
+        => new(message);
+
+    public bool Equals(ValidationError? other)
+        => _formattedMessage.Equals(other?._formattedMessage, StringComparison.Ordinal);
+
+    public override int GetHashCode()
+        => _formattedMessage.GetHashCode();
+
+    public override string ToString()
+        => _formattedMessage;
+}
+    ]]></file> 
+    <file name="ValidationErrors.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public class ValidationErrors : List<ValidationError> {
+    public ValidationErrors() {
+    }
+    public ValidationErrors(IEnumerable<ValidationError> errors) {
+        AddRange(errors);
+    }
+
+    public static implicit operator ValidationErrors(string error) => (ValidationError)error;
+    public static implicit operator ValidationErrors(List<string> errors) => errors.ToArray(e => (ValidationError)e);
+    public static implicit operator ValidationErrors(string[] errors) => errors.ToArray(e => (ValidationError)e);
+    public static implicit operator ValidationErrors(HashSet<string> errors) => errors.ToArray(e => (ValidationError)e);
+    public static implicit operator ValidationErrors(ValidationError error) => [error];
+    public static implicit operator ValidationErrors(ValidationError[] errors) => new(errors);
+    public static implicit operator ValidationErrors(HashSet<ValidationError> errors) => new(errors);
+    public static implicit operator ValidationError[](ValidationErrors errors) => [.. errors];
+    public static implicit operator HashSet<ValidationError>(ValidationErrors errors) => [.. errors];
+
+    public static ValidationErrors operator +(ValidationErrors left, ValidationErrors right)
+        => new(left.Union(right));
+    public static ValidationErrors operator +(ValidationErrors left, ValidationError right)
+        => new(left.Union([right]));
+
+    public int IndexOf(string value) => IndexOf((ValidationError)value);
+    public bool Contains(string value) => Contains((ValidationError)value);
+
+    public new void Add(ValidationError value) {
+        if (!Contains(value))
+            base.Add(value);
+    }
+
+    public void Add(string value) => Add((ValidationError)value);
+
+    public new void Insert(int index, ValidationError value) {
+        if (!Contains(value)) {
+            base.Insert(index, value);
+            return;
+        }
+
+        var oldIndex = base.IndexOf(value);
+        if (index != oldIndex) RemoveAt(oldIndex);
+        base.Insert(index, value);
+    }
+
+    public new void AddRange(IEnumerable<ValidationError> values) {
+        foreach (var value in values.Distinct())
+            Add(value);
+    }
+
+    public void Insert(int index, string value) => Insert(index, (ValidationError)value);
+    public void Remove(string value) => Remove((ValidationError)value);
+
+    public void CopyTo(Array array, int index) => ((ICollection)this).CopyTo(array, index);
+}
+    ]]></file> 
+    <file name="ValidationException.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Results;
+
+public sealed class ValidationException
+    : Exception {
+    public const string DefaultMessage = "Validation failed.";
+
+    public ValidationError[] Errors { get; }
+
+    public ValidationException(string? message = null)
+        : base(message ?? DefaultMessage) {
+        Errors = [new(message ?? DefaultMessage)];
+    }
+
+    public ValidationException(Exception innerException)
+        : this(DefaultMessage, innerException) {
+    }
+
+    public ValidationException(ValidationError error, Exception? innerException = null)
+        : this(DefaultMessage, error, innerException) {
+    }
+
+    public ValidationException(IEnumerable<ValidationError> errors, Exception? innerException = null)
+        : this(DefaultMessage, errors, innerException) {
+    }
+
+    public ValidationException(string message, Exception? innerException = null)
+        : this(message, string.Empty, innerException) {
+    }
+
+    private ValidationException(string message, ValidationError error, Exception? innerException = null)
+        : this(message, string.Empty, error, innerException) {
+    }
+
+    public ValidationException(string message, IEnumerable<ValidationError> errors, Exception? innerException = null)
+        : this(message, string.Empty, errors, innerException) {
+    }
+
+    public ValidationException(string message, string source, Exception? innerException = null)
+        : this(message, source, ValidationError.DefaultErrorMessage, innerException) {
+    }
+
+    public ValidationException(string message, string source, ValidationError error, Exception? innerException = null)
+        : this(message, source, [error], innerException) {
+    }
+
+    public ValidationException(string message, string source, IEnumerable<ValidationError> errors, Exception? innerException = null)
+        : base(IsNotNullOrWhiteSpace(message), innerException) {
+        Errors = errors.Distinct().ToArray();
+        Source = source;
+    }
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Sequencers"> 
+    <file name="INumericSequencer.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Sequencers;
+
+public interface INumericSequencer : ISequencer<uint>;
+    ]]></file> 
+    <file name="ISequencer.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Sequencers;
+
+public interface ISequencer<TValue>
+    : IEnumerator<TValue>
+    where TValue : notnull {
+    TValue First { get; }
+    new TValue Current { get; set; }
+
+    void Set(TValue value, bool skip = false);
+}
+    ]]></file> 
+    <file name="NullSequencer.cs"><![CDATA[ 
+﻿
+namespace DotNetToolbox.Sequencers;
+
+public class NullSequencer<TKey>
+    : HasDefault<NullSequencer<TKey>>
+    , ISequencer<TKey>
+    where TKey : notnull {
+    public TKey First => default!;
+    public TKey Current {
+        get => default!;
+        set { }
+    }
+    TKey IEnumerator<TKey>.Current => Current;
+    object IEnumerator.Current => Current;
+
+    public void Dispose() => GC.SuppressFinalize(this);
+    public bool MoveNext() => false;
+    public void Reset() { }
+    public void Set(TKey value, bool skip = false) { }
+}
+    ]]></file> 
+    <file name="NumericSequencer.cs"><![CDATA[ 
+﻿
+namespace DotNetToolbox.Sequencers;
+
+public sealed class NumericSequencer : NumericSequencer<NumericSequencer>;
+
+public class NumericSequencer<TSequence>(uint start)
+    : Sequencer<TSequence, uint>(start),
+      INumericSequencer
+    where TSequence : NumericSequencer<TSequence> {
+    public NumericSequencer()
+        : this(0) {
+    }
+
+    protected override bool TryGenerateNext(uint current, out uint next) {
+        next = current;
+        try {
+            ++next;
+            return true;
+        }
+        catch {
+            return false;
+        }
+    }
+}
+    ]]></file> 
+    <file name="Sequencer.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Sequencers;
+
+public abstract class Sequencer<TSequencer, TValue>
+    : ISequencer<TValue>
+    where TSequencer : Sequencer<TSequencer, TValue>
+    where TValue : notnull {
+    private bool _disposed;
+    private TValue _current;
+
+    protected Sequencer(TValue start) {
+        First = start;
+        Reset();
+    }
+
+    public TValue First { get; }
+    object IEnumerator.Current => _current;
+    public TValue Current {
+        get {
+            MoveNext();
+            return _current;
+        }
+        set => Set(value);
+    }
+
+    [MemberNotNull(nameof(_current))]
+    public void Reset()
+        => _current = First;
+
+    [MemberNotNull(nameof(_current))]
+    public void Set(TValue value, bool skip = false) {
+        _current = value;
+        if (skip) MoveNext();
+    }
+
+    [MemberNotNullWhen(true, nameof(_current))]
+    public bool MoveNext() {
+        var hasNext = TryGenerateNext(_current, out var next);
+        if (hasNext) _current = next;
+        return hasNext;
+    }
+
+    [MemberNotNullWhen(true, nameof(_current))]
+    protected abstract bool TryGenerateNext(TValue? current, out TValue next);
+
+    protected virtual void Dispose(bool disposing) {
+        if (_disposed) return;
+        if (disposing) {
+            if (First is IDisposable disposableFirst) disposableFirst.Dispose();
+            if (_current is IDisposable disposableCurrent) disposableCurrent.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    public void Dispose() {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Singleton"> 
+    <file name="HasDefault.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public class HasDefault<TSelf> : IHasDefault<TSelf>
+    where TSelf : HasDefault<TSelf>, new() {
+    public static TSelf Default { get; } = new();
+}
+    ]]></file> 
+    <file name="HasEmpty.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public class HasEmpty<TSelf> : IHasEmpty<TSelf>
+    where TSelf : HasEmpty<TSelf>, new() {
+    public static TSelf Empty { get; }= new();
+}
+    ]]></file> 
+    <file name="HasInstance.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public class HasInstance<TSelf> : IHasInstance<TSelf>
+    where TSelf : HasInstance<TSelf>, new() {
+    public static TSelf Instance { get; } = new();
+}
+    ]]></file> 
+    <file name="IHasDefault.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public interface IHasDefault<out TSelf>
+    where TSelf : IHasDefault<TSelf> {
+    public static abstract TSelf Default { get; }
+}
+    ]]></file> 
+    <file name="IHasEmpty.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public interface IHasEmpty<out TSelf>
+    where TSelf : IHasEmpty<TSelf> {
+    public static abstract TSelf Empty { get; }
+}
+    ]]></file> 
+    <file name="IHasInstance.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public interface IHasInstance<out TSelf>
+    where TSelf : IHasInstance<TSelf> {
+    public static abstract TSelf Instance { get; }
+}
+    ]]></file> 
+    <file name="INamedOptions.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public interface INamedOptions<out TOptions>
+    : IHasDefault<TOptions>
+    where TOptions : INamedOptions<TOptions> {
+    public static abstract string SectionName { get; }
+}
+    ]]></file> 
+    <file name="NamedOptions.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Singleton;
+
+public class NamedOptions<TOptions>
+    : HasDefault<TOptions>
+    , INamedOptions<TOptions>
+    where TOptions : NamedOptions<TOptions>, new() {
+    private const string _suffix = "Options";
+    private static readonly string _typeName = typeof(TOptions).Name;
+
+    // ReSharper disable once StaticMemberInGenericType
+    [SuppressMessage("Roslynator", "RCS1158:Static member in generic type should use a type parameter", Justification = "Unnecessary here.")]
+    public static string SectionName { get; }
+        = _typeName.EndsWith(_suffix)
+              ? _typeName.Remove(_typeName.Length - _suffix.Length)
+              : _typeName;
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Text"> 
+    <file name="StringBuilderExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System.Text;
+
+public static class StringBuilderExtensions {
+    public static StringBuilder AppendIntoNewLine(this StringBuilder builder, string? text)
+        => builder.AppendIntoNewLine(string.Empty, text);
+
+    public static StringBuilder AppendIntoNewLine(this StringBuilder builder, string ident, string? text)
+        => (string.IsNullOrWhiteSpace(text) || builder.Length == 0
+               ? builder
+               : builder.AppendLine())
+           .Append($"{ident}{text}");
+}
+    ]]></file> 
+    <file name="StringExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System.Text;
+
+public static class StringExtensions {
+    public static string ToBase64(this string value)
+        => Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+
+    public static string ToSafeBase64(this string value)
+        => Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+}
+    ]]></file> 
+    <file name="UrlSafeBase64String.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System.Text;
+
+public readonly partial record struct UrlSafeBase64String {
+    public UrlSafeBase64String() {
+        Bytes = [];
+    }
+
+    public UrlSafeBase64String(byte[]? input = null) {
+        Bytes = input ?? [];
+    }
+
+    public UrlSafeBase64String(Guid input) {
+        Bytes = input.ToByteArray();
+    }
+
+    public UrlSafeBase64String(string? input) {
+        input = input?.Trim() ?? string.Empty;
+        Bytes = _safeBase64String.IsMatch(input)
+            ? ToBytes(input)
+            : Encoding.UTF8.GetBytes(input);
+    }
+
+    public byte[] Bytes { get; }
+    public string Text => Encoding.UTF8.GetString(Bytes);
+    public string Base64 => ToBase64(Bytes);
+    public bool IsGuid => Bytes.Length is 0 or 16;
+    public Guid Guid => Bytes.Length switch {
+        0 => Guid.Empty,
+        16 => new(Bytes),
+        _ => throw new FormatException("The value is not a valid GUID."),
+    };
+
+    public static implicit operator UrlSafeBase64String(byte[]? input) => new(input);
+    public static implicit operator UrlSafeBase64String(string input) => new(input);
+    public static implicit operator UrlSafeBase64String(Guid input) => new(input);
+    public static implicit operator byte[](UrlSafeBase64String input) => input.Bytes;
+    public static implicit operator string(UrlSafeBase64String input) => input.Base64;
+    public static implicit operator Guid(UrlSafeBase64String input) => input.Guid;
+
+    private static string ToBase64(byte[] bytes)
+        => bytes.Length == 0
+        ? string.Empty
+        : ToSafeBase64(bytes);
+
+    private static string ToSafeBase64(byte[] bytes) {
+        var base64 = Convert.ToBase64String(bytes);
+        var builder = new StringBuilder(base64.TrimEnd('='));
+        builder.Replace('+', '-');
+        builder.Replace('/', '_');
+        return builder.ToString();
+    }
+
+    private static byte[] ToBytes(string input)
+        => Convert.FromBase64String(ToStandardBase64(input));
+
+    private static string ToStandardBase64(string input) {
+        var builder = new StringBuilder(input.Trim());
+        builder.Replace('_', '/');
+        builder.Replace('-', '+');
+        builder.Append('=', 24 - (input.Length % 24));
+        return builder.ToString();
+    }
+
+    private static readonly Regex _safeBase64String = SafeBase64String();
+    [GeneratedRegex("^[a-zA-Z0-9_-]{22}$", RegexOptions.Compiled)]
+    private static partial Regex SafeBase64String();
+}
+    ]]></file> 
+  </folder> 
+  <folder name="Threading"> 
+    <file name="Awaiter.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Threading;
+
+public class Awaiter(int timeoutInMilliseconds = 5000, int delayInMilliseconds = 100, ILogger<Awaiter>? logger = null)
+    : Awaiter<Awaiter>(timeoutInMilliseconds, delayInMilliseconds, logger);
+
+public abstract class Awaiter<TWaiter>(int timeoutInMilliseconds = 5000, int delayInMilliseconds = 100, ILogger<TWaiter>? logger = null)
+    : IAwaiter
+    where TWaiter : Awaiter<TWaiter> {
+    private bool _stopWaiting;
+    public bool IsWaiting => _stopwatch.IsRunning;
+    public void StopWaiting() => _stopwatch.Stop();
+
+    protected ILogger<TWaiter> Logger { get; } = logger ?? NullLogger<TWaiter>.Instance;
+    private readonly Stopwatch _stopwatch = new();
+
+    public async Task StartWait(CancellationToken ct) {
+        try {
+            if (_stopwatch.IsRunning) return;
+            _stopWaiting = false;
+            _stopwatch.Start();
+            Logger.LogDebug("Waiting...");
+            while (_stopwatch.IsRunning && _stopwatch.ElapsedMilliseconds < timeoutInMilliseconds)
+                await OnClockTick(ct);
+            if (!_stopWaiting) throw new TimeoutException();
+        }
+        catch (TimeoutException) {
+            Logger.LogError("Waiting timed out!");
+            throw;
+        }
+        catch (OperationCanceledException) {
+            Logger.LogWarning("Waiting cancelled.");
+            throw;
+        }
+        finally {
+            _stopwatch.Reset();
+            Logger.LogDebug("Stopped waiting.");
+        }
+    }
+
+    public virtual Task OnClockTick(CancellationToken ct) {
+        Logger.LogTrace("Clock tick.");
+        return Task.Delay(delayInMilliseconds, ct);
+    }
+}
+    ]]></file> 
+    <file name="IAwaiter.cs"><![CDATA[ 
+﻿namespace DotNetToolbox.Threading;
+
+public interface IAwaiter {
+    bool IsWaiting { get; }
+    Task StartWait(CancellationToken ct);
+    void StopWaiting();
+}
+    ]]></file> 
+    <folder name="Tasks"> 
+      <file name="FireAndForgetHandler.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Threading.Tasks;
+
+internal static class FireAndForgetHandler {
+    public static async void Send(ValueTask task, Action<OperationCanceledException>? onCancel, Action<Exception>? onException) {
+        try {
+            await IsNotNull(task).ConfigureAwait(false); // Fire and forget do not need to capture the current context
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(ex);
+        }
+    }
+
+    public static async void Send(ValueTask task, Action<ValueTask, OperationCanceledException>? onCancel, Action<ValueTask, Exception>? onException) {
+        try {
+            await IsNotNull(task).ConfigureAwait(false); // Fire and forget do not need to capture the current context
+        }
+        catch (OperationCanceledException ex) {
+            if (onCancel is null)
+                return;
+            onCancel(task, ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(task, ex);
+        }
+    }
+
+    public static async void Send<TResult>(ValueTask<TResult> task, Action<TResult> onResult, Action<OperationCanceledException>? onCancel, Action<Exception>? onException) {
+        try {
+            var result = await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+            onResult(result);
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(ex);
+        }
+    }
+
+    public static async void Send<TResult>(ValueTask<TResult> task, Action<TResult> onResult, Action<ValueTask<TResult>, OperationCanceledException>? onCancel, Action<ValueTask<TResult>, Exception>? onException) {
+        try {
+            var result = await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+            onResult(result);
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(task, ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(task, ex);
+        }
+    }
+
+    public static async void Send(Task task, Action<OperationCanceledException>? onCancel, Action<Exception>? onException) {
+        try {
+            await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(ex);
+        }
+    }
+
+    public static async void Send(Task task, Action<Task, OperationCanceledException>? onCancel, Action<Task, Exception>? onException) {
+        try {
+            await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(task, ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(task, ex);
+        }
+    }
+
+    public static async void Send<TResult>(Task<TResult> task, Action<TResult> onResult, Action<OperationCanceledException>? onCancel, Action<Exception>? onException) {
+        try {
+            var result = await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+            onResult(result);
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(ex);
+        }
+    }
+
+    public static async void Send<TResult>(Task<TResult> task, Action<TResult> onResult, Action<Task<TResult>, OperationCanceledException>? onCancel, Action<Task<TResult>, Exception>? onException) {
+        try {
+            var result = await task.ConfigureAwait(false); // Fire and forget do not need to capture the current context
+            onResult(result);
+        }
+        catch (OperationCanceledException ex) {
+            onCancel?.Invoke(task, ex);
+        }
+        catch (Exception ex) {
+            onException?.Invoke(task, ex);
+        }
+    }
+}
+      ]]></file> 
+      <file name="TaskExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Threading.Tasks;
+
+public static class TaskExtensions {
+    public static void FireAndForget(this Task task)
+        => FireAndForgetHandler.Send(task, default, default(Action<Exception>));
+    public static void FireAndForget(this Task task, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, default, IsNotNull(onException));
+    public static void FireAndForget(this Task task, Action<OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), default);
+    public static void FireAndForget(this Task task, Action<OperationCanceledException> onCancel, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), IsNotNull(onException));
+    public static void FireAndForget(this Task task, Action<Task, Exception> onException)
+        => FireAndForgetHandler.Send(task, default, IsNotNull(onException));
+    public static void FireAndForget(this Task task, Action<Task, OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), default);
+    public static void FireAndForget(this Task task, Action<Task, OperationCanceledException> onCancel, Action<Task, Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), IsNotNull(onException));
+
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), default, default(Action<Exception>));
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), default, IsNotNull(onException));
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), IsNotNull(onCancel), default);
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<OperationCanceledException> onCancel, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), IsNotNull(onCancel), IsNotNull(onException));
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<Task<TResult>, Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), default, IsNotNull(onException));
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<Task<TResult>, OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), IsNotNull(onCancel), default);
+    public static void FireAndForget<TResult>(this Task<TResult> task, Action<TResult> onResult, Action<Task<TResult>, OperationCanceledException> onCancel, Action<Task<TResult>, Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), IsNotNull(onCancel), IsNotNull(onException));
+}
+      ]]></file> 
+      <file name="ValueTaskExtensions.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System.Threading.Tasks;
+
+public static class ValueTaskExtensions {
+    public static void Wait(this ValueTask task) {
+        var awaiter = task.GetAwaiter();
+        if (awaiter.IsCompleted) {
+            awaiter.GetResult();
+            return;
+        }
+        task.AsTask().GetAwaiter().GetResult();
+    }
+
+    public static T GetResult<T>(this ValueTask<T> task) {
+        var awaiter = task.GetAwaiter();
+        return awaiter.IsCompleted
+            ? awaiter.GetResult()
+            : task.AsTask().GetAwaiter().GetResult();
+    }
+
+    public static void FireAndForget(this ValueTask task)
+        => FireAndForgetHandler.Send(task, default, default(Action<Exception>));
+    public static void FireAndForget(this ValueTask task, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, default, IsNotNull(onException));
+    public static void FireAndForget(this ValueTask task, Action<OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), default);
+    public static void FireAndForget(this ValueTask task, Action<OperationCanceledException> onCancel, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), IsNotNull(onException));
+    public static void FireAndForget(this ValueTask task, Action<ValueTask, Exception> onException)
+        => FireAndForgetHandler.Send(task, default, IsNotNull(onException));
+    public static void FireAndForget(this ValueTask task, Action<ValueTask, OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), default);
+    public static void FireAndForget(this ValueTask task, Action<ValueTask, OperationCanceledException> onCancel, Action<ValueTask, Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onCancel), IsNotNull(onException));
+
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), default, default(Action<Exception>));
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, onResult, default, IsNotNull(onException));
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, onResult, IsNotNull(onCancel), default);
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<OperationCanceledException> onCancel, Action<Exception> onException)
+        => FireAndForgetHandler.Send(task, onResult, IsNotNull(onCancel), IsNotNull(onException));
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<ValueTask<TResult>, Exception> onException)
+        => FireAndForgetHandler.Send(task, IsNotNull(onResult), default, IsNotNull(onException));
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<ValueTask<TResult>, OperationCanceledException> onCancel)
+        => FireAndForgetHandler.Send(task, onResult, IsNotNull(onCancel), default);
+    public static void FireAndForget<TResult>(this ValueTask<TResult> task, Action<TResult> onResult, Action<ValueTask<TResult>, OperationCanceledException> onCancel, Action<ValueTask<TResult>, Exception> onException)
+        => FireAndForgetHandler.Send(task, onResult, IsNotNull(onCancel), IsNotNull(onException));
+}
+      ]]></file> 
+    </folder> 
+  </folder> 
+  <folder name="Utilities"> 
+    <file name="Cast.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static class Cast {
+    public static TTarget To<TTarget>(this object? value) {
+        try {
+            return (TTarget)Convert.ChangeType(value, typeof(TTarget))!;
+        }
+        catch (Exception ex) {
+            throw new InvalidCastException($"Failed to cast value to type {typeof(TTarget)}", ex);
+        }
+    }
+}
+    ]]></file> 
+    <file name="DisposableStateHolder.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public class DisposableStateHolder(object? state)
+    : DisposableStateHolder<object?>(state);
+
+public class DisposableStateHolder<TState>(TState state)
+    : IDisposable {
+    public TState State { get; } = state;
+    public void Dispose() {
+        if (State is IDisposable disposable)
+            disposable.Dispose();
+        GC.SuppressFinalize(this);
+    }
+}
+    ]]></file> 
+    <file name="Ensure.AsyncValidation.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace
+namespace System;
+
+public static partial class Ensure {
+    public static Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, IMap? context = null, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IValidatableAsync
+        => IsValidAsync(IsNotNull(argument, paramName), arg => arg.Validate(context), paramName);
+
+    public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, IMap? context = null, TArgument? defaultValue = default)
+        where TArgument : IValidatableAsync {
+        var result = await (argument?.Validate(context) ?? Result.SuccessTask());
+        return result.IsSuccess && argument is not null
+                   ? argument
+                   : defaultValue;
+    }
+
+    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument, Task<Result>> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        var result = await validate(IsNotNull(argument, paramName));
+        return result.IsSuccess
+                   ? argument
+                   : throw new ValidationException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+    }
+
+    public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, Func<TArgument?, Task<Result>> validate, TArgument? defaultValue = default)
+        => (await validate(argument)).IsSuccess && argument is not null
+               ? argument
+               : defaultValue;
+
+    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument?, Task<bool>> isValid, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => await isValid(IsNotNull(argument, paramName))
+               ? argument
+               : throw new ValidationException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+
+    public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, Func<TArgument?, Task<bool>> isValid, TArgument? defaultValue = default)
+        => await isValid(argument) && argument is not null
+               ? argument
+               : defaultValue;
+}
+    ]]></file> 
+    <file name="Ensure.Collection.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    [return: NotNullIfNotNull(nameof(argument))]
+    public static TArgument? IsNotEmpty<TArgument>(TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable
+        => argument switch {
+            ICollection { Count: 0 } => throw new ArgumentException(string.Format(null, InvertMessage(CollectionMustBeEmpty)), paramName),
+            not null when !argument.Cast<object>().Any() => throw new ArgumentException(string.Format(null, InvertMessage(CollectionMustBeEmpty)), paramName),
+            _ => argument,
+        };
+
+    [return: NotNull]
+    public static TArgument IsNotNullOrEmpty<TArgument>([NotNull] TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable
+        => IsNotEmpty(IsNotNull(argument, paramName), paramName);
+}
+    ]]></file> 
+    <file name="Ensure.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure;
+    ]]></file> 
+    <file name="Ensure.Items.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    [return: NotNullIfNotNull(nameof(argument))]
+    public static TArgument? ItemsAreNotNull<TArgument>(TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable
+        => argument?.Cast<object?>().All(i => i is not null) ?? true
+               ? argument
+               : throw new ValidationException(string.Format(null, InvertMessage(CollectionMustContainNull)), paramName!);
+
+    [return: NotNullIfNotNull(nameof(argument))]
+    public static TArgument? ItemsAreValid<TArgument>(TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable<IValidatable>
+        => argument?.All(i => i.Validate().IsSuccess) ?? true
+               ? argument
+               : throw new ValidationException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+
+    [return: NotNullIfNotNull(nameof(argument))]
+    public static TArgument? ItemsAreValid<TArgument, TValue>(TArgument? argument, Func<TValue?, Result> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable<TValue?>
+        => argument?.All(i => validate(i).IsSuccess) ?? true
+               ? argument
+               : throw new ValidationException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+
+    [return: NotNullIfNotNull(nameof(argument))]
+    public static TArgument? ItemsAreValid<TArgument, TValue>(TArgument? argument, Func<TValue?, bool> isValid, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEnumerable<TValue?>
+        => argument?.All(isValid) ?? true
+                   ? argument
+                   : throw new ValidationException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+}
+    ]]></file> 
+    <file name="Ensure.Null.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    [return: NotNull]
+    public static TArgument IsNotNull<TArgument>([NotNull] TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        ArgumentNullException.ThrowIfNull(argument, paramName);
+        return argument;
+    }
+
+    [return: NotNull]
+    public static TArgument DefaultIfNull<TArgument>([NotNull] TArgument? argument, TArgument defaultValue) {
+        argument ??= IsNotNull(defaultValue);
+        return argument;
+    }
+}
+    ]]></file> 
+    <file name="Ensure.Range.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    public static TArgument? IsEqual<TArgument>(TArgument? argument, TArgument? requiredValue, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEquatable<TArgument?> {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(argument, requiredValue, paramName);
+        return argument;
+    }
+    public static TArgument? IsNotEqual<TArgument>(TArgument? argument, TArgument? forbiddenValue, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IEquatable<TArgument?> {
+        ArgumentOutOfRangeException.ThrowIfEqual(argument, forbiddenValue, paramName);
+        return argument;
+    }
+    public static TArgument IsGreaterThan<TArgument>(TArgument argument, TArgument maximum, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(argument, maximum, paramName);
+        return argument;
+    }
+    public static TArgument IsLessThan<TArgument>(TArgument argument, TArgument minimum, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(argument, minimum, paramName);
+        return argument;
+    }
+    public static TArgument IsNotGreaterThan<TArgument>(TArgument argument, TArgument maximum, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(argument, maximum, paramName);
+        return argument;
+    }
+    public static TArgument IsNotLessThan<TArgument>(TArgument argument, TArgument minimum, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfLessThan(argument, minimum, paramName);
+        return argument;
+    }
+    public static TArgument IsZero<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(argument, TArgument.Zero, paramName);
+        return argument;
+    }
+    public static TArgument IsNotZero<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfZero(argument, paramName);
+        return argument;
+    }
+    // Does not include Zero
+    public static TArgument IsPositive<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument>, IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(argument, paramName);
+        return argument;
+    }
+    // Does not include Zero
+    public static TArgument IsNegative<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument>, IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(argument, TArgument.Zero, paramName);
+        return argument;
+    }
+    public static TArgument IsNotNegative<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument>, IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfNegative(argument, paramName);
+        return argument;
+    }
+    public static TArgument IsNotPositive<TArgument>(TArgument argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : INumberBase<TArgument>, IComparable<TArgument> {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(argument, TArgument.Zero, paramName);
+        return argument;
+    }
+}
+    ]]></file> 
+    <file name="Ensure.String.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    public static string IsNotNullOrEmpty([NotNull] string? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        ArgumentException.ThrowIfNullOrEmpty(argument, paramName);
+        return argument;
+    }
+
+    public static string IsNotNullOrWhiteSpace([NotNull] string? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        ArgumentException.ThrowIfNullOrWhiteSpace(argument, paramName);
+        return argument;
+    }
+
+    [SuppressMessage("Roslynator", "RCS1212:Remove redundant assignment", Justification = "Assignment is required.")]
+    public static string DefaultIfNullOrEmpty([NotNull] string? argument, string defaultValue, [CallerArgumentExpression(nameof(defaultValue))] string? paramName = null) {
+        argument = string.IsNullOrEmpty(argument) ? IsNotNullOrEmpty(defaultValue, paramName) : argument;
+        return argument;
+    }
+
+    [SuppressMessage("Roslynator", "RCS1212:Remove redundant assignment", Justification = "Assignment is required.")]
+    public static string DefaultIfNullOrWhiteSpace([NotNull] string? argument, string defaultValue, [CallerArgumentExpression(nameof(defaultValue))] string? paramName = null) {
+        argument = string.IsNullOrWhiteSpace(argument) ? IsNotNullOrWhiteSpace(defaultValue, paramName) : argument;
+        return argument;
+    }
+
+    public static FormattableString IsNotNullOrEmpty([NotNull] FormattableString? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        ArgumentException.ThrowIfNullOrEmpty(argument?.Format, paramName);
+        return argument;
+    }
+
+    public static FormattableString IsNotNullOrWhiteSpace([NotNull] FormattableString? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        ArgumentException.ThrowIfNullOrWhiteSpace(argument?.Format, paramName);
+        return argument;
+    }
+
+    [SuppressMessage("Roslynator", "RCS1212:Remove redundant assignment", Justification = "Assignment is required.")]
+    public static FormattableString DefaultIfNullOrEmpty([NotNull] FormattableString? argument, FormattableString defaultValue, [CallerArgumentExpression(nameof(defaultValue))] string? paramName = null) {
+        argument = string.IsNullOrEmpty(argument?.Format) ? IsNotNullOrEmpty(defaultValue, paramName) : argument;
+        return argument;
+    }
+
+    [SuppressMessage("Roslynator", "RCS1212:Remove redundant assignment", Justification = "Assignment is required.")]
+    public static FormattableString DefaultIfNullOrWhiteSpace([NotNull] FormattableString? argument, FormattableString defaultValue, [CallerArgumentExpression(nameof(defaultValue))] string? paramName = null) {
+        argument = string.IsNullOrWhiteSpace(argument?.Format) ? IsNotNullOrWhiteSpace(defaultValue, paramName) : argument;
+        return argument;
+    }
+}
+    ]]></file> 
+    <file name="Ensure.Type.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    [return: NotNull]
+    public static TArgument IsOfType<TArgument>([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => IsNotNull(argument, paramName) is TArgument result
+            ? result
+            : throw new ArgumentException(string.Format(null, MustBeOfType, typeof(TArgument).Name, argument.GetType().Name), paramName);
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public static TArgument DefaultIfNotOfType<TArgument>(object? argument, TArgument? defaultValue = default)
+        => argument switch {
+            TArgument result => result,
+            _ => IsNotNull(defaultValue),
+        };
+}
+    ]]></file> 
+    <file name="Ensure.Valididation.cs"><![CDATA[ 
+﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static partial class Ensure {
+    [return: NotNull]
+    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, IMap? context = null, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where TArgument : IValidatable
+        => IsValid(IsNotNull(argument, paramName), arg => arg.Validate(context), paramName);
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, IMap? context = null, TArgument? defaultValue = default)
+        where TArgument : IValidatable {
+        var result = argument?.Validate(context) ?? Result.Success();
+        return result.IsSuccess && argument is not null
+                   ? argument
+                   : defaultValue;
+    }
+
+    [return: NotNull]
+    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument, Result> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+        var result = validate(IsNotNull(argument, paramName));
+        return result.IsSuccess
+            ? argument
+            : throw new ValidationException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+    }
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, Func<TArgument?, Result> validate, TArgument? defaultValue = default)
+        => validate(argument).IsSuccess && argument is not null
+               ? argument
+               : defaultValue;
+
+    [return: NotNull]
+    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument?, bool> isValid, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => isValid(IsNotNull(argument, paramName))
+               ? argument
+               : throw new ValidationException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+
+    [return: NotNullIfNotNull(nameof(defaultValue))]
+    public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, Func<TArgument?, bool> isValid, TArgument? defaultValue = default)
+        => isValid(argument)
+               ? argument ?? defaultValue
+               : defaultValue;
+}
+    ]]></file> 
+    <file name="InstanceFactory.cs"><![CDATA[ 
+﻿using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
+
+// ReSharper disable once CheckNamespace - Intended to be in this namespace
+namespace System;
+
+public static class InstanceFactory {
+    private const BindingFlags _allConstructors = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance;
+
+    public static T? CreateOrDefault<[DynamicallyAccessedMembers(PublicConstructors | NonPublicConstructors)] T>(params object[] args)
+        where T : class
+        => TryCreate<T>(out var result, args) ? result : default;
+
+    public static bool TryCreate<[DynamicallyAccessedMembers(PublicConstructors | NonPublicConstructors)] T>([MaybeNullWhen(false)] out T instance, params object[] args)
+        where T : class {
+        try {
+            instance = (T)IsNotNull(Activator.CreateInstance(typeof(T), _allConstructors, null, args, null, null), typeof(T).Name);
+            return true;
+        }
+        catch {
+            instance = default;
+            return false;
+        }
+    }
+
+    [return: NotNull]
+    public static T Create<[DynamicallyAccessedMembers(PublicConstructors | NonPublicConstructors)] T>(params object[] args)
+        where T : class {
+        try {
+            return (T)IsNotNull(Activator.CreateInstance(typeof(T), _allConstructors, null, args, null, null), typeof(T).Name);
+        }
+        catch (Exception ex) {
+            throw new InvalidOperationException($"Failed to create instance of type {typeof(T).Name}", ex);
+        }
+    }
+
+    public static T? CreateOrDefault<[DynamicallyAccessedMembers(PublicConstructors | NonPublicConstructors)] T>(IServiceProvider services, params object[] args)
+        where T : class
+        => TryCreate<T>(services, out var result, args) ? result : default;
+
+    public static bool TryCreate<[DynamicallyAccessedMembers(PublicConstructors)] T>(IServiceProvider services, [MaybeNullWhen(false)] out T instance, params object[] args)
+        where T : class {
+        try {
+            instance = ActivatorUtilities.CreateInstance<T>(services, args);
+            return true;
+        }
+        catch {
+            instance = default;
+            return false;
+        }
+    }
+
+    [return: NotNull]
+    public static T Create<[DynamicallyAccessedMembers(PublicConstructors)] T>(IServiceProvider services, params object[] args)
+        where T : class {
+        try {
+            return ActivatorUtilities.CreateInstance<T>(services, args);
+        }
+        catch (Exception ex) {
+            throw new InvalidOperationException($"Failed to create instance of type {typeof(T).Name}", ex);
+        }
+    }
+}
+    ]]></file> 
+  </folder> 
+</root> 

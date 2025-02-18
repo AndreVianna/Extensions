@@ -436,8 +436,8 @@ public class CrudResultTests {
         CrudResult crudResultWithoutErrors = resultWithoutErrors;
 
         // Assert
-        crudResultWithErrors.Type.Should().Be(CrudResultType.Invalid);
-        crudResultWithoutErrors.Type.Should().Be(CrudResultType.Success);
+        crudResultWithErrors.Type.Should().Be(CrudResultState.Invalid);
+        crudResultWithoutErrors.Type.Should().Be(CrudResultState.Success);
     }
 
     [Fact]
@@ -450,7 +450,7 @@ public class CrudResultTests {
         var combinedResult = resultError + resultNotFound;
 
         // Assert
-        combinedResult.Type.Should().Be(CrudResultType.Error);
+        combinedResult.Type.Should().Be(CrudResultState.Error);
     }
 
     [Fact]
@@ -463,7 +463,7 @@ public class CrudResultTests {
         var combinedResult = resultWithValue + resultWithConflict;
 
         // Assert
-        combinedResult.Type.Should().Be(CrudResultType.Conflict);
+        combinedResult.Type.Should().Be(CrudResultState.Conflict);
         combinedResult.Value.Should().Be("Test");
     }
 
@@ -699,7 +699,7 @@ public class CrudResultTests {
         var result = Error(exception);
 
         // Assert
-        result.Type.Should().Be(CrudResultType.Error);
+        result.Type.Should().Be(CrudResultState.Error);
     }
 
     [Fact]

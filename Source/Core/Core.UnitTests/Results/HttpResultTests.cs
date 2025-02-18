@@ -669,7 +669,7 @@ public class HttpResultTests {
         var result = InternalError(exception);
 
         // Assert
-        result.Type.Should().Be(HttpResultType.Error);
+        result.Type.Should().Be(HttpResultState.ServerError);
     }
 
     [Fact]

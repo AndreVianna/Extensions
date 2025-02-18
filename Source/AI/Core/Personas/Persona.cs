@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.AI.Personas;
+﻿using DotNetToolbox.Validation;
+
+namespace DotNetToolbox.AI.Personas;
 
 public class Persona
     : Map, IValidatable {

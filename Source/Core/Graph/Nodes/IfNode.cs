@@ -41,7 +41,7 @@ public abstract class IfNode<TNode>(string? tag, IServiceProvider services)
 
     protected override Result IsValid(ISet<INode> visited) {
         var result = base.IsValid(visited);
-        result += Then?.Validate(visited) ?? new ValidationError("The true node is not set.", Token?.ToSource());
+        result += Then?.Validate(visited) ?? new OperationError("The true node is not set.", Token?.ToSource());
         result += Else?.Validate(visited) ?? Success();
         return result;
     }

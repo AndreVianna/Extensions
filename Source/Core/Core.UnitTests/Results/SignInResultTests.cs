@@ -589,7 +589,7 @@ public class SignInResultTests {
         var result = Error(exception);
 
         // Assert
-        result.Type.Should().Be(SignInResultType.Error);
+        result.Type.Should().Be(SignInResultState.Error);
     }
 
     [Fact]

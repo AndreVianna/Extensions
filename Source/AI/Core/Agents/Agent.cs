@@ -69,7 +69,7 @@ public abstract class Agent<TAgent, TRequest, TResponse>
             case HttpStatusCode.BadRequest:
                 _logger.LogDebug("Invalid request.");
                 var badContent = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-                return HttpResult.BadRequest<Message>(new ValidationError(badContent));
+                return HttpResult.BadRequest<Message>(new OperationError(badContent));
             default:
                 _logger.LogDebug("Response received.");
                 var content = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
