@@ -38,18 +38,18 @@ public abstract class CaseNode<TNode>(string? tag, IServiceProvider services)
     public string Name { get; set; } = typeof(TNode).Name;
     public Dictionary<string, INode?> Choices { get; } = [];
 
-    protected override Result IsValid(ISet<INode> visited) {
+    protected override IValidationResult IsValid(ISet<INode> visited) {
         var result = base.IsValid(visited);
         if (Choices.Count == 0)
-            result += new OperationError("The case node has no choices.", Token?.ToSource());
+            result.Add(Failure("The case node has no choices.", Token?.ToSource()));
         var choices = Choices.Values
                              .Where(c => c is not null)
                              .Cast<INode>()
                              .Distinct();
         return choices.Aggregate(result, ValidateChoice);
 
-        Result ValidateChoice(Result current, INode choice)
-            => current + choice.Validate(visited);
+        IValidationResult ValidateChoice(IValidationResult current, INode choice)
+            => current.Add(choice.Validate(visited));
     }
 
     protected override async Task<INode?> SelectPath(IMap context, CancellationToken ct = default) {

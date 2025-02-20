@@ -16,38 +16,41 @@ public record HttpClientOptions
     public Dictionary<string, string[]>? CustomHeaders { get; init; }
 
     public virtual Result Validate(IMap? context = null) {
-        var result = new Result();
+        var result = ValidationResult.Default;
         var provider = (string?)context?["Provider"] ?? string.Empty;
         var providerPath = string.IsNullOrWhiteSpace(provider) ? string.Empty : $":{provider}";
 
-        result += ValidateBaseAddress(providerPath);
-        result += ValidateResponseFormat(providerPath);
-        result += ValidateAuthentication(providerPath);
+        result.Add(ValidateBaseAddress(providerPath));
+        result.Add(ValidateResponseFormat(providerPath));
+        result.Add(ValidateAuthentication(providerPath));
         return result;
     }
 
     private Result ValidateBaseAddress(string providerPath) {
-        var result = new Result();
+        var result = ValidationResult.Default;
+        var baseAddress = GetConfigurationPath(providerPath, nameof(BaseAddress));
         if (string.IsNullOrWhiteSpace(BaseAddress))
-            result += new ValidationError("Http client base address is missing.", GetConfigurationPath(providerPath, nameof(BaseAddress)));
+            result.Add(Failure("Http client base address is missing.", baseAddress));
         else if (!Uri.IsWellFormedUriString(BaseAddress, UriKind.Absolute))
-            result += new ValidationError("Http client base address is not a valid URI.", GetConfigurationPath(providerPath, nameof(BaseAddress)));
+            result.Add(Failure("Http client base address is not a valid URI.", baseAddress));
         return result;
     }
 
     private Result ValidateResponseFormat(string providerPath) {
-        var result = new Result();
+        var result = ValidationResult.Default;
+        var responseFormat = GetConfigurationPath(providerPath, nameof(ResponseFormat));
         if (string.IsNullOrWhiteSpace(ResponseFormat) && !MediaTypeWithQualityHeaderValue.TryParse(ResponseFormat, out _))
-            result += new ValidationError("Http client response format value is not valid.", GetConfigurationPath(providerPath, nameof(ResponseFormat)));
+            result.Add(Failure("Http client response format value is not valid.", responseFormat));
         return result;
     }
 
     private Result ValidateAuthentication(string providerPath) {
-        var result = new Result();
+        var result = ValidationResult.Default;
+        var authentication = GetConfigurationPath(providerPath, $"{nameof(Authentication)}:{nameof(HttpClientAuthentication.Value)}");
         if (Authentication is null || Authentication.Type is None)
             return result;
         if (string.IsNullOrWhiteSpace(Authentication.Value))
-            result += new ValidationError("The http client authentication value is missing.", GetConfigurationPath(providerPath, $"{nameof(Authentication)}:{nameof(HttpClientAuthentication.Value)}"));
+            result.Add(Failure("The http client authentication value is missing.", authentication));
         return result;
     }
 

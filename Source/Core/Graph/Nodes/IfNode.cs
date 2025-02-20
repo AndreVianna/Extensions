@@ -39,10 +39,10 @@ public abstract class IfNode<TNode>(string? tag, IServiceProvider services)
     public INode? Then { get; set; }
     public INode? Else { get; set; }
 
-    protected override Result IsValid(ISet<INode> visited) {
+    protected override IValidationResult IsValid(ISet<INode> visited) {
         var result = base.IsValid(visited);
-        result += Then?.Validate(visited) ?? new OperationError("The true node is not set.", Token?.ToSource());
-        result += Else?.Validate(visited) ?? Success();
+        result.Add(Then?.Validate(visited) ?? Failure("The true node is not set.", Token?.ToSource()));
+        result.Add(Else?.Validate(visited) ?? Default);
         return result;
     }
 

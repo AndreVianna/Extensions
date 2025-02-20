@@ -1,7 +1,7 @@
 ﻿namespace DotNetToolbox.Results;
 
 public interface IHasErrors {
-    IEnumerable<OperationError> Errors { get; }
+    ISet<ResultError> Errors { get; }
     bool HasErrors { get; }
     void EnsureHasNoErrors();
 }

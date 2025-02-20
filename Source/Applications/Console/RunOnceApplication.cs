@@ -35,9 +35,9 @@ public abstract class RunOnceApplication<TApplication, TBuilder, TSettings>(stri
         ProcessResult(result);
     }
 
-    protected virtual Task<Result> ExecuteDefault(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<IValidationResult> ExecuteDefault(CancellationToken ct = default) => Task.FromResult(Success());
 
-    private Task<Result> ShowHelp(CancellationToken ct) {
+    private Task<IValidationResult> ShowHelp(CancellationToken ct) {
         var help = new HelpCommand(this);
         return help.Execute([], ct);
     }

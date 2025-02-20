@@ -12,15 +12,15 @@ public class Map(IEnumerable<KeyValuePair<string, object>>? source = null)
         => new() { [key] = value };
 
     public static Map FromMap(IEnumerable<KeyValuePair<string, object>> dict)
-        => new(dict);
+        => [.. dict];
     public static Map<TValue> FromMap<TValue>(IEnumerable<KeyValuePair<string, TValue>> dict)
         where TValue : notnull
-        => new(dict);
+        => [.. dict];
     public static Map FromList(IEnumerable<object> list, Func<object, string> keySelector)
-        => new(list.ToDictionary(keySelector));
+        => [.. list.ToDictionary(keySelector)];
     public static Map<TValue> FromList<TValue>(IEnumerable<TValue> list, Func<TValue, string> keySelector)
         where TValue : notnull
-        => new(list.ToDictionary(keySelector));
+        => [.. list.ToDictionary(keySelector)];
     public static Map<Map<string>> FromTable(IEnumerable<IEnumerable<string>> table) {
         var rows = table.ToArray(r => r.ToArray());
         if (rows.Length < 2 || rows[0].Length == 0) return Empty<Map<string>>();

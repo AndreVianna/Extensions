@@ -3,7 +3,7 @@
 public sealed class WorkflowParser {
     private readonly IEnumerator<Token> _tokens;
     private readonly List<INode> _nodes = [];
-    private readonly ValidationErrors _errors = [];
+    private readonly ResultErrors _errors = [];
     private readonly IServiceProvider _services;
     private int _indentLevel = -1;
 
@@ -13,11 +13,11 @@ public sealed class WorkflowParser {
         _tokens.MoveNext();
     }
 
-    public static Result<INode?> Parse(IEnumerable<Token> tokens, IServiceProvider services) {
+    public static IValidationResult<INode?> Parse(IEnumerable<Token> tokens, IServiceProvider services) {
         var parser = new WorkflowParser(tokens, services);
         var blockStart = parser.ParseBlock();
         parser.ConnectJumps();
-        return new(blockStart, parser._errors);
+        return From(blockStart, parser._errors);
     }
 
     private INode? ParseBlock() {
@@ -206,7 +206,7 @@ public sealed class WorkflowParser {
     private void AddError(string? message, Token? token = null) {
         var source = (token ?? _tokens.Current).ToSource();
         message ??= "Unknown error.";
-        _errors.Add(new OperationError(message, source));
+        _errors.Add(new ResultError(message, source));
     }
 
     private int CountToken(TokenType type) {

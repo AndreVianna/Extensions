@@ -6,7 +6,7 @@ public class ExitCommand(IHasChildren parent)
         n.Description = "Exit";
         n.Help = "Exit the application.";
     }) {
-    protected override Result Execute() {
+    protected override IValidationResult Execute() {
         Application.Exit();
         return Success();
     }

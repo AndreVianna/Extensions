@@ -23,13 +23,13 @@ public class AgentSettings
     public Result Validate(IMap? context = null) {
         var result = Result.Success();
         if (StopSequences.Count > 0 && StopSequences.Any(string.IsNullOrWhiteSpace))
-            result += new OperationError("StopWaiting signals cannot be null, empty, or contain only whitespace.", nameof(StopSequences));
+            result += new ResultError("StopWaiting signals cannot be null, empty, or contain only whitespace.", nameof(StopSequences));
         if (MaximumNumberOfRetries > _maximumRetries)
-            result += new OperationError($"The maximum number of retries is {_maximumRetries}. Found: {MaximumNumberOfRetries}", nameof(MaximumNumberOfRetries));
+            result += new ResultError($"The maximum number of retries is {_maximumRetries}. Found: {MaximumNumberOfRetries}", nameof(MaximumNumberOfRetries));
         if (Temperature is < 0 or > _maximumTemperature)
-            result += new OperationError($"Content must be between {0} and {_maximumTemperature}. Found: {Temperature}", nameof(Temperature));
+            result += new ResultError($"Content must be between {0} and {_maximumTemperature}. Found: {Temperature}", nameof(Temperature));
         if (TokenProbabilityCutOff is < 0 or > _maximumTokenProbabilityCutOff)
-            result += new OperationError($"Content must be between {0} and {_maximumTokenProbabilityCutOff}. Found: {TokenProbabilityCutOff}", nameof(TokenProbabilityCutOff));
+            result += new ResultError($"Content must be between {0} and {_maximumTokenProbabilityCutOff}. Found: {TokenProbabilityCutOff}", nameof(TokenProbabilityCutOff));
 
         return result;
     }

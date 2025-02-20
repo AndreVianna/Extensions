@@ -6,5 +6,5 @@ public interface IParameter : IHasParent {
     bool IsRequired { get; }
     bool IsSet { get; }
 
-    Task<Result> Read(string? value, IMap context, CancellationToken ct = default);
+    Task<IValidationResult> Read(string? value, IMap context, CancellationToken ct = default);
 }

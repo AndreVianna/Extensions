@@ -6,7 +6,7 @@ public sealed class Option(IHasChildren parent, string name, Action<Option>? con
 public abstract class Option<TOption>(IHasChildren parent, string name, Action<TOption>? configure = null)
     : Node<TOption>(parent, name, configure), IOption
     where TOption : Option<TOption> {
-    Task<Result> IOption.Read(string? value, IMap context, CancellationToken ct) {
+    Task<IValidationResult> IOption.Read(string? value, IMap context, CancellationToken ct) {
         context[Name] = value switch {
             null or "null" or "default" => null!,
             ['"', .. var text, '"'] => text,
@@ -16,5 +16,5 @@ public abstract class Option<TOption>(IHasChildren parent, string name, Action<T
         return Execute(ct);
     }
 
-    protected virtual Task<Result> Execute(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<IValidationResult> Execute(CancellationToken ct = default) => Task.FromResult(Success());
 }

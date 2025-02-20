@@ -5,5 +5,5 @@ public class BackCommand(IHasChildren parent)
         n.Description = "Back";
         n.Help = "Return to the previous menu.";
     }) {
-    protected override Result Execute() => Success();
+    protected override IValidationResult Execute() => Success();
 }

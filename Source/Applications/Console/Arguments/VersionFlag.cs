@@ -5,8 +5,8 @@ internal sealed class VersionFlag(IHasChildren parent)
         n.Description = "Show version number.";
         n.Help = "Display the application's current version.";
     }) {
-    protected override Task<Result> Execute(CancellationToken ct = default) {
+    protected override Task<IValidationResult> Execute(CancellationToken ct = default) {
         Output.WriteLine((Parent as IApplication)!.FullName);
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

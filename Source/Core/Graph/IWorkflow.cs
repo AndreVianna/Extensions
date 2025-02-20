@@ -9,6 +9,6 @@ public interface IWorkflow<out TContext>
     TContext Context { get; }
     INode StartNode { get; }
 
-    Result Validate();
+    IValidationResult Validate();
     Task Run(CancellationToken ct = default);
 }

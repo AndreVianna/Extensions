@@ -30,7 +30,7 @@ public abstract class Node<TNode>
 
     public INode? Next { get; set; }
 
-    public Result Validate(ISet<INode>? visited = null) {
+    public IValidationResult Validate(ISet<INode>? visited = null) {
         visited ??= new HashSet<INode>();
         return !visited.Add(this)
             ? Success()
@@ -39,7 +39,7 @@ public abstract class Node<TNode>
 
     public abstract void ConnectTo(INode? next);
 
-    protected virtual Result IsValid(ISet<INode> visited) => Success();
+    protected virtual IValidationResult IsValid(ISet<INode> visited) => Success();
 
     public async Task<INode?> Run(IMap context, CancellationToken ct = default) {
         await UpdateState(context, ct);

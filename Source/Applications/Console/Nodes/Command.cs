@@ -3,12 +3,12 @@
 public sealed class Command(IHasChildren parent,
                             string name,
                             Action<Command>? configure = null,
-                            Func<Command, CancellationToken, Task<Result>>? executeAsync = null)
+                            Func<Command, CancellationToken, Task<IValidationResult>>? executeAsync = null)
     : Command<Command>(parent, name, configure, executeAsync) {
-    public Command(IHasChildren parent, string name, Func<Command, Result> execute)
+    public Command(IHasChildren parent, string name, Func<Command, IValidationResult> execute)
         : this(parent, name, null, (cmd, ct) => Task.Run(() => execute(cmd), ct)) {
     }
-    public Command(IHasChildren parent, string name, Action<Command>? configure, Func<Command, Result> execute)
+    public Command(IHasChildren parent, string name, Action<Command>? configure, Func<Command, IValidationResult> execute)
         : this(parent, name, configure, (cmd, ct) => Task.Run(() => execute(cmd), ct)) {
     }
 }
@@ -16,15 +16,15 @@ public sealed class Command(IHasChildren parent,
 public class Command<TCommand>(IHasChildren parent,
                                string name,
                                Action<TCommand>? configure = null,
-                               Func<TCommand, CancellationToken, Task<Result>>? executeAsync = null)
+                               Func<TCommand, CancellationToken, Task<IValidationResult>>? executeAsync = null)
     : Node<TCommand>(parent, name, configure),
       ICommand
     where TCommand : Command<TCommand> {
-    public Command(IHasChildren parent, string name, Func<TCommand, Result> execute)
+    public Command(IHasChildren parent, string name, Func<TCommand, IValidationResult> execute)
         : this(parent, name, null, (cmd, ct) => Task.Run(() => execute(cmd), ct)) {
     }
 
-    public Command(IHasChildren parent, string name, Action<TCommand> configure, Func<TCommand, Result> execute)
+    public Command(IHasChildren parent, string name, Action<TCommand> configure, Func<TCommand, IValidationResult> execute)
         : this(parent, name, configure, (cmd, ct) => Task.Run(() => execute(cmd), ct)) {
     }
 
@@ -35,10 +35,10 @@ public class Command<TCommand>(IHasChildren parent,
     public IArgument[] Options => [.. Children.OfType<IArgument>()];
     public ICommand[] Commands => [.. Children.OfType<ICommand>().Except(Options.Cast<INode>()).Cast<ICommand>()];
 
-    protected virtual Task<Result> ExecuteAsync(CancellationToken ct = default)
+    protected virtual Task<IValidationResult> ExecuteAsync(CancellationToken ct = default)
         => executeAsync?.Invoke((TCommand)this, ct) ?? Task.Run(Execute, ct);
-    protected virtual Result Execute() => Success();
-    public async Task<Result> Execute(IReadOnlyList<string> args, CancellationToken ct = default) {
+    protected virtual IValidationResult Execute() => Success();
+    public async Task<IValidationResult> Execute(IReadOnlyList<string> args, CancellationToken ct = default) {
         var result = await ArgumentsParser.Parse(this, args, ct);
         return result.IsSuccess ? await ExecuteAsync(ct) : result;
     }

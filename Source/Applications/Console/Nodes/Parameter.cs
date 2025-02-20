@@ -21,7 +21,7 @@ public abstract class Parameter<TParameter>(IHasChildren parent, string name, Ac
     public bool IsRequired => DefaultValue is null;
     public bool IsSet { get; private set; }
 
-    Task<Result> IParameter.Read(string? value, IMap context, CancellationToken ct) {
+    Task<IValidationResult> IParameter.Read(string? value, IMap context, CancellationToken ct) {
         context[Name] = value switch {
             null or "default" => DefaultValue!,
             "null" => null!,
@@ -32,5 +32,5 @@ public abstract class Parameter<TParameter>(IHasChildren parent, string name, Ac
         return Execute(ct);
     }
 
-    protected virtual Task<Result> Execute(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<IValidationResult> Execute(CancellationToken ct = default) => Task.FromResult(Success());
 }

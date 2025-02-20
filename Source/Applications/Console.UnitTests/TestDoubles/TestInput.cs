@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.ConsoleApplication.TestDoubles;
+﻿using DotNetToolbox.ConsoleApplication.Extensions;
+
+namespace DotNetToolbox.ConsoleApplication.TestDoubles;
 
 internal sealed class TestInput(IOutput output, params string[] inputs)
     : IInput {

@@ -5,7 +5,7 @@ internal class ClearScreenCommand(IHasChildren parent)
         n.Aliases = ["cls"];
         n.Description = "Clear the screen.";
     }) {
-    protected override Result Execute() {
+    protected override IValidationResult Execute() {
         Output.ClearScreen();
         return Success();
     }

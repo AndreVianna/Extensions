@@ -9,6 +9,6 @@ public interface INode {
     INode? Next { get; set; }
 
     void ConnectTo(INode? next);
-    Result Validate(ISet<INode>? visited = null);
+    IValidationResult Validate(ISet<INode>? visited = null);
     Task<INode?> Run(IMap context, CancellationToken ct = default);
 }

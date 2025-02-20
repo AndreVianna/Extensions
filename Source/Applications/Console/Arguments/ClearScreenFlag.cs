@@ -5,8 +5,8 @@ internal sealed class ClearScreenFlag(IHasChildren parent)
         n.Aliases = ["cls"];
         n.Description = "Clear the screen.";
     }) {
-    protected override Task<Result> Execute(CancellationToken ct = default) {
+    protected override Task<IValidationResult> Execute(CancellationToken ct = default) {
         Output.ClearScreen();
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

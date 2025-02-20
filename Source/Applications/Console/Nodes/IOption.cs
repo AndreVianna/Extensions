@@ -1,5 +1,5 @@
 ﻿namespace DotNetToolbox.ConsoleApplication.Nodes;
 
 public interface IOption : IArgument {
-    Task<Result> Read(string? value, IMap context, CancellationToken ct = default);
+    Task<IValidationResult> Read(string? value, IMap context, CancellationToken ct = default);
 }

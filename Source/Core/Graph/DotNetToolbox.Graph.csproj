@@ -60,7 +60,7 @@
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\Core\DotNetToolbox.Core.csproj" />
-    <ProjectReference Include="..\Results\DotNetToolbox.Results.csproj" />
+    <ProjectReference Include="..\Results\DotNetToolbox.Monads.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Release'">

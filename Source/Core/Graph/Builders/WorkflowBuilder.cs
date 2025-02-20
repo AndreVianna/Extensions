@@ -168,7 +168,7 @@ public sealed class WorkflowBuilder(IServiceProvider services)
     private void ConnectJumps() {
         foreach (var jumpNode in _nodes.OfType<IJumpNode>()) {
             var targetNodeTag = _nodes.Find(n => n.Tag == jumpNode.TargetTag)
-                             ?? throw new OperationException($"Jump target '{jumpNode.TargetTag}' not found.", jumpNode.Token?.ToSource() ?? string.Empty);
+                             ?? throw new ResultException($"Jump target '{jumpNode.TargetTag}' not found.", jumpNode.Token?.ToSource() ?? string.Empty);
             jumpNode.ConnectTo(targetNodeTag);
         }
     }

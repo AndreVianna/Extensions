@@ -6,9 +6,9 @@ internal sealed class HelpFlag(IHasChildren parent)
         n.Description = "Show help.";
         n.Help = "Display this help information.";
     }) {
-    protected override Task<Result> Execute(CancellationToken ct = default) {
+    protected override Task<IValidationResult> Execute(CancellationToken ct = default) {
         Output.WriteLine(Parent.ToHelp());
         Application.Exit();
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

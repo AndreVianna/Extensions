@@ -15,8 +15,10 @@ global using System.Text.RegularExpressions;
 
 global using DotNetToolbox;
 global using DotNetToolbox.Environment;
+global using DotNetToolbox.Results;
 global using DotNetToolbox.Sequencers;
-global using DotNetToolbox.Singleton;
+global using DotNetToolbox.Singletons;
+global using DotNetToolbox.Validation;
 
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;

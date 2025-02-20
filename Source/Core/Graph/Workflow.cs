@@ -50,9 +50,9 @@ public class Workflow<TContext>(string id,
     public INode StartNode { get; } = IsNotNull(start);
     public TContext Context { get; } = IsNotNull(context);
 
-    public Result Validate() => ValidateNode(StartNode);
+    public IValidationResult Validate() => ValidateNode(StartNode);
 
-    private static Result ValidateNode(INode? node, ISet<INode>? visited = null) {
+    private static IValidationResult ValidateNode(INode? node, ISet<INode>? visited = null) {
         if (node is null) return Success();
         visited ??= new HashSet<INode>();
         var result = !visited.Add(node)
@@ -60,22 +60,22 @@ public class Workflow<TContext>(string id,
                          : node.Validate(visited);
         switch (node) {
             case IActionNode n:
-                result += ValidateNode(n.Next, visited);
+                result = result.Add(ValidateNode(n.Next, visited));
                 break;
             case IIfNode n:
-                result += ValidateNode(n.Then, visited);
-                result += ValidateNode(n.Else, visited);
+                result = result.Add(ValidateNode(n.Then, visited));
+                result = result.Add(ValidateNode(n.Else, visited));
                 break;
             case ICaseNode n:
                 foreach ((_, var branch) in n.Choices)
-                    result += ValidateNode(branch, visited);
+                    result = result.Add(ValidateNode(branch, visited));
                 break;
         }
         return result;
     }
 
     public Task Run(CancellationToken ct = default) {
-        var runner = new Runner<TContext>(++_runCount, (IWorkflow<TContext>)this, dateTime, loggerFactory);
+        var runner = new Runner<TContext>(++_runCount, this, dateTime, loggerFactory);
         return runner.Run(ct);
     }
 }

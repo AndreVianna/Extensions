@@ -74,10 +74,10 @@ public abstract class ApplicationBase<TApplication, TBuilder, TSettings>
         }
     }
 
-    protected void ProcessResult(Result result) {
-        if (result.HasException) throw result.Exception!;
+    protected void ProcessResult(IValidationResult result) {
         if (!result.HasErrors) return;
-        Output.WriteLine(result.Errors.ToText());
+        var errors = new ResultErrors(result.Errors);
+        Output.WriteLine(errors.ToText());
     }
 
     protected async Task<bool> TryParseArguments(CancellationToken ct) {
@@ -89,16 +89,16 @@ public abstract class ApplicationBase<TApplication, TBuilder, TSettings>
     protected virtual bool HandleException<TException>(TException ex)
         where TException : Exception => false;
 
-    protected Task<Result> ProcessCommand(string command, CancellationToken ct)
+    protected Task<IValidationResult> ProcessCommand(string command, CancellationToken ct)
         => ProcessCommand([command], ct);
 
-    protected Task<Result> ProcessCommand(string command, string[] args, CancellationToken ct)
+    protected Task<IValidationResult> ProcessCommand(string command, string[] args, CancellationToken ct)
         => ProcessCommand([command, .. args], ct);
 
-    protected virtual async Task<Result> ProcessCommand(string[] input, CancellationToken ct) {
+    protected virtual async Task<IValidationResult> ProcessCommand(string[] input, CancellationToken ct) {
         if (input.Length == 0) return Success();
         var command = FindCommand((this as IHasChildren).Commands, input[0]);
-        if (command is null) return Invalid($"Command '{input[0]}' not found. For a list of available commands use 'help'.");
+        if (command is null) return Failure($"Command '{input[0]}' not found. For a list of available commands use 'help'.");
         var arguments = input.Skip(1).ToArray();
         return await command.Execute(arguments, ct);
     }
@@ -191,8 +191,9 @@ public abstract partial class ApplicationBase<TSettings>
     public IArgument[] Options => [.. Children.OfType<IArgument>().OrderBy(i => i.Name)];
     public ICommand[] Commands => [.. Children.OfType<ICommand>().Except(Options.Cast<INode>()).Cast<ICommand>().OrderBy(i => i.Name)];
 
-    protected virtual Task<Result> OnStart(CancellationToken ct = default) => SuccessTask();
-    protected virtual Result OnExit() => Success();
+    protected virtual Task<IValidationResult> OnStart(CancellationToken ct = default)
+        => Task.FromResult(Success());
+    protected virtual IValidationResult OnExit() => Success();
 
     public virtual void Exit(int code = IApplication.DefaultExitCode) {
         OnExit();
