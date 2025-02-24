@@ -17,7 +17,7 @@ public sealed class ValidationCommandFactoryTests {
     [InlineData(typeof(Dictionary<double, double>))]
     public void Create_ForUnsupportedValidator_Throws(Type subjectType) {
         //Act
-        var action = () => ValidationCommandFactory.For(subjectType, "Attribute").Create("Anything", []);
+        var action = () => ValidationCommandFactory.For(subjectType, "Attribute").Create("Anything");
 
         //Assert
         action.Should().Throw<InvalidOperationException>();

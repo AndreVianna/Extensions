@@ -7,12 +7,12 @@ public static partial class Ensure {
         where TArgument : IEnumerable
         => argument?.Cast<object?>().All(i => i is not null) ?? true
                ? argument
-               : throw new ResultException(string.Format(null, InvertMessage(CollectionMustContainNull)), paramName!);
+               : throw new ResultException(new Error(string.Format(null, InvertMessage(CollectionMustContainNull)), paramName!));
 
     [return: NotNullIfNotNull(nameof(argument))]
     public static TArgument? ItemsAreValid<TArgument, TValue>(TArgument? argument, Func<TValue?, bool> isValid, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         where TArgument : IEnumerable<TValue?>
         => argument?.All(isValid) ?? true
                    ? argument
-                   : throw new ResultException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+                   : throw new ResultException(new Error(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!));
 }

@@ -1,4 +1,4 @@
-﻿namespace DotNetToolbox.Singleton;
+﻿namespace DotNetToolbox.Singletons;
 
 public class HasDefaultTests {
     private sealed class ClassHasDefault : HasDefault<ClassHasDefault>;

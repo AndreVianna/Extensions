@@ -9,9 +9,10 @@ public sealed class NodeTests {
         app.Services.Returns(serviceProvider);
 
         // Act
-        var node = new TestNode(app, "node", ["n"]) {
-            Description = "Some description.",
-        };
+        var node = new TestNode(app, "node",
+                                "n") {
+                                         Description = "Some description.",
+                                     };
 
         // Assert
         node.Name.Should().Be("node");
@@ -29,10 +30,11 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]) {
-            Help = "Some help.",
-            Description = "Some description.",
-        };
+        var node = new TestNode(app, "node",
+                                "n") {
+                                         Help = "Some help.",
+                                         Description = "Some description.",
+                                     };
         var expectedToString = $"TestNode: {node.Name}, {node.Aliases[0]} => {node.Help}";
 
         // Act
@@ -58,7 +60,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         var result = () => node.AddCommand("command", action);
@@ -73,7 +76,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
         var command = (Command)node.AddCommand("command", (Action)(() => throw new()));
 
         // Act
@@ -107,7 +111,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         var subject = node.AddCommand("command", action);
@@ -127,7 +132,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddCommand("command", "c", action);
@@ -143,7 +149,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddCommand<TestCommand>();
@@ -197,7 +204,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddOption("option");
@@ -214,7 +222,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddOption("option", "o");
@@ -231,7 +240,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddOption<TestOption>();
@@ -265,7 +275,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
         const string parameterName = "param1";
 
         // Act
@@ -285,7 +296,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
         const string parameterName = "param1";
         const string defaultValue = "defaultValue";
 
@@ -306,7 +318,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddParameter<TestParameter>();
@@ -349,7 +362,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         var result = () => node.AddFlag("flag", action);
@@ -364,7 +378,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
         var flag = node.AddFlag("flag", (Action)(() => throw new()));
         var context = new Map();
 
@@ -399,7 +414,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
         var context = new Map();
 
         // Act
@@ -420,7 +436,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddFlag("flag", "c", action);
@@ -436,7 +453,8 @@ public sealed class NodeTests {
         var app = Substitute.For<IApplication>();
         var serviceProvider = CreateFakeServiceProvider();
         app.Services.Returns(serviceProvider);
-        var node = new TestNode(app, "node", ["n"]);
+        var node = new TestNode(app, "node",
+                                "n");
 
         // Act
         node.AddFlag<TestFlag>();

@@ -9,7 +9,7 @@ public interface ILinePromptBuilder<TValue> {
     ILinePromptBuilder<TValue> AddChoices(IEnumerable<TValue> choices);
     ILinePromptBuilder<TValue> AddChoices(TValue choice, params TValue[] otherChoices);
     ILinePromptBuilder<TValue> ShowOptionalFlag();
-    ILinePromptBuilder<TValue> AddValidation(Func<TValue, IValidationResult> validate);
+    ILinePromptBuilder<TValue> AddValidation(Func<TValue, IResult> validate);
     TValue Show();
     Task<TValue> ShowAsync(CancellationToken ct = default);
 }

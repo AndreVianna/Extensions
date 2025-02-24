@@ -6,7 +6,7 @@ public static partial class Ensure {
     public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument?, bool> isValid, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         => isValid(IsNotNull(argument, paramName))
                ? argument
-               : throw new ResultException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+               : throw new ResultException(new Error(string.Format(null, InvertMessage(ValueIsValid)), paramName!));
 
     [return: NotNullIfNotNull(nameof(defaultValue))]
     public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, Func<TArgument?, bool> isValid, TArgument? defaultValue = default)

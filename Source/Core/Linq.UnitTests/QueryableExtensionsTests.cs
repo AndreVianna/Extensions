@@ -41,7 +41,8 @@ public class QueryableExtensionsTests {
         var result = source.ToArray<int>(project);
 
         // Assert
-        result.Should().Equal([2, 4, 6]);
+        result.Should().Equal(2, 4,
+                              6);
     }
 
     [Fact]
@@ -54,7 +55,8 @@ public class QueryableExtensionsTests {
         var result = source.ToList<int>(project);
 
         // Assert
-        result.Should().Equal([2, 4, 6]);
+        result.Should().Equal(2, 4,
+                              6);
     }
 
     [Fact]

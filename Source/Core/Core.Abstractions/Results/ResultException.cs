@@ -2,24 +2,24 @@
 
 public sealed class ResultException
     : Exception {
-    private const string _defaultMessage = "Operation failed.";
+    private const string _defaultMessage = "An error has occured.";
 
-    public ResultError[] Errors { get; }
+    public IReadOnlyList<IError> Errors { get; }
 
     public ResultException(string? message = null)
         : base(message ?? _defaultMessage) {
-        Errors = [new(message ?? _defaultMessage)];
+        Errors = [new Error(message ?? _defaultMessage)];
     }
 
     public ResultException(Exception innerException)
         : this(_defaultMessage, innerException) {
     }
 
-    public ResultException(ResultError error, Exception? innerException = null)
-        : this(_defaultMessage, error, innerException) {
+    public ResultException(IError error, Exception? innerException = null)
+        : this(error.Message, [error], innerException) {
     }
 
-    public ResultException(IEnumerable<ResultError> errors, Exception? innerException = null)
+    public ResultException(IEnumerable<IError> errors, Exception? innerException = null)
         : this(_defaultMessage, errors, innerException) {
     }
 
@@ -27,12 +27,12 @@ public sealed class ResultException
         : this(message, [], innerException) {
     }
 
-    public ResultException(string message, ResultError error, Exception? innerException = null)
+    public ResultException(string message, IError error, Exception? innerException = null)
         : this(message, [error], innerException) {
     }
 
-    public ResultException(string message, IEnumerable<ResultError> errors, Exception? innerException = null)
-        : base(!string.IsNullOrWhiteSpace(message) ? message : throw new ArgumentException("The error message cannot be null or whitespace.", nameof(message)), innerException) {
+    public ResultException(string message, IEnumerable<IError> errors, Exception? innerException = null)
+        : base(message, innerException) {
         Errors = [.. errors.Distinct()];
     }
 }

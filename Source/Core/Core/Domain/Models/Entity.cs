@@ -7,5 +7,5 @@ public abstract class Entity<TEntity, TKey>
     where TKey : notnull {
     public TKey Id { get; set; } = default!;
 
-    public abstract IValidationResult Validate(IMap? context = null);
+    public abstract IResult Validate(IMap? context = null);
 }

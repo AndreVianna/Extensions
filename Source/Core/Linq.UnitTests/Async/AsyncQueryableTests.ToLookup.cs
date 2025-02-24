@@ -14,7 +14,7 @@ public partial class AsyncQueryableTests {
         var result = _repo.ToLookup(x => x.Name, x => $"{x.Name}*");
         result.Should().HaveCount(3);
         result.First().Key.Should().Be("A");
-        result["A"].Should().BeEquivalentTo(["A*"]);
+        result["A"].Should().BeEquivalentTo("A*");
     }
 
     [Fact]
@@ -30,6 +30,6 @@ public partial class AsyncQueryableTests {
         var result = _repo.ToLookup(x => x.Name, x => $"{x.Name}*", EqualityComparer<string>.Default);
         result.Should().HaveCount(3);
         result.First().Key.Should().Be("A");
-        result["A"].Should().BeEquivalentTo(["A*"]);
+        result["A"].Should().BeEquivalentTo("A*");
     }
 }

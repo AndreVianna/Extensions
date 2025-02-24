@@ -10,23 +10,23 @@ public static partial class Ensure {
     [return: NotNullIfNotNull(nameof(defaultValue))]
     public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, IMap? context = null, TArgument? defaultValue = default)
         where TArgument : IValidatable {
-        var result = argument?.Validate(context) ?? ValidationResult.Success();
-        return result.IsSuccess && argument is not null
+        var result = argument?.Validate(context) ?? Result.Success();
+        return result.IsSuccessful && argument is not null
                    ? argument
                    : defaultValue;
     }
 
     [return: NotNull]
-    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument, IValidationResult> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument, IResult> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
         var result = validate(IsNotNull(argument, paramName));
-        return result.IsSuccess
+        return result.IsSuccessful
                    ? argument
-                   : throw new ResultException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+                   : throw new ResultException(new Error(string.Format(null, InvertMessage(ValueIsValid)), paramName!));
     }
 
     [return: NotNullIfNotNull(nameof(defaultValue))]
-    public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, Func<TArgument?, IValidationResult> validate, TArgument? defaultValue = default)
-        => validate(argument).IsSuccess && argument is not null
+    public static TArgument? DefaultIfNotValid<TArgument>(TArgument? argument, Func<TArgument?, Result> validate, TArgument? defaultValue = default)
+        => validate(argument).IsSuccessful && argument is not null
                ? argument
                : defaultValue;
 
@@ -36,35 +36,35 @@ public static partial class Ensure {
 
     public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, IMap? context = null, TArgument? defaultValue = default)
         where TArgument : IAsyncValidatable {
-        var result = await (argument?.ValidateAsync(context) ?? Task.FromResult(ValidationResult.Success()));
-        return result.IsSuccess && argument is not null
+        var result = await (argument?.ValidateAsync(context) ?? Task.FromResult(Result.Success()));
+        return result.IsSuccessful && argument is not null
                    ? argument
                    : defaultValue;
     }
 
-    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument, Task<IValidationResult>> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument, Task<IResult>> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
         var result = await validate(IsNotNull(argument, paramName));
-        return result.IsSuccess
+        return result.IsSuccessful
                    ? argument
-                   : throw new ResultException(string.Format(null, InvertMessage(ValueIsValid)), paramName!);
+                   : throw new ResultException(new Error(string.Format(null, InvertMessage(ValueIsValid)), paramName!));
     }
 
-    public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, Func<TArgument?, Task<IValidationResult>> validate, TArgument? defaultValue = default)
-        => (await validate(argument)).IsSuccess && argument is not null
+    public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, Func<TArgument?, Task<IResult>> validate, TArgument? defaultValue = default)
+        => (await validate(argument)).IsSuccessful && argument is not null
                ? argument
                : defaultValue;
 
     [return: NotNullIfNotNull(nameof(argument))]
     public static TArgument? ItemsAreValid<TArgument>(TArgument? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         where TArgument : IEnumerable<IValidatable>
-        => argument?.All(i => i.Validate().IsSuccess) ?? true
+        => argument?.All(i => i.Validate().IsSuccessful) ?? true
                ? argument
-               : throw new ResultException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+               : throw new ResultException(new Error(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!));
 
     [return: NotNullIfNotNull(nameof(argument))]
-    public static TArgument? ItemsAreValid<TArgument, TValue>(TArgument? argument, Func<TValue?, IValidationResult> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+    public static TArgument? ItemsAreValid<TArgument, TValue>(TArgument? argument, Func<TValue?, IResult> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         where TArgument : IEnumerable<TValue?>
-        => argument?.All(i => validate(i).IsSuccess) ?? true
+        => argument?.All(i => validate(i).IsSuccessful) ?? true
                ? argument
-               : throw new ResultException(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!);
+               : throw new ResultException(new Error(string.Format(null, InvertMessage(CollectionMustContainInvalid)), paramName!));
 }

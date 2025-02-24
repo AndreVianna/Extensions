@@ -16,7 +16,7 @@ public class RetryPolicy
 
 public abstract class RetryPolicy<TPolicy>
     : IRetryPolicy,
-      IHasDefault<TPolicy>
+      Results.IHasDefault<TPolicy>
     where TPolicy : RetryPolicy<TPolicy>, new() {
     private readonly Random _random = Random.Shared;
 

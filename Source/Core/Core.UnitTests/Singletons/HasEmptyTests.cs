@@ -1,4 +1,4 @@
-﻿namespace DotNetToolbox.Singleton;
+﻿namespace DotNetToolbox.Singletons;
 
 public class HasEmptyTests {
     private sealed class ClassWithEmpty : HasEmpty<ClassWithEmpty>;
