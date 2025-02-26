@@ -7,6 +7,6 @@ internal sealed class ClearScreenFlag(IHasChildren parent)
     }) {
     protected override Task<Result> Execute(CancellationToken ct = default) {
         Output.ClearScreen();
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

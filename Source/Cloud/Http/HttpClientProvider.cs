@@ -23,8 +23,7 @@ public class HttpClientProvider
         SetDefaultConfiguration(Options);
         configure?.Invoke(Options);
         var result = Options.Validate(context);
-        if (result.HasException) throw result.Exception;
-        if (result.HasErrors) throw new ValidationException("Error while creating up the HttpClient provider.", result.Errors);
+        if (result.HasErrors) throw new OperationFailureException("Error while creating up the HttpClient provider.", result.Errors);
     }
 
     public string Name { get; }

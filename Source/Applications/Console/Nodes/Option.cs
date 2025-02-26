@@ -16,5 +16,5 @@ public abstract class Option<TOption>(IHasChildren parent, string name, Action<T
         return Execute(ct);
     }
 
-    protected virtual Task<Result> Execute(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<Result> Execute(CancellationToken ct = default) => Task.FromResult(Success());
 }

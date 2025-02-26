@@ -32,5 +32,5 @@ public abstract class Parameter<TParameter>(IHasChildren parent, string name, Ac
         return Execute(ct);
     }
 
-    protected virtual Task<Result> Execute(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<Result> Execute(CancellationToken ct = default) => Task.FromResult(Success());
 }

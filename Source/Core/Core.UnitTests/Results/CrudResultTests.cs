@@ -497,7 +497,7 @@ public class CrudResultTests {
     [Fact]
     public async Task SuccessTask_ReturnsTaskWithSuccessCrudResult() {
         // Act
-        var task = SuccessTask();
+        var task = Task.FromResult(Success());
 
         // Assert
         var result = await task;

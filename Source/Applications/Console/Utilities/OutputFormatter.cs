@@ -9,7 +9,7 @@ internal static class OutputFormatter {
         return builder.ToString();
     }
 
-    public static string ToText(this IEnumerable<ValidationError> errors) {
+    public static string ToText(this IEnumerable<IError> errors) {
         var builder = new StringBuilder();
         foreach (var error in errors)
             builder.AppendLine($"Validation error: {error.Message}");

@@ -48,7 +48,7 @@ public abstract class ShellApplication<TApplication, TBuilder, TSettings>
 
     protected override Task<Result> OnStart(CancellationToken ct = default) {
         Output.WriteLine(FullName);
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 
     protected virtual string GetPrePromptText() => string.Empty;
@@ -71,12 +71,12 @@ public abstract class ShellApplication<TApplication, TBuilder, TSettings>
     }
 
     protected virtual Task<Result> ProcessFreeText(string[] lines, CancellationToken ct = default)
-        => SuccessTask();
+        => Task.FromResult(Success());
 
     protected virtual Task<Result> ProcessInteraction(CancellationToken ct = default) {
         Output.Write(GetPrePromptText());
         Output.WritePrompt();
-        var input = (AllowMultiLine ? Input.ReadText() : Input.ReadLine()) ?? string.Empty;
+        var input = Input.ReadLine() ?? string.Empty;
         return ProcessUserInput(input, ct);
     }
 

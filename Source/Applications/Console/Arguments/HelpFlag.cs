@@ -9,6 +9,6 @@ internal sealed class HelpFlag(IHasChildren parent)
     protected override Task<Result> Execute(CancellationToken ct = default) {
         Output.WriteLine(Parent.ToHelp());
         Application.Exit();
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

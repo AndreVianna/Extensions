@@ -559,7 +559,7 @@ public class ResultTests {
     [Fact]
     public async Task SuccessTask_ReturnsTaskWithSuccessResult() {
         // Act
-        var task = Result.SuccessTask();
+        var task = Result.Task.FromResult(Success());
 
         // Assert
         var result = await task;

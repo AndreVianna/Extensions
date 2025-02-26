@@ -9,6 +9,6 @@ internal sealed class SayCommand : Command<SayCommand> {
     protected override Task<Result> ExecuteAsync(CancellationToken ct = default) {
         var text = Application.Context["Text"];
         Output.WriteLine(text);
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

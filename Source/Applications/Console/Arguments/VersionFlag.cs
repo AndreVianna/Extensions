@@ -7,6 +7,6 @@ internal sealed class VersionFlag(IHasChildren parent)
     }) {
     protected override Task<Result> Execute(CancellationToken ct = default) {
         Output.WriteLine((Parent as IApplication)!.FullName);
-        return SuccessTask();
+        return Task.FromResult(Success());
     }
 }

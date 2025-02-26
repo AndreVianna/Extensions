@@ -12,5 +12,5 @@ public abstract class Flag<TFlag>(IHasChildren parent, string name, Action<TFlag
     }
 
     protected virtual Task<Result> Execute(CancellationToken ct = default)
-        => execute?.Invoke((TFlag)this, ct) ?? SuccessTask();
+        => execute?.Invoke((TFlag)this, ct) ?? Task.FromResult(Success());
 }

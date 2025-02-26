@@ -18,7 +18,7 @@ public class ArgumentsParserTests {
         _flag = new Flag(_app, "Flag", f => f.Aliases = ["f"]);
         _requiredParameter = new Parameter(_app, "Name");
         _parameter = new Parameter(_app, "Age", p => p.DefaultValue = "18");
-        _command = new(_app, "Say", c => c.Aliases = ["s"], (_, _) => Result.SuccessTask());
+        _command = new(_app, "Say", c => c.Aliases = ["s"], (_, _) => Result.Task.FromResult(Success()));
     }
 
     [Fact]

@@ -64,18 +64,17 @@ public abstract class ApplicationBase<TApplication, TBuilder, TSettings>
         }
         catch (ConsoleException ex) {
             HandleException(ex);
-            Output.WriteError(ex);
+            Output.Write(ex);
             return ex.ExitCode;
         }
         catch (Exception ex) {
             HandleException(ex);
-            Output.WriteError(ex);
+            Output.Write(ex);
             return IApplication.DefaultErrorCode;
         }
     }
 
     protected void ProcessResult(Result result) {
-        if (result.HasException) throw result.Exception!;
         if (!result.HasErrors) return;
         Output.WriteLine(result.Errors.ToText());
     }
@@ -98,7 +97,7 @@ public abstract class ApplicationBase<TApplication, TBuilder, TSettings>
     protected virtual async Task<Result> ProcessCommand(string[] input, CancellationToken ct) {
         if (input.Length == 0) return Success();
         var command = FindCommand((this as IHasChildren).Commands, input[0]);
-        if (command is null) return Invalid($"Command '{input[0]}' not found. For a list of available commands use 'help'.");
+        if (command is null) return Failure($"Command '{input[0]}' not found. For a list of available commands use 'help'.");
         var arguments = input.Skip(1).ToArray();
         return await command.Execute(arguments, ct);
     }
@@ -114,7 +113,6 @@ public abstract partial class ApplicationBase<TSettings>
     : IApplication<TSettings>
     where TSettings : ApplicationSettings, new() {
     private readonly AsyncServiceScope _servicesScope;
-    private string _description = string.Empty;
 
     protected ApplicationBase(string[] args, IServiceCollection services) {
         Arguments = args;
@@ -164,12 +162,12 @@ public abstract partial class ApplicationBase<TSettings>
     public string DisplayVersion { get; }
     public string FullName => $"{Name} v{DisplayVersion}";
     public string Description {
-        get => _description;
+        get;
         set {
-            _description = value;
-            if (string.IsNullOrWhiteSpace(Help)) Help = _description;
+            field = value;
+            if (string.IsNullOrWhiteSpace(Help)) Help = field;
         }
-    }
+    } = string.Empty;
     public string Help { get; set; } = string.Empty;
     public TSettings Settings { get; init; }
 
@@ -191,7 +189,7 @@ public abstract partial class ApplicationBase<TSettings>
     public IArgument[] Options => [.. Children.OfType<IArgument>().OrderBy(i => i.Name)];
     public ICommand[] Commands => [.. Children.OfType<ICommand>().Except(Options.Cast<INode>()).Cast<ICommand>().OrderBy(i => i.Name)];
 
-    protected virtual Task<Result> OnStart(CancellationToken ct = default) => SuccessTask();
+    protected virtual Task<Result> OnStart(CancellationToken ct = default) => Task.FromResult(Success());
     protected virtual Result OnExit() => Success();
 
     public virtual void Exit(int code = IApplication.DefaultExitCode) {

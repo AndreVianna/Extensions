@@ -43,7 +43,7 @@ public static class NodeFactory {
 
     private static Func<TNode, CancellationToken, Task<Result>> ConvertToTask<TNode>(Delegate? action)
         => action switch {
-            null => (_, _) => SuccessTask(),
+            null => (_, _) => Task.FromResult(Success()),
             Action func => (_, ct) => Task.Run(() => func(), ct).ContinueWith(_ => Success(), ct, TaskContinuationOptions.NotOnFaulted, TaskScheduler.Current),
             Action<TNode> func => (c, ct) => Task.Run(() => func(c), ct).ContinueWith(_ => Success(), ct, TaskContinuationOptions.NotOnFaulted, TaskScheduler.Current),
             Func<Result> func => (_, _) => Task.FromResult(func()),
