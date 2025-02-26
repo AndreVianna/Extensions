@@ -238,7 +238,7 @@ EXIT
 var interpreter = new WorkflowInterpreter(services);
 var result = interpreter.InterpretScript(script);
 
-if (result.IsSuccess)
+if (result.IsSuccessful)
 {
     var workflow = new Workflow("ParsedWorkflow", result.Value!, new Map());
     await workflow.Run();

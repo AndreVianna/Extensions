@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.Graph.Policies;
+﻿using DotNetToolbox.Singletons;
+
+namespace DotNetToolbox.Graph.Policies;
 
 public class RetryPolicy
     : RetryPolicy<RetryPolicy> {

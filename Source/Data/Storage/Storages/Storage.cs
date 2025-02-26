@@ -59,7 +59,7 @@ public abstract class Storage<TStorage, TItem, TKey>(IList<TItem>? data = null)
 
     protected async Task<Result<TKey>> GetNextKeyAsync(CancellationToken ct = default) {
         var result = await GenerateNextKeyAsync(ct);
-        if (!result.IsSuccess) throw new InvalidOperationException("Failed to generate next key.");
+        if (!result.IsSuccessful) throw new InvalidOperationException("Failed to generate next key.");
         LastUsedKey = result.Value;
         return LastUsedKey;
     }

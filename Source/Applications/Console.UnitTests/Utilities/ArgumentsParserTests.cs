@@ -82,7 +82,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Flag"].Should().BeOfType<string>().Subject.Should().Be("True");
     }
 
@@ -96,7 +96,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Flag"].Should().BeOfType<string>().Subject.Should().Be("True");
     }
 
@@ -125,7 +125,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Option"].Should().BeOfType<string>().Subject.Should().Be("42");
     }
 
@@ -139,7 +139,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Option"].Should().BeOfType<string>().Subject.Should().Be("42");
     }
 
@@ -155,7 +155,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Option"].Should().Be("John Doe");
     }
 
@@ -169,7 +169,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Option"].Should().BeNull();
     }
 
@@ -183,7 +183,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Option"].Should().BeNull();
     }
 
@@ -198,7 +198,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Age"].Should().BeOfType<string>().Subject.Should().Be("42");
     }
 
@@ -213,7 +213,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Name"].Should().Be("John Doe");
         _app.Context["Age"].Should().Be("18");
     }
@@ -245,7 +245,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Age"].Should().BeOfType<string>().Subject.Should().Be("18");
     }
 
@@ -260,7 +260,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Age"].Should().BeOfType<string>().Subject.Should().Be("18");
     }
 
@@ -275,7 +275,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Age"].Should().BeNull();
     }
 
@@ -313,7 +313,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         _app.Context["Flag"].Should().BeOfType<string>().Subject.Should().Be("True");
         _app.Context["Option"].Should().BeOfType<string>().Subject.Should().Be("42");
         _app.Context["Name"].Should().BeOfType<string>().Subject.Should().Be("John Doe");
@@ -346,7 +346,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -359,7 +359,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -377,7 +377,7 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -390,6 +390,6 @@ public class ArgumentsParserTests {
         var result = await ArgumentsParser.Parse(_app, arguments, default);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 }

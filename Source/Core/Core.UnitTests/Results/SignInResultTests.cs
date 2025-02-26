@@ -21,7 +21,7 @@ public class SignInResultTests {
         var result = Success("SomeToken") with { };
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().Be("SomeToken");
@@ -39,7 +39,7 @@ public class SignInResultTests {
         var result = TwoFactorIsRequired("SomeToken");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().Be("SomeToken");
@@ -57,7 +57,7 @@ public class SignInResultTests {
         var result = ConfirmationIsPending("SomeToken");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().Be("SomeToken");
@@ -75,7 +75,7 @@ public class SignInResultTests {
         var result = InvalidRequest("Some error.");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -93,7 +93,7 @@ public class SignInResultTests {
         var result = InvalidRequest(new ValidationError("Some error.", "Field1"));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -111,7 +111,7 @@ public class SignInResultTests {
         var result = InvalidRequest(Result.Invalid("Some error."));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -129,7 +129,7 @@ public class SignInResultTests {
         var result = BlockedAccount();
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -147,7 +147,7 @@ public class SignInResultTests {
         var result = LockedAccount();
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -165,7 +165,7 @@ public class SignInResultTests {
         var result = FailedAttempt();
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().BeNull();
         result.Token.Should().BeNull();
@@ -183,7 +183,7 @@ public class SignInResultTests {
         var result = Error(new Exception("Message"));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().NotBeNull();
         result.Token.Should().BeNull();
@@ -201,7 +201,7 @@ public class SignInResultTests {
         var result = Error("Message");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.Exception.Should().NotBeNull();
         result.Token.Should().BeNull();
@@ -276,7 +276,7 @@ public class SignInResultTests {
         ToResult(subject)!.IsFailure.Should().Be(isFailure);
         ToResult(subject)!.RequiresConfirmation.Should().Be(confirmationRequired);
         ToResult(subject)!.RequiresTwoFactor.Should().Be(twoFactorRequired);
-        ToResult(subject)!.IsSuccess.Should().Be(isSuccess);
+        ToResult(subject)!.IsSuccessful.Should().Be(isSuccess);
     }
 
     [Fact]
@@ -321,7 +321,7 @@ public class SignInResultTests {
         result += Result.Success();
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.IsInvalid.Should().BeFalse();
         result.Token.Should().Be("SomeToken");
     }
@@ -335,7 +335,7 @@ public class SignInResultTests {
         result += new ValidationError("Some error.", "Source");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Token.Should().BeNull();
     }
@@ -349,7 +349,7 @@ public class SignInResultTests {
         result += new ValidationError("Source", "Other error.");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().HaveCount(2);
     }
 
@@ -362,7 +362,7 @@ public class SignInResultTests {
         result += new ValidationError("Some error.", "Source");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
     }
 
@@ -373,7 +373,7 @@ public class SignInResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -393,7 +393,7 @@ public class SignInResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.RequiresConfirmation.Should().BeTrue();
     }
 
@@ -461,7 +461,7 @@ public class SignInResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.RequiresConfirmation.Should().BeFalse();
         result.RequiresTwoFactor.Should().BeFalse();
         result.Token.Should().Be("SomeToken");
@@ -474,7 +474,7 @@ public class SignInResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.RequiresConfirmation.Should().BeFalse();
         result.RequiresTwoFactor.Should().BeTrue();
         result.Token.Should().Be("SomeToken");
@@ -487,7 +487,7 @@ public class SignInResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.RequiresConfirmation.Should().BeTrue();
         result.RequiresTwoFactor.Should().BeFalse();
         result.Token.Should().Be("SomeToken");
@@ -526,7 +526,7 @@ public class SignInResultTests {
         SignInResult result = new ValidationError("Some error.", nameof(result));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Token.Should().BeNull();
     }

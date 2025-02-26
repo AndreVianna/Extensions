@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.Http;
+﻿using DotNetToolbox.Options;
+
+namespace DotNetToolbox.Http;
 
 public record HttpClientOptions
     : INamedOptions<HttpClientOptions>, IValidatable {

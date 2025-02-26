@@ -21,10 +21,3 @@ public static class StringExtensions {
     public static string? Trim(this string? source, string? value)
         => source?.TrimStart(value).TrimEnd(value);
 }
-
-public static class HashSetExtensions {
-    public static void AddRange<TValue>(this HashSet<TValue> source, IEnumerable<TValue> values) {
-        foreach (var value in values)
-            source.Add(value);
-    }
-}

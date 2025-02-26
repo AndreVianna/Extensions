@@ -22,7 +22,7 @@ public partial class InMemoryDataSourceTests {
     [Fact]
     public void Create_CreatesItem() {
         var result = _updatableRepo.Create(s => s.Name = "Z");
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Name.Should().Be("Z");
     }
 
@@ -41,7 +41,7 @@ public partial class InMemoryDataSourceTests {
             s.Name = "Z";
             return Task.CompletedTask;
         }, Map.Empty());
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Name.Should().Be("Z");
     }
 }

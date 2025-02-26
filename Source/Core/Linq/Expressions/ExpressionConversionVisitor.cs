@@ -2,7 +2,7 @@
 
 public class ExpressionConversionVisitor(IEnumerable<ParameterExpression> parentParameters, IEnumerable<TypeMapper> mappers)
     : ExpressionVisitor {
-    private readonly List<ParameterExpression> _parameters = IsNotNull(parentParameters).ToList();
+    private readonly List<ParameterExpression> _parameters = [.. IsNotNull(parentParameters)];
 
     public ExpressionConversionVisitor(params TypeMapper[] mappers)
         : this([], mappers) {

@@ -3,14 +3,14 @@
 [ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
 public class GuidProvider
-    : HasDefault<GuidProvider>,
-      IGuidProvider {
+    : IHasDefault<GuidProvider>
+    , IGuidProvider {
+    public static GuidProvider Default { get; } = new();
+
     public virtual Guid Create() => Guid.NewGuid();
-    public virtual Guid Create(byte[] bytes) => new(bytes);
-    public virtual Guid Create(ReadOnlySpan<byte> bytes) => new(bytes);
-    public virtual Guid CreateSortable() => Ulid.NewUlid().ToGuid();
-    public virtual Guid CreateSortable(byte[] bytes) => new Ulid(bytes).ToGuid();
-    public virtual Guid CreateSortable(ReadOnlySpan<byte> bytes) => new Ulid(bytes).ToGuid();
+    public virtual Guid CreateFrom(byte[] bytes) => new(bytes);
+    public virtual Guid CreateFrom(ReadOnlySpan<byte> bytes) => new(bytes);
+    public virtual Guid CreateSortable() => Guid.CreateVersion7();
 
     public virtual Guid Parse(string input) => Guid.Parse(input);
     public virtual Guid Parse(ReadOnlySpan<char> input) => Guid.Parse(input);

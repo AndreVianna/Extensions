@@ -15,7 +15,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var ifNode = result.Value.Should().BeOfType<IfNode>().Subject;
             ifNode.Id.Should().Be(1);
             ifNode.Tag.Should().BeNull();
@@ -45,7 +45,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var ifNode = result.Value.Should().BeOfType<IfNode>().Subject;
             ifNode.Id.Should().Be(1);
             ifNode.Label.Should().Be("Condition");
@@ -78,7 +78,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var ifNode = result.Value.Should().BeOfType<IfNode>().Subject;
             ifNode.Id.Should().Be(1);
             ifNode.Label.Should().Be("Condition");
@@ -118,7 +118,7 @@ public partial class WorkflowParserTests {
 
             // Assert
             result.Errors.Should().BeEmpty();
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var caseNode = result.Value.Should().BeOfType<CaseNode>().Subject;
             caseNode.Id.Should().Be(1);
             caseNode.Label.Should().Be("Selection");

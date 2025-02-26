@@ -2,7 +2,10 @@
 
 [ExcludeFromCodeCoverage(Justification = "Thin wrapper for Assembly functionality.")]
 public class AssemblyDescriptor
-    : HasDefault<AssemblyDescriptor>, IAssemblyDescriptor {
+    : IHasDefault<AssemblyDescriptor>
+    , IAssemblyDescriptor {
+    public static AssemblyDescriptor Default { get; } = new();
+
     private readonly Assembly _assembly;
 
     public AssemblyDescriptor() {

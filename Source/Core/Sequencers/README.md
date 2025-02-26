@@ -105,7 +105,7 @@ When validation fails, a `ValidationException` can be thrown, leveraging the `Re
 try {
     var model = new MyModel();
     var result = model.Validate();
-    if (!result.IsSuccess) {
+    if (!result.IsSuccessful) {
         throw new ValidationException(result.Errors);
     }
 } catch (ValidationException ex) {
@@ -225,7 +225,7 @@ One of the key features of `HttpResult` is its ability to carry data along with 
 ```csharp
 public HttpResult CreateUser(UserDto newUser) {
     var validationResult = ValidateNewUser(newUser);
-    if (!validationResult.IsSuccess) {
+    if (!validationResult.IsSuccessful) {
         return HttpResult.BadRequest(validationResult.Errors);
     }
     var user = CreateUserFromDto(newUser);

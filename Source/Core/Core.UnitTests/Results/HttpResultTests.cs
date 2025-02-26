@@ -177,7 +177,7 @@ public class HttpResultTests {
         var result = Ok();
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Errors.Should().BeEmpty();
     }
 
@@ -187,7 +187,7 @@ public class HttpResultTests {
         var result = BadRequest(new ValidationError("Some error."));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
     }
 
@@ -197,7 +197,7 @@ public class HttpResultTests {
         var result = BadRequest(new ValidationError("Some error.", "Field1"));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEquivalentTo(new[] {
             new ValidationError("Some error.", "Field1"),
         });
@@ -209,7 +209,7 @@ public class HttpResultTests {
         var result = BadRequest(Result.Invalid("Some error."));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
     }
 
@@ -263,7 +263,7 @@ public class HttpResultTests {
         };
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be(7);
     }
 
@@ -387,7 +387,7 @@ public class HttpResultTests {
         var result = Ok(42);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Errors.Should().BeEmpty();
     }
 
@@ -397,7 +397,7 @@ public class HttpResultTests {
         var result = BadRequest(42, new ValidationError("Some error."));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
     }
 
@@ -407,7 +407,7 @@ public class HttpResultTests {
         var result = BadRequest(42, new ValidationError("Some error.", "Field1"));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEquivalentTo(new[] {
             new ValidationError("Some error.", "Field1"),
         });
@@ -419,7 +419,7 @@ public class HttpResultTests {
         var result = BadRequest(42, Result.Invalid("Some error."));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
     }
 
@@ -430,7 +430,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -440,7 +440,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -450,7 +450,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
     }
 
     [Fact]
@@ -491,7 +491,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be("Test value");
     }
 
@@ -502,7 +502,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be("Test value");
     }
 
@@ -513,7 +513,7 @@ public class HttpResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
     }
 
     [Fact]
@@ -588,7 +588,7 @@ public class HttpResultTests {
         HttpResult<int> result = new ValidationError("Some error.", nameof(result));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().ContainSingle();
         result.Value.Should().Be(default);
     }

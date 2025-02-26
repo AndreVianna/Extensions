@@ -10,5 +10,5 @@ global using DotNetToolbox.Environment;
 global using DotNetToolbox.Pagination;
 global using DotNetToolbox.Results;
 
-global using static System.Ensure;
+global using static DotNetToolbox.Ensure;
 global using static DotNetToolbox.Pagination.PaginationSettings;

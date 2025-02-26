@@ -10,7 +10,7 @@ public static partial class QueryableAsyncExtensions {
             }
         }
         finally {
-            enumerable.DisposeAsync().Wait();
+            enumerable.DisposeAsync().AsTask().GetAwaiter().GetResult();
         }
     }
 }

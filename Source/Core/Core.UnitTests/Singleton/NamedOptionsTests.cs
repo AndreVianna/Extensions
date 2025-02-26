@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.Singleton;
+﻿using DotNetToolbox.Options;
+
+namespace DotNetToolbox.Singleton;
 
 public class NamedOptionsTests {
     private sealed class TestOptions : NamedOptions<TestOptions>;

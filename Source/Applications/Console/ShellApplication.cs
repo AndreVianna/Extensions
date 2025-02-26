@@ -37,7 +37,7 @@ public abstract class ShellApplication<TApplication, TBuilder, TSettings>
     internal sealed override async Task Run(CancellationToken ct = default) {
         var result = await OnStart(ct).ConfigureAwait(false);
         ProcessResult(result);
-        if (!result.IsSuccess) {
+        if (!result.IsSuccessful) {
             Exit(1);
             return;
         }
@@ -61,7 +61,7 @@ public abstract class ShellApplication<TApplication, TBuilder, TSettings>
         var result = StartsWithCommand(tokens.FirstOrDefault())
                    ? await ProcessCommand(tokens, ct).ConfigureAwait(false)
                    : await ProcessFreeText(lines, ct).ConfigureAwait(false);
-        if (!result.IsSuccess) {
+        if (!result.IsSuccessful) {
             foreach (var error in result.Errors) {
                 Output.WriteLine($"Validation error: {error}");
             }

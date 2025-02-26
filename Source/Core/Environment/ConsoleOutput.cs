@@ -1,193 +1,251 @@
-﻿using Spectre.Console.Rendering;
-
-namespace DotNetToolbox.Environment;
+﻿namespace DotNetToolbox.Environment;
 
 [ExcludeFromCodeCoverage(Justification = "Thin wrapper for Console functionality.")]
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
 public class ConsoleOutput
-    : HasDefault<ConsoleOutput>,
-      IOutput {
-    public virtual string Prompt { get; set; } = "> ";
+    : IHasDefault<ConsoleOutput>
+    , IOutput {
+    public static ConsoleOutput Default { get; } = new();
+
+    public virtual void ClearScreen() => Console.Clear();
+
+    public virtual TextWriter Writer => Console.Out;
+    public virtual TextWriter ErrorWriter => Console.Error;
 
     public virtual Encoding Encoding {
         get => Console.OutputEncoding;
         set => Console.OutputEncoding = value;
     }
 
-    public virtual ConsoleColor ForegroundColor {
-        get => Console.ForegroundColor;
-        set => Console.ForegroundColor = value;
-    }
     public virtual ConsoleColor BackgroundColor {
         get => Console.BackgroundColor;
         set => Console.BackgroundColor = value;
     }
 
-    public virtual TextWriter Writer => Console.Out;
-    public virtual TextWriter ErrorWriter => Console.Error;
-
-    public virtual void ResetColor() => Console.ResetColor();
-    public virtual void ClearScreen() => Console.Clear();
-
-    public virtual void Write(bool value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(ulong value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(uint value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(long value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(int value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(float value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(double value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(decimal value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(char value)
-        => AnsiConsole.Write(value);
-    public virtual void Write(string value)
-        => AnsiConsole.Markup(value);
-    public virtual void Write([Syntax(Syntax.CompositeFormat)] string format, params object?[] args)
-        => AnsiConsole.Markup(format, args!);
-    public virtual void Write(object? value) {
-        if (value is IRenderable text) AnsiConsole.Write(text);
-        else Write($"{value}");
+    public virtual ConsoleColor ForegroundColor {
+        get => Console.ForegroundColor;
+        set => Console.ForegroundColor = value;
     }
-    public virtual void Write(StringBuilder? builder)
-        => AnsiConsole.Markup(builder?.ToString() ?? string.Empty);
-    public virtual void Write(char[]? buffer)
-        => AnsiConsole.Markup(new(buffer));
-    public virtual void Write(char[] buffer, int index, int count)
-        => AnsiConsole.Markup(new(buffer), index, count);
+    public virtual void ResetColor() => Console.ResetColor();
 
-    public virtual void WritePrompt()
-        => AnsiConsole.Markup(Prompt);
     public virtual string NewLine => System.Environment.NewLine;
 
-    public virtual void WriteLine()
-        => AnsiConsole.WriteLine();
-    public virtual void WriteLine(bool value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(ulong value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(uint value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(long value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(int value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(float value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(double value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(decimal value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(char value)
-        => AnsiConsole.WriteLine(value);
-    public virtual void WriteLine(string value)
-        => AnsiConsole.MarkupLine(value);
-    public virtual void WriteLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args)
-        => AnsiConsole.MarkupLine(format, args!);
-    public virtual void WriteLine(object? value) {
-        if (value is IRenderable widget) AnsiConsole.Write(widget);
-        else Write($"{value}");
-    }
-    public virtual void WriteLine(StringBuilder? builder)
-        => AnsiConsole.MarkupLine(builder?.ToString() ?? string.Empty);
-    public virtual void WriteLine(char[]? buffer)
-        => AnsiConsole.MarkupLine(new(buffer));
-    public virtual void WriteLine(char[] buffer, int index, int count)
-        => AnsiConsole.MarkupLine(new(buffer), index, count);
+    public virtual string Prompt { get; set; } = "> ";
+    public virtual void WritePrompt() => Writer.Write(Prompt);
 
-    public virtual void WriteOnANewLine(bool value) {
+    #region Write
+
+    public virtual void Write(bool value)
+        => Writer.Write(value);
+    public virtual void Write(ulong value)
+        => Writer.Write(value);
+    public virtual void Write(uint value)
+        => Writer.Write(value);
+    public virtual void Write(long value)
+        => Writer.Write(value);
+    public virtual void Write(int value)
+        => Writer.Write(value);
+    public virtual void Write(float value)
+        => Writer.Write(value);
+    public virtual void Write(double value)
+        => Writer.Write(value);
+    public virtual void Write(decimal value)
+        => Writer.Write(value);
+    public virtual void Write(char value)
+        => Writer.Write(value);
+    public virtual void Write(string value)
+        => Writer.Write(value);
+    public virtual void Write([Syntax(Syntax.CompositeFormat)] string format, params IEnumerable<object?> args)
+        => Writer.Write(format, args);
+    public virtual void Write(object? value)
+        => Writer.Write(value);
+    public virtual void Write(StringBuilder? builder)
+        => Writer.Write(builder?.ToString() ?? string.Empty);
+    public virtual void Write(char[]? buffer)
+        => Writer.Write(buffer);
+    public virtual void Write(char[] buffer, int index, int count)
+        => Writer.Write(buffer, index, count);
+
+    #endregion
+
+    #region WriteLine
+
+    public virtual void WriteLine()
+        => Writer.WriteLine();
+    public virtual void WriteLine(bool value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(ulong value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(uint value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(long value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(int value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(float value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(double value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(decimal value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(char value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(string value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine([Syntax(Syntax.CompositeFormat)] string format, params IEnumerable<object?> args)
+        => Writer.WriteLine(format, args);
+    public virtual void WriteLine(object? value)
+        => Writer.WriteLine(value);
+    public virtual void WriteLine(StringBuilder? builder)
+        => Writer.WriteLine(builder?.ToString() ?? string.Empty);
+    public virtual void WriteLine(char[]? buffer)
+        => Writer.WriteLine(buffer);
+    public virtual void WriteLine(char[] buffer, int index, int count)
+        => Writer.WriteLine(buffer, index, count);
+
+    #endregion
+
+    #region EndLineThenWrite
+
+    public virtual void EndLineThenWrite(bool value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(uint value) {
+    public virtual void EndLineThenWrite(uint value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(ulong value) {
+    public virtual void EndLineThenWrite(ulong value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(int value) {
+    public virtual void EndLineThenWrite(int value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(long value) {
+    public virtual void EndLineThenWrite(long value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(float value) {
+    public virtual void EndLineThenWrite(float value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(double value) {
+    public virtual void EndLineThenWrite(double value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(decimal value) {
+    public virtual void EndLineThenWrite(decimal value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(char value) {
+    public virtual void EndLineThenWrite(char value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(string value) {
+    public virtual void EndLineThenWrite(string value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args) {
+    public virtual void EndLineThenWrite([Syntax(Syntax.CompositeFormat)] string format, params object?[] args) {
         WriteLine();
         Write(format, args);
     }
-    public virtual void WriteOnANewLine(object? value) {
+    public virtual void EndLineThenWrite(object? value) {
         WriteLine();
         Write(value);
     }
-    public virtual void WriteOnANewLine(StringBuilder? builder) {
+    public virtual void EndLineThenWrite(StringBuilder? builder) {
         WriteLine();
         Write(builder);
     }
-    public virtual void WriteOnANewLine(char[]? buffer) {
+    public virtual void EndLineThenWrite(char[]? buffer) {
         WriteLine();
         Write(buffer);
     }
-    public virtual void WriteOnANewLine(char[] buffer, int index, int count) {
+    public virtual void EndLineThenWrite(char[] buffer, int index, int count) {
         WriteLine();
         Write(buffer, index, count);
     }
 
-#if DEBUG
-    private const ExceptionFormats _exceptionFormat = ExceptionFormats.ShowLinks;
-#endif
+    #endregion
 
-    public virtual void WriteError(Exception exception) {
+    #region EndLineThenWriteLine
+
+    public virtual void EndLineThenWriteLine(bool value) {
         WriteLine();
-#if DEBUG
-        AnsiConsole.WriteException(exception, _exceptionFormat);
-#else
-        WriteLine($"[bold red]An error has occurred! {exception.Message}[/]");
-#endif
-        WriteLine();
+        WriteLine(value);
     }
 
-    public virtual void WriteError(Exception exception, string message) {
+    public virtual void EndLineThenWriteLine(uint value) {
         WriteLine();
-        WriteLine($"[bold red]An error has occurred!  {IsNotNullOrWhiteSpace(message)}[/]");
-#if DEBUG
-        AnsiConsole.WriteException(exception, _exceptionFormat);
-#endif
-        WriteLine();
+        WriteLine(value);
     }
 
-    public virtual void WriteError(string message) {
+    public virtual void EndLineThenWriteLine(ulong value) {
         WriteLine();
-        WriteLine($"[bold red]An error has occurred! {IsNotNullOrWhiteSpace(message)}[/]");
-        WriteLine();
+        WriteLine(value);
     }
+
+    public virtual void EndLineThenWriteLine(int value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(long value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(float value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(double value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(decimal value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(char value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(string value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine([Syntax(Syntax.CompositeFormat)] string format, params object?[] args) {
+        WriteLine();
+        WriteLine(format, args);
+    }
+
+    public virtual void EndLineThenWriteLine(object? value) {
+        WriteLine();
+        WriteLine(value);
+    }
+
+    public virtual void EndLineThenWriteLine(StringBuilder? builder) {
+        WriteLine();
+        WriteLine(builder);
+    }
+
+    public virtual void EndLineThenWriteLine(char[]? buffer) {
+        WriteLine();
+        WriteLine(buffer);
+    }
+
+    public virtual void EndLineThenWriteLine(char[] buffer, int index, int count) {
+        WriteLine();
+        WriteLine(buffer, index, count);
+    }
+
+    #endregion
 }

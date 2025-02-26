@@ -1,5 +1,4 @@
-﻿// ReSharper disable once CheckNamespace - Intended to be in this namespace
-namespace System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
 public static class EnumerableExtensions {
     public static IAsyncEnumerable<TItem> ToAsyncEnumerable<TItem>(this IEnumerable<TItem> source)

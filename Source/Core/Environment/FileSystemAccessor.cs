@@ -2,7 +2,11 @@
 
 [ExcludeFromCodeCoverage(Justification = "Thin wrapper for OS functionality.")]
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global - Used for externally.
-public class FileSystemAccessor : HasDefault<FileSystemAccessor>, IFileSystemAccessor {
+public class FileSystemAccessor
+    : IHasDefault<FileSystemAccessor>
+    , IFileSystemAccessor {
+    public static FileSystemAccessor Default { get; } = new();
+
     public virtual char DirectorySeparatorChar => Path.DirectorySeparatorChar;
     public virtual string CombinePath(params string[] paths) => Path.Combine(paths);
     public virtual string[] GetFilePath(string filePath)

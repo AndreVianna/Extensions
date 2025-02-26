@@ -86,7 +86,7 @@ public partial class NodeTests {
 
             var result = node.Validate();
 
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
         }
     }
 }

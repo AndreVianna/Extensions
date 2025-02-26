@@ -114,7 +114,7 @@ public abstract class JsonFilePerRecordStorage<TItem, TKey>
         context[nameof(EntityAction)] = EntityAction.Insert;
         if (TryGetNextKey(out var next)) newItem.Id = next;
         var result = newItem.Validate(context);
-        if (!result.IsSuccess) return result;
+        if (!result.IsSuccessful) return result;
         Data.Add(newItem);
         SaveItem(newItem);
         return result;
@@ -126,7 +126,7 @@ public abstract class JsonFilePerRecordStorage<TItem, TKey>
         var entry = Data.Index().FirstOrDefault(i => i.Item.Id.Equals(updatedItem.Id));
         if (entry.Item is null) return new ValidationError($"Item '{updatedItem.Id}' not found", nameof(updatedItem));
         var result = updatedItem.Validate(context);
-        if (!result.IsSuccess) return result;
+        if (!result.IsSuccessful) return result;
         Data[entry.Index] = updatedItem;
         SaveItem(updatedItem);
         return result;

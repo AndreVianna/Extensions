@@ -2,14 +2,14 @@
 
 public interface IRunner<out TContext>
     where TContext : IMap {
-    public string WorkflowId { get; }
-    public uint Id { get; }
-    public bool IsRunning { get; }
-    public DateTimeOffset? Start { get; }
-    public DateTimeOffset? End { get; }
-    public TimeSpan? ElapsedTime { get; }
-    public bool HasStarted { get; }
-    public bool HasStopped { get; }
+    string WorkflowId { get; }
+    uint Id { get; }
+    bool IsRunning { get; }
+    DateTimeOffset? Start { get; }
+    DateTimeOffset? End { get; }
+    TimeSpan? ElapsedTime { get; }
+    bool HasStarted { get; }
+    bool HasStopped { get; }
 
     Task Run(CancellationToken ct = default);
 

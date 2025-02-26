@@ -62,11 +62,15 @@
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\..\Core\Core\DotNetToolbox.Core.csproj" />
+    <ProjectReference Include="..\..\Core\Environment\DotNetToolbox.Environment.csproj" />
+    <ProjectReference Include="..\..\Domain\DotNetToolbox.Domain.csproj" />
     <ProjectReference Include="..\..\Core\Linq\DotNetToolbox.Linq.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Release'">
     <PackageReference Include="DotNetToolbox.Core" Version="9.0.0" />
+    <PackageReference Include="DotNetToolbox.Environment" Version="9.0.0" />
+    <PackageReference Include="DotNetToolbox.Domain" Version="9.0.0" />
     <PackageReference Include="DotNetToolbox.Linq" Version="9.0.0" />
   </ItemGroup>
 

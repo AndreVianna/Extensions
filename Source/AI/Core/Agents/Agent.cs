@@ -23,7 +23,7 @@ public abstract class Agent<TAgent, TRequest, TResponse>
 
             var finalMessage = new Message(MessageRole.Assistant);
             var result = await PostRequest(chat, context, ct).ConfigureAwait(false);
-            while (result.IsSuccess && result.Value!.IsPartial) {
+            while (result.IsSuccessful && result.Value!.IsPartial) {
                 _logger.LogDebug("Response is incomplete.");
                 var addedMessage = result.Value;
                 finalMessage.AddRange(addedMessage);
@@ -33,7 +33,7 @@ public abstract class Agent<TAgent, TRequest, TResponse>
 
             _logger.LogDebug("Request completed.");
             chat[^1] = new(MessageRole.User, originalUserMessage);
-            if (!result.IsSuccess) return result;
+            if (!result.IsSuccessful) return result;
 
             finalMessage.AddRange(result.Value!);
             chat.Add(finalMessage);
@@ -69,7 +69,7 @@ public abstract class Agent<TAgent, TRequest, TResponse>
             case HttpStatusCode.BadRequest:
                 _logger.LogDebug("Invalid request.");
                 var badContent = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-                return HttpResult.BadRequest<Message>(new OperationError(badContent));
+                return HttpResult.BadRequest<Message>(new Error(badContent));
             default:
                 _logger.LogDebug("Response received.");
                 var content = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);

@@ -1,0 +1,15 @@
+﻿namespace DotNetToolbox.Validation;
+
+public interface IValidatable : IValidatable<IMap>;
+
+public interface IValidatable<in TContext>
+    where TContext : class {
+    IResult Validate(TContext? context = null);
+}
+
+public interface IAsyncValidatable : IAsyncValidatable<IMap>;
+
+public interface IAsyncValidatable<in TContext>
+    where TContext : class {
+    Task<IResult> ValidateAsync(TContext? context = null, CancellationToken token = default);
+}

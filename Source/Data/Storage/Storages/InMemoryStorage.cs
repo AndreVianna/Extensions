@@ -1,5 +1,7 @@
 using DotNetToolbox.Validation;
 
+using static DotNetToolbox.Results.Result;
+
 namespace DotNetToolbox.Data.Storages;
 
 public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
@@ -23,7 +25,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         LastUsedKey = Data.Count != 0
             ? Data.Max(item => item.Id)
             : default;
-        return Result.Success(LastUsedKey);
+        return Success(LastUsedKey);
     }
 
     public override TItem[] GetAll(Expression<Func<TItem, bool>>? filterBy = null, HashSet<SortClause>? orderBy = null)
@@ -42,7 +44,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         var item = new TItem();
         item.Id = TryGetNextKey(out var next) ? next : item.Id;
         setItem?.Invoke(item);
-        var result = Result.Success(item);
+        var result = Success(item);
         result += _keylessStrategy.Add(item, validationContext);
         return result;
     }
@@ -90,7 +92,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         => _keylessStrategy.Clear();
 
     public override Result UpdateMany(IEnumerable<TItem> updatedItems, IMap? validationContext = null) {
-        var result = Result.Success();
+        var result = Success();
         foreach (var updatedItem in updatedItems)
             result += Update(updatedItem, validationContext);
         return result;
@@ -98,26 +100,26 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     public override Result AddOrUpdate(TItem updatedItem, IMap? validationContext = null) {
         var result = updatedItem.Validate(validationContext);
-        if (!result.IsSuccess) return result;
+        if (!result.IsSuccessful) return (Result)result;
         result += Remove(updatedItem.Id);
-        return !result.IsSuccess
+        return (Result)(!result.IsSuccessful
             ? result
-            : _keylessStrategy.Add(updatedItem, validationContext);
+            : _keylessStrategy.Add(updatedItem, validationContext));
     }
 
     public override Result AddOrUpdateMany(IEnumerable<TItem> updatedItems, IMap? validationContext = null) {
-        var result = Result.Success();
+        var result = Success();
         foreach (var item in updatedItems)
             result += AddOrUpdate(item, validationContext);
         return result;
     }
 
     public override Result PatchMany(IEnumerable<TKey> keys, Action<TItem> setItem, IMap? validationContext = null) {
-        var result = Result.Success();
+        var result = Success();
         foreach (var key in keys) {
             var item = FindByKey(key);
             if (item is null) {
-                result += new OperationError($"Item with key {key} not found.", nameof(keys));
+                result += new Error($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             setItem(item);
@@ -127,7 +129,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
     }
 
     public override Result RemoveMany(IEnumerable<TKey> keys) {
-        var result = Result.Success();
+        var result = Success();
         foreach (var key in keys)
             result += Remove(key);
         return result;
@@ -141,7 +143,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         LastUsedKey = await Data.AsAsyncQueryable().AnyAsync(ct)
             ? await Data.AsAsyncQueryable().MaxAsync(item => item.Id, ct)
             : default;
-        return Result.Success(LastUsedKey);
+        return Success(LastUsedKey);
     }
 
     public override Task<Result> SeedAsync(IEnumerable<TItem> seed, bool preserveContent = false, IMap? validationContext = null, CancellationToken ct = default)
@@ -167,7 +169,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
     public override async Task<Result<TItem>> CreateAsync(Func<TItem, CancellationToken, Task> setItem, IMap validationContext, CancellationToken ct = default) {
         var item = new TItem();
         await setItem(item, ct);
-        var result = Result.Success(item);
+        var result = Success(item);
         result += item.Validate(validationContext);
         return result;
     }
@@ -179,7 +181,8 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
     }
 
     public override async Task<Result> AddAsync(TItem newItem, IMap? validationContext = null, CancellationToken ct = default) {
-        newItem.Id = await GetNextKeyAsync(ct);
+        var result = await GetNextKeyAsync(ct);
+        newItem.Id = result.Value;
         return await _keylessStrategy.AddAsync(newItem, validationContext, ct);
     }
 
@@ -216,7 +219,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         => _keylessStrategy.ClearAsync(ct);
 
     public override async Task<Result> UpdateManyAsync(IEnumerable<TItem> updatedItems, IMap? validationContext = null, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var updatedItem in updatedItems.AsAsyncEnumerable(ct))
             result += await UpdateAsync(updatedItem, validationContext, ct);
         return result;
@@ -224,25 +227,25 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     public override async Task<Result> AddOrUpdateAsync(TItem updatedItem, IMap? validationContext = null, CancellationToken ct = default) {
         var result = updatedItem.Validate(validationContext);
-        if (!result.IsSuccess) return result;
+        if (!result.IsSuccessful) return (Result)result;
         result += await RemoveAsync(updatedItem.Id, ct);
-        return !result.IsSuccess
+        return (Result)(!result.IsSuccessful
             ? result
-            : await AddAsync(updatedItem, validationContext, ct);
+            : await AddAsync(updatedItem, validationContext, ct));
     }
 
     public override async Task<Result> AddOrUpdateManyAsync(IEnumerable<TItem> updatedItems, IMap? validationContext = null, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var item in updatedItems.AsAsyncEnumerable(ct)) result += await AddOrUpdateAsync(item, validationContext, ct);
         return result;
     }
 
     public override async Task<Result> PatchManyAsync(IEnumerable<TKey> keys, Action<TItem> setItem, IMap? validationContext = null, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new OperationError($"Item with key {key} not found.", nameof(keys));
+                result += new Error($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             setItem(item);
@@ -251,11 +254,11 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         return result;
     }
     public override async Task<Result> PatchManyAsync(IEnumerable<TKey> keys, Func<TItem, CancellationToken, Task> setItem, IMap? validationContext = null, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new OperationError($"Item with key {key} not found.", nameof(keys));
+                result += new Error($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             await setItem(item, ct);
@@ -265,11 +268,11 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
     }
 
     public override async Task<Result> RemoveManyAsync(IEnumerable<TKey> keys, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var key in keys.AsAsyncEnumerable(ct)) {
             var item = await FindByKeyAsync(key, ct: ct);
             if (item is null) {
-                result += new OperationError($"Item with key {key} not found.", nameof(keys));
+                result += new Error($"Item with key {key} not found.", nameof(keys));
                 continue;
             }
             Data.Remove(item);
@@ -285,13 +288,13 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     #region Blocking
 
     public override Result Seed(IEnumerable<TItem> seed, bool preserveContent = false, IMap? validationContext = null) {
-        var result = Result.Success();
+        var result = Success();
         if (!preserveContent) result += Clear();
         result += AddMany(seed, validationContext);
         return result;
     }
 
-    public override Result Load() => Result.Success();
+    public override Result Load() => Success();
 
     public override TItem[] GetAll(Expression<Func<TItem, bool>>? filterBy = null, HashSet<SortClause>? orderBy = null)
         => [.. Data];
@@ -330,26 +333,26 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     public override Result<TItem> Create(Action<TItem>? setItem = null, IMap? validationContext = null) {
         var item = Activator.CreateInstance<TItem>();
         setItem?.Invoke(item);
-        var result = Result.Success(item);
+        var result = Success(item);
         result += Add(item, validationContext);
         return result;
     }
 
     public override Result Add(TItem newItem, IMap? context = null) {
-        var result = Result.Success();
+        var result = Success();
         result = newItem is IValidatable validatable
             ? result + validatable.Validate(context)
             : result;
-        if (result.IsSuccess) Data.Add(newItem);
+        if (result.IsSuccessful) Data.Add(newItem);
         return result;
     }
     public override Result AddMany(IEnumerable<TItem> newItems, IMap? validationContext = null) {
-        var result = Result.Success();
+        var result = Success();
         var validItems = new List<TItem>();
         foreach (var newItem in newItems) {
-            var itemResult = Result.Success();
+            var itemResult = Success();
             if (newItem is IValidatable validatable) itemResult += validatable.Validate(validationContext);
-            if (!itemResult.IsSuccess) {
+            if (!itemResult.IsSuccessful) {
                 result += itemResult;
                 continue;
             }
@@ -362,7 +365,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override Result Update(Expression<Func<TItem, bool>> predicate, TItem updatedItem, IMap? validationContext = null) {
         var result = TryRemove(predicate);
-        return !result.IsSuccess
+        return !result.IsSuccessful
             ? result
             : Add(updatedItem, validationContext);
     }
@@ -377,15 +380,15 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override Result Patch(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null) {
         var itemToPatch = Data.AsQueryable().FirstOrDefault(predicate);
-        if (itemToPatch is null) return Result.Invalid("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
         setItem(itemToPatch);
-        return itemToPatch is IValidatable validatable
+        return (Result)(itemToPatch is IValidatable validatable
             ? validatable.Validate(validationContext)
-            : Result.Success();
+            : Success());
     }
     public override Result PatchMany(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null) {
         var itemsToPatch = Data.AsQueryable().Where(predicate);
-        var result = Result.Success();
+        var result = Success();
         foreach (var item in itemsToPatch) {
             setItem(item);
             if (item is IValidatable validatable)
@@ -399,20 +402,20 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     public override Result RemoveMany(Expression<Func<TItem, bool>> predicate) {
         var itemsToRemove = Data.AsQueryable().Where(predicate);
         foreach (var item in itemsToRemove.ToArray()) Data.Remove(item);
-        return Result.Success();
+        return Success();
     }
 
     public override Result Clear() {
         Data.Clear();
-        return Result.Success();
+        return Success();
     }
 
     private Result TryRemove(Expression<Func<TItem, bool>> predicate) {
         var itemToRemove = Data.AsQueryable().FirstOrDefault(predicate);
         if (itemToRemove is null)
-            return new OperationError("Item not found.", nameof(predicate));
+            return new Error("Item not found.", nameof(predicate));
         Data.Remove(itemToRemove);
-        return Result.Success();
+        return Success();
     }
 
     #endregion
@@ -421,12 +424,12 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override Task<Result> SeedAsync(IEnumerable<TItem> seed, bool preserveContent = false, IMap? validationContext = null, CancellationToken ct = default) {
         Seed(seed, preserveContent, validationContext);
-        return Result.SuccessTask();
+        return Task.FromResult(Success());
     }
 
     public override Task<Result> LoadAsync(CancellationToken ct = default) {
         Load();
-        return Result.SuccessTask();
+        return Task.FromResult(Success());
     }
 
     public override ValueTask<TItem[]> GetAllAsync(Expression<Func<TItem, bool>>? filterBy = null, HashSet<SortClause>? orderBy = null, CancellationToken ct = default) {
@@ -495,7 +498,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     public override async Task<Result<TItem>> CreateAsync(Func<TItem, CancellationToken, Task> setItem, IMap validationContext, CancellationToken ct = default) {
         var item = Activator.CreateInstance<TItem>();
         await setItem(item, ct);
-        var result = Result.Success(item);
+        var result = Success(item);
         if (item is IValidatable validatable) result += validatable.Validate(validationContext);
         return result;
     }
@@ -503,11 +506,11 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     public override Task<Result> AddAsync(TItem newItem, IMap? validationContext = null, CancellationToken ct = default)
         => Task.Run(() => Add(newItem), ct);
     public override async Task<Result> AddManyAsync(IEnumerable<TItem> newItems, IMap? validationContext = null, CancellationToken ct = default) {
-        var result = Result.Success();
+        var result = Success();
         await foreach (var item in newItems.AsAsyncEnumerable(ct)) {
-            var itemResult = Result.Success();
+            var itemResult = Success();
             if (item is IValidatable validatable) itemResult += validatable.Validate(validationContext);
-            if (!itemResult.IsSuccess) {
+            if (!itemResult.IsSuccessful) {
                 result += itemResult;
                 continue;
             }
@@ -518,7 +521,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override async Task<Result> UpdateAsync(Expression<Func<TItem, bool>> predicate, TItem updatedItem, IMap? validationContext = null, CancellationToken ct = default) {
         var result = await TryRemoveAsync(predicate, ct);
-        return !result.IsSuccess
+        return !result.IsSuccessful
             ? result
             : await AddAsync(updatedItem, validationContext, ct);
     }
@@ -534,24 +537,24 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override async Task<Result> PatchAsync(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemToPatch = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
-        if (itemToPatch is null) return Result.Invalid("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
         setItem(itemToPatch);
-        return itemToPatch is IValidatable validatable
+        return (Result)(itemToPatch is IValidatable validatable
             ? validatable.Validate(validationContext)
-            : Result.Success();
+            : Success());
     }
     public override async Task<Result> PatchAsync(Expression<Func<TItem, bool>> predicate, Func<TItem, CancellationToken, Task> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemToPatch = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
-        if (itemToPatch is null) return Result.Invalid("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
         await setItem(itemToPatch, ct);
-        return itemToPatch is IValidatable validatable
+        return (Result)(itemToPatch is IValidatable validatable
             ? validatable.Validate(validationContext)
-            : Result.Success();
+            : Success());
     }
 
     public override async Task<Result> PatchManyAsync(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemsToPatch = Data.AsAsyncQueryable().Where(predicate).AsAsyncEnumerable(ct);
-        var result = Result.Success();
+        var result = Success();
         await foreach (var item in itemsToPatch) {
             setItem(item);
             if (item is IValidatable validatable)
@@ -561,7 +564,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     }
     public override async Task<Result> PatchManyAsync(Expression<Func<TItem, bool>> predicate, Func<TItem, CancellationToken, Task> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemsToPatch = Data.AsAsyncQueryable().Where(predicate).AsAsyncEnumerable(ct);
-        var result = Result.Success();
+        var result = Success();
         await foreach (var item in itemsToPatch) {
             await setItem(item, ct);
             if (item is IValidatable validatable)
@@ -574,7 +577,7 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
         => TryRemoveAsync(predicate, ct);
     public override async Task<Result> RemoveManyAsync(Expression<Func<TItem, bool>> predicate, CancellationToken ct = default) {
         await foreach (var item in Data.AsAsyncQueryable().Where(predicate).AsAsyncEnumerable(ct)) Data.Remove(item);
-        return Result.Success();
+        return Success();
     }
 
     public override Task<Result> ClearAsync(CancellationToken ct = default)
@@ -583,9 +586,9 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
     private async Task<Result> TryRemoveAsync(Expression<Func<TItem, bool>> predicate, CancellationToken ct = default) {
         var itemToRemove = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
         if (itemToRemove is null)
-            return new OperationError("Item not found.", nameof(predicate));
+            return new Error("Item not found.", nameof(predicate));
         Data.Remove(itemToRemove);
-        return Result.Success();
+        return Success();
     }
 
     #endregion

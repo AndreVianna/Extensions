@@ -39,7 +39,7 @@ public class Workflow<TContext>(string id,
                     TContext context,
                     IDateTimeProvider? dateTime = null,
                     ILoggerFactory? loggerFactory = null)
-        : this(StringGuidProvider.Default.CreateSortable(),
+        : this(GuidProvider.Default.CreateSortable().ToString(),
                start,
                context,
                dateTime,
@@ -75,7 +75,7 @@ public class Workflow<TContext>(string id,
     }
 
     public Task Run(CancellationToken ct = default) {
-        var runner = new Runner<TContext>(++_runCount, (IWorkflow<TContext>)this, dateTime, loggerFactory);
+        var runner = new Runner<TContext>(++_runCount, this, dateTime, loggerFactory);
         return runner.Run(ct);
     }
 }

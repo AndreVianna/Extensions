@@ -20,7 +20,7 @@ public partial class NodeTests {
 
             var result = workflow.Validate();
 
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
         }
 
         [Fact]
@@ -32,7 +32,7 @@ public partial class NodeTests {
 
             var result = startNode.Validate();
 
-            result.IsSuccess.Should().BeTrue(); // Circular references are allowed, but detected
+            result.IsSuccessful.Should().BeTrue(); // Circular references are allowed, but detected
         }
 
         [Fact]

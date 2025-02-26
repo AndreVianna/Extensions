@@ -40,7 +40,7 @@ public class Command<TCommand>(IHasChildren parent,
     protected virtual Result Execute() => Success();
     public async Task<Result> Execute(IReadOnlyList<string> args, CancellationToken ct = default) {
         var result = await ArgumentsParser.Parse(this, args, ct);
-        return result.IsSuccess ? await ExecuteAsync(ct) : result;
+        return result.IsSuccessful ? await ExecuteAsync(ct) : result;
     }
 
     public ICommand AddCommand(string name, Delegate action)

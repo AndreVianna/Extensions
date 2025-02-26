@@ -12,7 +12,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             result.Value.Should().BeNull();
         }
 
@@ -28,7 +28,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var start = result.Value.Should().BeOfType<ActionNode>().Subject;
             start.Id.Should().Be(1);
             start.Tag.Should().BeNull();
@@ -49,7 +49,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var start = result.Value.Should().BeOfType<ActionNode>().Subject;
             start.Id.Should().Be(1);
             start.Name.Should().Be("DoSomething");
@@ -74,7 +74,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var action1 = result.Value.Should().BeOfType<ActionNode>().Subject;
             action1.Id.Should().Be(1);
             action1.Name.Should().Be("Action1");
@@ -99,7 +99,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccessful.Should().BeTrue();
             var start = result.Value.Should().BeOfType<ActionNode>().Subject;
             start.Id.Should().Be(1);
             start.Tag.Should().Be("Tag");

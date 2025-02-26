@@ -18,7 +18,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.FileProviders;
 global using Microsoft.Extensions.Logging;
 
-global using static System.Ensure;
+global using static DotNetToolbox.Ensure;
 global using static System.Text.RegularExpressions.RegexOptions;
 global using static DotNetToolbox.ConsoleApplication.Utilities.OutputFormatter;
 global using static DotNetToolbox.Results.Result;

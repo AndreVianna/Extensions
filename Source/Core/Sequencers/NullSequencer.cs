@@ -1,10 +1,11 @@
-﻿
-namespace DotNetToolbox.Sequencers;
+﻿namespace DotNetToolbox.Sequencers;
 
 public class NullSequencer<TKey>
-    : HasDefault<NullSequencer<TKey>>
+    : IHasDefault<NullSequencer<TKey>>
     , ISequencer<TKey>
     where TKey : notnull {
+    public static NullSequencer<TKey> Default => new();
+
     public TKey First => default!;
     public TKey Current {
         get => default!;

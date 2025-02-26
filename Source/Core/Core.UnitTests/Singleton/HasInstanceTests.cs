@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.Singleton;
+﻿using DotNetToolbox.Singletons;
+
+namespace DotNetToolbox.Singleton;
 
 public class HasInstanceTests {
     private sealed class ClassWithInstance : HasInstance<ClassWithInstance>;

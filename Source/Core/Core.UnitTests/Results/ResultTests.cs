@@ -18,7 +18,7 @@ public class ResultTests {
 
         // Assert
         result.Type.Should().Be(ResultType.Success);
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().BeEmpty();
@@ -31,7 +31,7 @@ public class ResultTests {
 
         // Assert
         result.Type.Should().Be(ResultType.Invalid);
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -43,7 +43,7 @@ public class ResultTests {
         Result result = new[] { new ValidationError("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -55,7 +55,7 @@ public class ResultTests {
         Result result = new List<ValidationError> { new("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -67,7 +67,7 @@ public class ResultTests {
         Result result = new HashSet<ValidationError> { new("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -80,7 +80,7 @@ public class ResultTests {
 
         // Assert
         result.Type.Should().Be(ResultType.Error);
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
         result.Errors.Should().BeEmpty();
@@ -132,7 +132,7 @@ public class ResultTests {
         result += Result.Success() + new ValidationError("Some error.", "result");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
     }
@@ -146,7 +146,7 @@ public class ResultTests {
         result += new ValidationError("Some error.", "result");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
     }
@@ -160,7 +160,7 @@ public class ResultTests {
         result += new Exception("Some error.");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
     }
@@ -242,7 +242,7 @@ public class ResultTests {
 
         // Assert
         subject.Value.Should().Be("Value");
-        subject.IsSuccess.Should().BeTrue();
+        subject.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class ResultTests {
         result += Result.Success();
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be("42");
     }
 
@@ -267,7 +267,7 @@ public class ResultTests {
         result += new ValidationError("Some error.", "result");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Value.Should().Be("42");
     }
 
@@ -278,7 +278,7 @@ public class ResultTests {
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Errors.Should().BeEmpty();
     }
 
@@ -289,7 +289,7 @@ public class ResultTests {
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();
     }
 
@@ -300,7 +300,7 @@ public class ResultTests {
 
         // Assert
         result.Should().BeOfType<Result<int?>>();
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.Errors.Should().BeEmpty();
         result.IsFaulty.Should().BeTrue();
     }
@@ -312,7 +312,7 @@ public class ResultTests {
 
         // Assert
         result.Type.Should().Be(ResultType.Success);
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().BeEmpty();
@@ -335,7 +335,7 @@ public class ResultTests {
         Result<string> result = new ValidationError("Some error.", nameof(result));
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -347,7 +347,7 @@ public class ResultTests {
         Result<string> result = new[] { new ValidationError("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -359,7 +359,7 @@ public class ResultTests {
         Result<string> result = new List<ValidationError> { new("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -371,7 +371,7 @@ public class ResultTests {
         Result<string> result = new HashSet<ValidationError> { new("Some error.", nameof(result)) };
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Errors.Should().ContainSingle();
@@ -383,7 +383,7 @@ public class ResultTests {
         Result<string> result = new InvalidOperationException("Some error.");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
         result.Errors.Should().BeEmpty();
@@ -463,7 +463,7 @@ public class ResultTests {
         result += Result.Success() + new ValidationError("Some error.", "result");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeTrue();
         result.IsFaulty.Should().BeFalse();
         result.Value.Should().Be("42");
@@ -478,7 +478,7 @@ public class ResultTests {
         result += new ValidationError("Some error.", "result");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -493,7 +493,7 @@ public class ResultTests {
         result += new Exception("Some error.");
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccessful.Should().BeFalse();
         result.IsInvalid.Should().BeFalse();
         result.IsFaulty.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -508,7 +508,7 @@ public class ResultTests {
         var result = Result.Success(value);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be(value);
     }
 
@@ -563,7 +563,7 @@ public class ResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
@@ -700,7 +700,7 @@ public class ResultTests {
 
         // Assert
         var result = await task;
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be("Test value");
     }
 

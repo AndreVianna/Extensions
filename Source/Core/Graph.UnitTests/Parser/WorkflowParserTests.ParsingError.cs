@@ -12,7 +12,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             var error = result.Errors.Should().ContainSingle().Subject;
             error.Message.Should().Be("Identifier can only contain letters, numbers, and underscores.");
             error.Source.Should().Be("Error@(1, 1): Identifier can only contain letters, numbers, and underscores.");
@@ -28,7 +28,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             var error = result.Errors.Should().ContainSingle().Subject;
             error.Message.Should().Be("'EndOfLine' expected but found 'Identifier'.");
             error.Source.Should().Be("Identifier@(1, 9): Action2");
@@ -44,7 +44,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
@@ -72,7 +72,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("Unexpected token: 'Else'.");
@@ -92,7 +92,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("'EndOfLine' expected but found 'Identifier'.");
@@ -112,7 +112,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(4);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("'Identifier' expected but found 'Number'.");
@@ -147,7 +147,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("Unexpected token: 'Else'.");
@@ -169,7 +169,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
@@ -194,7 +194,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(3);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("'Otherwise' not allowed here.");
@@ -220,7 +220,7 @@ public partial class WorkflowParserTests {
             var result = WorkflowParser.Parse(tokens, _services);
 
             // Assert
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
             var error1 = result.Errors[0];
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
