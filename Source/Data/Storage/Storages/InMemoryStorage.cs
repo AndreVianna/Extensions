@@ -100,7 +100,7 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     public override Result AddOrUpdate(TItem updatedItem, IMap? validationContext = null) {
         var result = updatedItem.Validate(validationContext);
-        if (!result.IsSuccessful) return (Result)result;
+        if (!result.IsSuccessful) return result;
         result += Remove(updatedItem.Id);
         return (Result)(!result.IsSuccessful
             ? result
@@ -227,11 +227,11 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     public override async Task<Result> AddOrUpdateAsync(TItem updatedItem, IMap? validationContext = null, CancellationToken ct = default) {
         var result = updatedItem.Validate(validationContext);
-        if (!result.IsSuccessful) return (Result)result;
+        if (!result.IsSuccessful) return result;
         result += await RemoveAsync(updatedItem.Id, ct);
-        return (Result)(!result.IsSuccessful
+        return !result.IsSuccessful
             ? result
-            : await AddAsync(updatedItem, validationContext, ct));
+            : await AddAsync(updatedItem, validationContext, ct);
     }
 
     public override async Task<Result> AddOrUpdateManyAsync(IEnumerable<TItem> updatedItems, IMap? validationContext = null, CancellationToken ct = default) {

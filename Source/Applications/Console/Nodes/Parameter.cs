@@ -7,13 +7,11 @@ public abstract class Parameter<TParameter>(IHasChildren parent, string name, Ac
     : Node<TParameter>(parent, name, configure),
       IParameter
     where TParameter : Parameter<TParameter> {
-    private string? _defaultValue;
-
     public string? DefaultValue {
-        get => _defaultValue;
+        get;
         set {
-            _defaultValue = value;
-            Parent.Context[Name] = _defaultValue!;
+            field = value;
+            Parent.Context[Name] = field!;
         }
     }
 

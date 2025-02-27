@@ -3,8 +3,6 @@
 public abstract class Node<TNode>
     : IHasParent
     where TNode : Node<TNode> {
-    private string _description = string.Empty;
-
     protected Node(IHasChildren parent, string name, Action<TNode>? configure = null) {
         Parent = parent;
         Application = FindRoot(this);
@@ -21,13 +19,15 @@ public abstract class Node<TNode>
     public IHasChildren Parent { get; }
     public string Name { get; }
     public string[] Aliases { get; set; } = [];
+
     public string Description {
-        get => _description;
+        get;
         set {
-            _description = value;
-            if (string.IsNullOrWhiteSpace(Help)) Help = _description;
+            field = value;
+            if (string.IsNullOrWhiteSpace(Help)) Help = field;
         }
-    }
+    } = string.Empty;
+
     public string Help { get; set; } = string.Empty;
 
     public IInput Input => Environment.OperatingSystem.Input;

@@ -1,4 +1,6 @@
-﻿namespace DotNetToolbox.Http;
+﻿using static DotNetToolbox.Results.Result;
+
+namespace DotNetToolbox.Http;
 
 public record HttpClientOptions
     : INamedOptions<HttpClientOptions>, IValidatable {
@@ -15,8 +17,8 @@ public record HttpClientOptions
     public HttpClientAuthentication? Authentication { get; set; }
     public Dictionary<string, string[]>? CustomHeaders { get; init; }
 
-    public virtual IResult Validate(IMap? context = null) {
-        var result = Result.Default;
+    public virtual Result Validate(IMap? context = null) {
+        var result = Success();
         var provider = (string?)context?["Provider"] ?? string.Empty;
         var providerPath = string.IsNullOrWhiteSpace(provider) ? string.Empty : $":{provider}";
 

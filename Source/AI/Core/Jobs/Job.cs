@@ -4,11 +4,11 @@ public class Job(string id, JobContext context)
     : IJob {
     private readonly Chat _chat = new(id);
 
-    public Job(IStringGuidProvider guid, JobContext context)
-        : this(guid.CreateSortable(), context) {
+    public Job(IGuidProvider guid, JobContext context)
+        : this(guid.CreateSortable().ToString(), context) {
     }
     public Job(JobContext context)
-        : this(StringGuidProvider.Default, context) {
+        : this(GuidProvider.Default, context) {
     }
     public string Id { get; } = id;
     public Dictionary<Type, Func<object, string>> Converters { get; } = [];
@@ -18,7 +18,7 @@ public class Job(string id, JobContext context)
             SetSystemMessage();
             SetUserMessage();
             var response = await context.Agent.SendRequest(_chat, context, ct);
-            if (!response.IsOk) return response.Errors;
+            if (!response.IsSuccessful) return response.Errors.ToArray();
             SetAgentResponse();
             return Result.Success();
         }

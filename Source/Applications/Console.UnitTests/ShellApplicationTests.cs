@@ -455,7 +455,7 @@ public sealed class ShellApplicationTests {
         var output = new TestOutput();
         var input = new TestInput(output, "crash", "exit");
 
-        static Result CommandAction() => Result.Invalid("Some error.");
+        static Result CommandAction() => Result.Failure("Some error.");
         const string expectedOutput =
             """
             testhost v15.0.0.0
@@ -532,7 +532,7 @@ public sealed class ShellApplicationTests {
     private sealed class TestShellApp(string[] args, IServiceCollection services)
         : ShellApplication<TestShellApp, ApplicationSettings>(args, services) {
         protected override Task<Result> OnStart(CancellationToken ct = default)
-            => Result.InvalidTask("Some error.");
+            => Task.FromResult(Result.Failure("Some error."));
     }
 
     [Fact]
@@ -555,7 +555,7 @@ public sealed class ShellApplicationTests {
     private sealed class TestFaultyShellApp(string[] args, IServiceCollection services)
         : ShellApplication<TestFaultyShellApp, ApplicationSettings>(args, services) {
         protected override Task<Result> OnStart(CancellationToken ct = default)
-            => Result.ErrorTask(new ConsoleException(13));
+            => throw new ConsoleException(13);
     }
 
     [Fact]

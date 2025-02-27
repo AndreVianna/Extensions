@@ -9,5 +9,5 @@ public abstract class Entity<TEntity, TKey>
 
     public virtual Result Validate(IMap? context = null)
         => Result.Success();
-    IResult IValidatable<IMap>.Validate(IMap? context) => Validate(context);
+    Result IValidatable<IMap>.Validate(IMap? context) => Validate(context);
 }

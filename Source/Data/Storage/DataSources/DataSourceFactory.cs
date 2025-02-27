@@ -5,7 +5,7 @@ internal class DataSourceFactory
     public InMemoryDataSource<TItem, TKey> CreateInMemory<TItem, TKey>(IEnumerable<TItem>? data = null)
         where TItem : class, IEntity<TKey>, new()
         where TKey : notnull
-        => new(data);
+        => [.. data ?? []];
 
     public DataSource<TStorage, TItem, TKey> CreateFromStorage<TStorage, TItem, TKey>(IEnumerable<TItem>? data = null)
         where TStorage : class, IStorage<TItem, TKey>
@@ -20,7 +20,7 @@ internal class DataSourceFactory
         => InstanceFactory.Create<TRepository>(data ?? []);
 
     public InMemoryDataSource<TItem> CreateInMemory<TItem>(IEnumerable<TItem>? data = null)
-        => new(data);
+        => [.. data ?? []];
 
     public DataSource<TStorage, TItem> CreateFromStorage<TStorage, TItem>(IEnumerable<TItem>? data = null)
         where TStorage : class, IStorage<TItem>

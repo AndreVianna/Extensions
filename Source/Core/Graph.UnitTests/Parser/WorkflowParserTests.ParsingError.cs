@@ -15,7 +15,7 @@ public partial class WorkflowParserTests {
             result.IsSuccessful.Should().BeFalse();
             var error = result.Errors.Should().ContainSingle().Subject;
             error.Message.Should().Be("Identifier can only contain letters, numbers, and underscores.");
-            error.Source.Should().Be("Error@(1, 1): Identifier can only contain letters, numbers, and underscores.");
+            error.Sources.Should().BeEquivalentTo("Error@(1, 1): Identifier can only contain letters, numbers, and underscores.");
         }
 
         [Fact]
@@ -31,7 +31,7 @@ public partial class WorkflowParserTests {
             result.IsSuccessful.Should().BeFalse();
             var error = result.Errors.Should().ContainSingle().Subject;
             error.Message.Should().Be("'EndOfLine' expected but found 'Identifier'.");
-            error.Source.Should().Be("Identifier@(1, 9): Action2");
+            error.Sources.Should().BeEquivalentTo("Identifier@(1, 9): Action2");
         }
 
         [Fact]
@@ -46,12 +46,12 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
-            error1.Source.Should().Be("EndOfFile@(1, 12)");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("EndOfFile@(1, 12)");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("If statement must have a body.");
-            error2.Source.Should().Be("EndOfFile@(1, 12)");
+            error2.Sources.Should().BeEquivalentTo("EndOfFile@(1, 12)");
         }
 
         [Fact]
@@ -74,12 +74,12 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("Unexpected token: 'Else'.");
-            error1.Source.Should().Be("Else@(6, 3)");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("Else@(6, 3)");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("Invalid indentation. Expected '0' but found 2.");
-            error2.Source.Should().Be("Identifier@(7, 5): ActionDefault");
+            error2.Sources.Should().BeEquivalentTo("Identifier@(7, 5): ActionDefault");
         }
 
         [Fact]
@@ -94,12 +94,12 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("'EndOfLine' expected but found 'Identifier'.");
-            error1.Source.Should().Be("Identifier@(1, 6): InvalidCode");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("Identifier@(1, 6): InvalidCode");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("An exit node cannot be connected to another node.");
-            error2.Source.Should().Be("Identifier@(1, 6): InvalidCode");
+            error2.Sources.Should().BeEquivalentTo("Identifier@(1, 6): InvalidCode");
         }
 
         [Fact]
@@ -114,18 +114,18 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(4);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("'Identifier' expected but found 'Number'.");
-            error1.Source.Should().Be("Number@(1, 6): 123");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("Number@(1, 6): 123");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("'EndOfLine' expected but found 'Number'.");
-            error2.Source.Should().Be("Number@(1, 6): 123");
-            var error3 = result.Errors[2];
+            error2.Sources.Should().BeEquivalentTo("Number@(1, 6): 123");
+            var error3 = result.Errors.Skip(2).First();
             error3.Message.Should().Be("Unexpected token: 'Number'.");
-            error3.Source.Should().Be("Number@(1, 6): 123");
-            var error4 = result.Errors[3];
+            error3.Sources.Should().BeEquivalentTo("Number@(1, 6): 123");
+            var error4 = result.Errors.Skip(3).First();
             error4.Message.Should().Be("Jump target '123' not found.");
-            error4.Source.Should().Be("GoTo@(1, 1)");
+            error4.Sources.Should().BeEquivalentTo("GoTo@(1, 1)");
         }
 
         [Fact]
@@ -149,12 +149,12 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(2);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("Unexpected token: 'Else'.");
-            error1.Source.Should().Be("Else@(7, 3)");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("Else@(7, 3)");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("Invalid indentation. Expected '0' but found 2.");
-            error2.Source.Should().Be("Identifier@(8, 5): ActionDefault");
+            error2.Sources.Should().BeEquivalentTo("Identifier@(8, 5): ActionDefault");
         }
 
         [Fact]
@@ -171,9 +171,9 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
-            error1.Source.Should().Be("EndOfFile@(1, 14)");
+            error1.Sources.Should().BeEquivalentTo("EndOfFile@(1, 14)");
         }
 
         [Fact]
@@ -196,15 +196,15 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(3);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("'Otherwise' not allowed here.");
-            error1.Source.Should().Be("Otherwise@(6, 3)");
-            var error2 = result.Errors[1];
+            error1.Sources.Should().BeEquivalentTo("Otherwise@(6, 3)");
+            var error2 = result.Errors.Skip(1).First();
             error2.Message.Should().Be("Unexpected token: 'Otherwise'.");
-            error2.Source.Should().Be("Otherwise@(6, 3)");
-            var error3 = result.Errors[2];
+            error2.Sources.Should().BeEquivalentTo("Otherwise@(6, 3)");
+            var error3 = result.Errors.Skip(2).First();
             error3.Message.Should().Be("Invalid indentation. Expected '0' but found 2.");
-            error3.Source.Should().Be("Identifier@(7, 5): ActionDefault2");
+            error3.Sources.Should().BeEquivalentTo("Identifier@(7, 5): ActionDefault2");
         }
 
         [Fact]
@@ -222,9 +222,9 @@ public partial class WorkflowParserTests {
             // Assert
             result.IsSuccessful.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
-            var error1 = result.Errors[0];
+            var error1 = result.Errors.First();
             error1.Message.Should().Be("Invalid indentation. Expected '1' but found 0.");
-            error1.Source.Should().Be("Identifier@(2, 1): Action1");
+            error1.Sources.Should().BeEquivalentTo("Identifier@(2, 1): Action1");
         }
     }
 }

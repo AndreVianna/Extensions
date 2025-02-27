@@ -25,7 +25,7 @@ internal static partial class JobInputHelper {
     }
 
     private static string[] ExtractKeys(string template)
-        => MatchInputKey.Matches(template).Select(m => m.Groups[1].Value).Distinct().ToArray();
+        => [.. MatchInputKey.Matches(template).Select(m => m.Groups[1].Value).Distinct()];
 
     private static string FindValue(object input, string key, IReadOnlyDictionary<Type, Func<object, string>> converters)
         => input switch {

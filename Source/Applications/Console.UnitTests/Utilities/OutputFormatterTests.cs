@@ -34,7 +34,7 @@ public class OutputFormatterTests {
     [Fact]
     public void FormatValidationErrors_WithNoErrors_ReturnsEmptyString() {
         // Arrange
-        var errors = Array.Empty<ValidationError>();
+        var errors = Array.Empty<Error>();
 
         // Act
         var result = errors.ToText();
@@ -46,7 +46,7 @@ public class OutputFormatterTests {
     [Fact]
     public void FormatValidationErrors_WithMultipleErrors_FormatsAllErrors() {
         // Arrange
-        var errors = new List<ValidationError> {
+        var errors = new List<Error> {
             new("First error."),
             new("Second error."),
         };

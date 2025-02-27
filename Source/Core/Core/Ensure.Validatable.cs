@@ -37,13 +37,13 @@ public static partial class Ensure {
 
     public static async Task<TArgument?> DefaultIfNotValidAsync<TArgument>(TArgument? argument, IMap? context = null, TArgument? defaultValue = default)
         where TArgument : IAsyncValidatable {
-        var result = await (argument?.ValidateAsync(context) ?? Task.FromResult<IResult>(Success()));
+        var result = await (argument?.ValidateAsync(context) ?? Task.FromResult(Success()));
         return result.IsSuccessful && argument is not null
                    ? argument
                    : defaultValue;
     }
 
-    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument, Task<IResult>> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+    public static async Task<TArgument?> IsValidAsync<TArgument>(TArgument? argument, Func<TArgument, Task<Result>> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
         var result = await validate(IsNotNull(argument, paramName));
         return result.IsSuccessful
                    ? argument

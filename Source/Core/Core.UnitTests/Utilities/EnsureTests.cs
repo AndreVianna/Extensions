@@ -1,3 +1,5 @@
+using DotNetToolbox.Validation;
+
 namespace DotNetToolbox.Utilities;
 
 public class EnsureTests {
@@ -7,7 +9,7 @@ public class EnsureTests {
         const int input = 12;
 
         // Act
-        var action = () => IsOfType<string>(input);
+        var action = static () => IsOfType<string>(input);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Expected value to be of type 'String'. Found: 'Int32'. (Parameter 'input')");
@@ -31,7 +33,7 @@ public class EnsureTests {
         const object? input = null;
 
         // Act
-        var action = () => IsNotNull(input);
+        var action = static () => IsNotNull(input);
 
         // Assert
         action.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'input')");
@@ -76,7 +78,7 @@ public class EnsureTests {
     [Fact]
     public void NotNullOrEmpty_WhenStringIsNull_ThrowsArgumentException() {
         // Arrange
-        const string? input = null;
+        string? input = null;
 
         // Act
         var action = () => IsNotNullOrEmpty(input);
@@ -115,7 +117,7 @@ public class EnsureTests {
         const string? input = null;
 
         // Act
-        var action = () => IsNotNullOrWhiteSpace(input);
+        var action = static () => IsNotNullOrWhiteSpace(input);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'input')");
@@ -136,7 +138,7 @@ public class EnsureTests {
     [Fact]
     public void NotNullOrWhiteSpace_WhenStringIsWhiteSpace_ThrowsArgumentException() {
         // Arrange
-        const string input = " ";
+        var input = " ";
 
         // Act
         var action = () => IsNotNullOrWhiteSpace(input);
@@ -166,8 +168,8 @@ public class EnsureTests {
         var action = () => ItemsAreNotNull(input);
 
         // Assert
-        action.Should().Throw<ValidationException>().WithMessage("The collection cannot contain null element(s).");
-        action.Should().Throw<ValidationException>().Which.Source.Should().Be(nameof(input));
+        action.Should().Throw<OperationFailureException>().WithMessage("The collection cannot contain null element(s).");
+        action.Should().Throw<OperationFailureException>().Which.Source.Should().Be(nameof(input));
     }
 
     [Fact]
@@ -239,8 +241,8 @@ public class EnsureTests {
         var action = () => ItemsAreNotNull(input);
 
         // Assert
-        action.Should().Throw<ValidationException>().WithMessage("The collection cannot contain null element(s).");
-        action.Should().Throw<ValidationException>().Which.Source.Should().Be(nameof(input));
+        action.Should().Throw<OperationFailureException>().WithMessage("The collection cannot contain null element(s).");
+        action.Should().Throw<OperationFailureException>().Which.Source.Should().Be(nameof(input));
     }
 
     [Fact]
@@ -257,7 +259,7 @@ public class EnsureTests {
 
     private sealed class ValidatableObject(bool isValid) : IValidatable {
         public Result Validate(IMap? context = null)
-            => isValid ? Result.Success() : Result.Invalid("Is not valid.", "Source");
+            => isValid ? Result.Success() : Result.Failure("Is not valid.", "Source");
     }
 
     [Fact]
@@ -269,7 +271,7 @@ public class EnsureTests {
         var result = () => IsValid(input);
 
         // Assert
-        result.Should().Throw<ValidationException>();
+        result.Should().Throw<OperationFailureException>();
     }
 
     [Fact]
@@ -289,7 +291,7 @@ public class EnsureTests {
         var input = new object();
 
         // Act
-        var result = IsValid(input, _ => Result.Success());
+        var result = IsValid(input, static _ => Result.Success());
 
         // Assert
         result.Should().BeSameAs(input);
@@ -301,10 +303,10 @@ public class EnsureTests {
         var input = new object();
 
         // Act
-        var result = () => IsValid(input, _ => Result.Invalid("Some error."));
+        var result = () => IsValid(input, _ => Result.Failure("Some error."));
 
         // Assert
-        result.Should().Throw<ValidationException>();
+        result.Should().Throw<OperationFailureException>();
     }
 
     [Fact]
@@ -313,7 +315,7 @@ public class EnsureTests {
         var input = new object();
 
         // Act
-        var result = IsValid(input, _ => true);
+        var result = IsValid(input, static _ => true);
 
         // Assert
         result.Should().BeSameAs(input);
@@ -328,7 +330,7 @@ public class EnsureTests {
         var result = () => IsValid(input, _ => false);
 
         // Assert
-        result.Should().Throw<ValidationException>();
+        result.Should().Throw<OperationFailureException>();
     }
 
     [Fact]
@@ -402,7 +404,7 @@ public class EnsureTests {
         const string argument = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => Result.Success(), argument);
+        var result = DefaultIfNotValid(argument, static _ => Result.Success(), argument);
 
         // Assert
         result.Should().Be(argument);
@@ -415,7 +417,7 @@ public class EnsureTests {
         const string defaultValue = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => Result.Invalid("ErrorWriter"), defaultValue);
+        var result = DefaultIfNotValid(argument, static _ => Result.Failure("ErrorWriter"), defaultValue);
 
         // Assert
         result.Should().Be(defaultValue);
@@ -428,7 +430,7 @@ public class EnsureTests {
         const string defaultValue = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => Result.Success(), defaultValue);
+        var result = DefaultIfNotValid(argument, static _ => Result.Success(), defaultValue);
 
         // Assert
         result.Should().Be(defaultValue);
@@ -440,7 +442,7 @@ public class EnsureTests {
         const string argument = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => true, argument);
+        var result = DefaultIfNotValid(argument, static _ => true, argument);
 
         // Assert
         result.Should().Be(argument);
@@ -453,7 +455,7 @@ public class EnsureTests {
         const string defaultValue = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => false, defaultValue);
+        var result = DefaultIfNotValid(argument, static _ => false, defaultValue);
 
         // Assert
         result.Should().Be(defaultValue);
@@ -466,7 +468,7 @@ public class EnsureTests {
         const string defaultValue = "Valid";
 
         // Act
-        var result = DefaultIfNotValid(argument, _ => true, defaultValue);
+        var result = DefaultIfNotValid(argument, static _ => true, defaultValue);
 
         // Assert
         result.Should().Be(defaultValue);
@@ -493,8 +495,8 @@ public class EnsureTests {
         Action act = () => ItemsAreValid(argument);
 
         // Assert
-        act.Should().Throw<ValidationException>().WithMessage("The collection cannot have invalid element(s).");
-        act.Should().Throw<ValidationException>().Which.Source.Should().Be(nameof(argument));
+        act.Should().Throw<OperationFailureException>().WithMessage("The collection cannot have invalid element(s).");
+        act.Should().Throw<OperationFailureException>().Which.Source.Should().Be(nameof(argument));
     }
 
     [Fact]
@@ -503,7 +505,7 @@ public class EnsureTests {
         var argument = new List<string> { default!, "Valid", "Valid" };
 
         // Act
-        var result = ItemsAreValid<List<string>, string>(argument, _ => Result.Success());
+        var result = ItemsAreValid<List<string>, string>(argument, static _ => Result.Success());
 
         // Assert
         result.Should().BeEquivalentTo(argument);
@@ -515,17 +517,17 @@ public class EnsureTests {
         var argument = new List<string> { default!, "Valid", "Invalid" };
 
         // Act
-        Action act = () => ItemsAreValid<List<string>, string>(argument, _ => Result.Invalid("ErrorWriter"));
+        Action act = () => ItemsAreValid<List<string>, string>(argument, _ => Result.Failure("ErrorWriter"));
 
         // Assert
-        act.Should().Throw<ValidationException>().WithMessage("The collection cannot have invalid element(s).");
-        act.Should().Throw<ValidationException>().Which.Source.Should().Be(nameof(argument));
+        act.Should().Throw<OperationFailureException>().WithMessage("The collection cannot have invalid element(s).");
+        act.Should().Throw<OperationFailureException>().Which.Source.Should().Be(nameof(argument));
     }
 
     [Fact]
     public void DoesNotContainInvalidItems_WhenArgumentIsNull_ReturnsArgument() {
         // Act
-        Action act = () => IsValid<string[]>(default, _ => true);
+        Action act = static () => IsValid<string[]>(default, static _ => true);
 
         // Assert
         act.Should().Throw<ArgumentNullException>().WithMessage("*default*");
@@ -537,7 +539,7 @@ public class EnsureTests {
         string[] argument = [default!, "One", "Two"];
 
         // Act
-        var result = IsValid(argument, _ => true);
+        var result = IsValid(argument, static _ => true);
 
         // Assert
         result.Should().BeEquivalentTo(argument);
@@ -552,7 +554,7 @@ public class EnsureTests {
         Action act = () => IsValid(argument, _ => false);
 
         // Assert
-        act.Should().Throw<ValidationException>().WithMessage("The value is not valid.");
-        act.Should().Throw<ValidationException>().Which.Source.Should().Be(nameof(argument));
+        act.Should().Throw<OperationFailureException>().WithMessage("The value is not valid.");
+        act.Should().Throw<OperationFailureException>().Which.Source.Should().Be(nameof(argument));
     }
 }

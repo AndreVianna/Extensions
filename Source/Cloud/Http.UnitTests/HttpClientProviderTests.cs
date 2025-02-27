@@ -43,7 +43,7 @@ public sealed class HttpClientProviderTests : IDisposable {
         var result = () => CreateHttpClientBuilder();
 
         // Assert
-        var exception = result.Should().Throw<ValidationException>().Subject.First();
+        var exception = result.Should().Throw<OperationFailureException>().Subject.First();
         exception.Errors.Should().ContainSingle();
         exception.Errors[0].Message.Should().Be("Http client base address is missing.");
     }

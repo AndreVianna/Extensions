@@ -15,7 +15,7 @@ public class AnalysisActionNode(string tag, IServiceProvider services)
         var job = new Job($"{Id}", jobContext);
         jobContext.Input = input;
         var result = await job.Execute(ct);
-        result.EnsureSuccess();
+        result.EnsureIsSuccess();
         context["AnalysisResult"] = jobContext.Output;
     }
 }

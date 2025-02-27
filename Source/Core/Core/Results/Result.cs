@@ -1,19 +1,18 @@
-﻿using DotNetToolbox.Singletons;
-
-namespace DotNetToolbox.Results;
+﻿namespace DotNetToolbox.Results;
 
 public record Result
     : IResult
     , IHasDefault<Result>
-    , IResultFactory {
-    internal Result(IEnumerable<IError>? errors = null) {
-        Errors = errors as HashSet<IError> ?? errors?.ToHashSet() ?? [];
+    , IMergeResult<Result>
+    , IConvertToResult<Result> {
+    internal Result(IEnumerable<Error>? errors = null) {
+        Errors = errors as HashSet<Error> ?? errors?.ToHashSet() ?? [];
     }
 
     /// <summary>
     /// The collection of unique errors. If empty, the Result is considered a Success.
     /// </summary>
-    public IReadOnlySet<IError> Errors { get; }
+    public IReadOnlySet<Error> Errors { get; }
 
     /// <summary>
     /// True if the result has at least one error.
@@ -58,28 +57,9 @@ public record Result
     /// <param name="error">The first error (must not be null).</param>
     /// <param name="additionalErrors">Optional additional errors (null errors are ignored).</param>
     /// <returns>A Failure result with a unique set of errors.</returns>
-    public static Result Failure(IError error, params IEnumerable<IError> additionalErrors) {
+    public static Result Failure(Error error, params IEnumerable<Error> additionalErrors) {
         ArgumentNullException.ThrowIfNull(error);
         return Failure([error, .. additionalErrors]);
-    }
-
-    /// <summary>
-    /// Creates a Failure result with at least one error.
-    /// </summary>
-    /// <param name="error">The first error (must not be null).</param>
-    /// <param name="additionalErrors">Optional additional errors (null errors are ignored).</param>
-    /// <returns>A Failure result with a unique set of errors.</returns>
-    public static Result Failure(Error error, params IEnumerable<IError> additionalErrors)
-        => Failure((IError)error, additionalErrors);
-
-    /// <summary>
-    /// Creates a Failure result with at least one error.
-    /// </summary>
-    /// <param name="errors">List of errors (must not be null).</param>
-    /// <returns>A Failure result with a unique set of errors.</returns>
-    public static Result Failure(IEnumerable<IError> errors) {
-        ArgumentNullException.ThrowIfNull(errors);
-        return new(errors);
     }
 
     /// <summary>
@@ -101,41 +81,9 @@ public record Result
     /// <summary>
     /// Creates a Failure result. The value is set to default.
     /// </summary>
-    public static Result<TValue> Failure<TValue>(TValue value, IError error, params IEnumerable<IError> additionalErrors) {
-        ArgumentNullException.ThrowIfNull(error);
-        return Failure(value, [error, .. additionalErrors]);
-    }
-
-    /// <summary>
-    /// Creates a Failure result. The value is set to default.
-    /// </summary>
-    public static Result<TValue> Failure<TValue>(TValue value, Error error, params IEnumerable<IError> additionalErrors) {
-        ArgumentNullException.ThrowIfNull(error);
-        return Failure(value, [error, .. additionalErrors]);
-    }
-
-    /// <summary>
-    /// Creates a Failure result. The value is set to default.
-    /// </summary>
     public static Result<TValue> Failure<TValue>(TValue value, Error error, params IEnumerable<Error> additionalErrors) {
         ArgumentNullException.ThrowIfNull(error);
         return Failure(value, [error, .. additionalErrors]);
-    }
-
-    /// <summary>
-    /// Creates a Failure result. The value is set to default.
-    /// </summary>
-    public static Result<TValue> Failure<TValue>(TValue value, IError error, params IEnumerable<Error> additionalErrors) {
-        ArgumentNullException.ThrowIfNull(error);
-        return Failure(value, [error, .. additionalErrors]);
-    }
-
-    /// <summary>
-    /// Creates a Failure result. The value is set to default.
-    /// </summary>
-    public static Result<TValue> Failure<TValue>(TValue value, IEnumerable<IError> errors) {
-        ArgumentNullException.ThrowIfNull(errors);
-        return new(value, errors);
     }
 
     /// <summary>
@@ -153,12 +101,36 @@ public record Result
     /// - If the collection is null or empty, returns the current result.
     /// - Otherwise, adds the errors (ignoring nulls) uniquely.
     /// </summary>
-    public static Result operator +(Result result, IEnumerable<IError>? errors) {
+    public static Result operator +(Result result, Error? error) {
         ArgumentNullException.ThrowIfNull(result);
-        var enumerable = errors as IError[] ?? errors?.ToArray() ?? [];
+        return error is null
+                   ? result
+                   : new([.. result.Errors, error]);
+    }
+
+    /// <summary>
+    /// Adding a collection of errors.
+    /// - If the collection is null or empty, returns the current result.
+    /// - Otherwise, adds the errors (ignoring nulls) uniquely.
+    /// </summary>
+    public static Result operator +(Result result, IEnumerable<Error>? errors) {
+        ArgumentNullException.ThrowIfNull(result);
+        var enumerable = errors as Error[] ?? errors?.ToArray() ?? [];
         return enumerable.Length == 0
                    ? result
                    : new([.. result.Errors, .. enumerable]);
+    }
+
+    /// <summary>
+    /// Adding a collection of errors.
+    /// - If the collection is null or empty, returns the current result.
+    /// - Otherwise, adds the errors (ignoring nulls) uniquely.
+    /// </summary>
+    public static Result operator +(Result result, IResult? other) {
+        ArgumentNullException.ThrowIfNull(result);
+        return other is null
+                   ? result
+                   : new([.. result.Errors, .. other.Errors]);
     }
 
     /// <summary>
@@ -168,9 +140,11 @@ public record Result
     ///   - If current result is Success, returns a new Failure that equals the other.
     ///   - If both are Failures, merges the errors (uniquely).
     /// </summary>
-    public static Result operator +(Result result, Result other) {
+    public static Result operator +(Result result, Result? other) {
         ArgumentNullException.ThrowIfNull(result);
-        return new([..result.Errors, ..other.Errors]);
+        return other is null
+                   ? result
+                   : new([.. result.Errors, .. other.Errors]);
     }
 
     // Implicit conversions
@@ -207,8 +181,9 @@ public record Result
 
 public record Result<TValue>
     : Result
-    , IResult<TValue> {
-    internal Result(TValue value, IEnumerable<IError>? errors = null)
+    , IResult<TValue>
+    , IMergeResult<Result<TValue>> {
+    internal Result(TValue value, IEnumerable<Error>? errors = null)
         : base(errors) {
         Value = value;
     }
@@ -222,9 +197,19 @@ public record Result<TValue>
     // Operator overloads
 
     /// <summary>
+    /// Adds an error.
+    /// </summary>
+    public static Result<TValue> operator +(Result<TValue> result, Error? error) {
+        ArgumentNullException.ThrowIfNull(result);
+        return error is null
+                   ? result
+                   : new(result.Value, [.. result.Errors, error]);
+    }
+
+    /// <summary>
     /// Adds a collection of errors.
     /// </summary>
-    public static Result<TValue> operator +(Result<TValue> result, IEnumerable<IError>? errors) {
+    public static Result<TValue> operator +(Result<TValue> result, IEnumerable<Error>? errors) {
         ArgumentNullException.ThrowIfNull(result);
         var enumerable = errors as Error[] ?? errors?.ToArray() ?? [];
         return enumerable.Length == 0
@@ -235,9 +220,21 @@ public record Result<TValue>
     /// <summary>
     /// Merges errors from another Result.
     /// </summary>
-    public static Result<TValue> operator +(Result<TValue> result, Result other) {
+    public static Result<TValue> operator +(Result<TValue> result, IResult? other) {
         ArgumentNullException.ThrowIfNull(result);
-        return new(result.Value, [.. result.Errors, .. other.Errors]);
+        return other is null
+                   ? result
+                   : new(result.Value, [.. result.Errors, .. other.Errors]);
+    }
+
+    /// <summary>
+    /// Merges errors from another Result.
+    /// </summary>
+    public static Result<TValue> operator +(Result<TValue> result, Result? other) {
+        ArgumentNullException.ThrowIfNull(result);
+        return other is null
+                   ? result
+                   : new(result.Value, [.. result.Errors, .. other.Errors]);
     }
 
     public virtual bool Equals(Result<TValue>? other)
@@ -252,33 +249,4 @@ public record Result<TValue>
     /// Implicitly converts a value to a Success Result.
     /// </summary>
     public static implicit operator Result<TValue>(TValue value) => new(value);
-
-    /// <summary>
-    /// Implicitly converts an Error to a Result.
-    /// </summary>
-    public static implicit operator Result<TValue>(Error error) => new(default!, [error]);
-
-    /// <summary>
-    /// Implicitly converts an array of Errors to a Result.
-    /// </summary>
-    public static implicit operator Result<TValue>(Error[]? errors) {
-        ArgumentNullException.ThrowIfNull(errors);
-        return new(default!, errors);
-    }
-
-    /// <summary>
-    /// Implicitly converts a List of Errors to a Result.
-    /// </summary>
-    public static implicit operator Result<TValue>(List<Error>? errors) {
-        ArgumentNullException.ThrowIfNull(errors);
-        return new(default!, errors);
-    }
-
-    /// <summary>
-    /// Implicitly converts a HashSet of Errors to a Result.
-    /// </summary>
-    public static implicit operator Result<TValue>(HashSet<Error>? errors) {
-        ArgumentNullException.ThrowIfNull(errors);
-        return new(default!, errors);
-    }
 }

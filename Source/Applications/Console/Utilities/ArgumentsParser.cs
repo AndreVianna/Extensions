@@ -24,8 +24,8 @@ public static class ArgumentsParser {
             IFlag f => (await f.Read(node.Context, ct), index),
             IOption when index >= arguments.Count - 1 => (Failure($"Missing value for option '{arguments[index]}'."), index + 1),
             IOption o => (await o.Read(arguments[++index], node.Context, ct), index),
-            ICommand c => (await c.Execute(arguments.Skip(++index).ToArray(), ct), index),
-            _ => (await ReadParameters(node, arguments.Skip(index).ToArray(), ct), arguments.Count - 1),
+            ICommand c => (await c.Execute([.. arguments.Skip(++index)], ct), index),
+            _ => (await ReadParameters(node, [.. arguments.Skip(index)], ct), arguments.Count - 1),
         };
     }
 

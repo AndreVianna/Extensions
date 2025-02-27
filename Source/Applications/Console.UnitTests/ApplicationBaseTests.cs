@@ -205,12 +205,12 @@ public class ApplicationBaseTests {
             Add((Command _) => { });
             Add(() => Result.Success());
             Add((Command _) => Result.Success());
-            Add(() => Result.Task.FromResult(Success()));
-            Add((Command _) => Result.Task.FromResult(Success()));
+            Add(() => Task.FromResult(Result.Success()));
+            Add((Command _) => Task.FromResult(Result.Success()));
             Add(() => Task.CompletedTask);
             Add((Command _) => Task.CompletedTask);
-            Add((CancellationToken _) => Result.Task.FromResult(Success()));
-            Add((Command _, CancellationToken _) => Result.Task.FromResult(Success()));
+            Add((CancellationToken _) => Task.FromResult(Result.Success()));
+            Add((Command _, CancellationToken _) => Task.FromResult(Result.Success()));
             Add((CancellationToken _) => Task.CompletedTask);
             Add((Command _, CancellationToken _) => Task.CompletedTask);
         }
@@ -478,12 +478,12 @@ public class ApplicationBaseTests {
             Add((Flag _) => { });
             Add(() => Result.Success());
             Add((Flag _) => Result.Success());
-            Add(() => Result.Task.FromResult(Success()));
-            Add((Flag _) => Result.Task.FromResult(Success()));
+            Add(() => Task.FromResult(Result.Success()));
+            Add((Flag _) => Task.FromResult(Result.Success()));
             Add(() => Task.CompletedTask);
             Add((Flag _) => Task.CompletedTask);
-            Add((CancellationToken _) => Result.Task.FromResult(Success()));
-            Add((Flag _, CancellationToken _) => Result.Task.FromResult(Success()));
+            Add((CancellationToken _) => Task.FromResult(Result.Success()));
+            Add((Flag _, CancellationToken _) => Task.FromResult(Result.Success()));
             Add((CancellationToken _) => Task.CompletedTask);
             Add((Flag _, CancellationToken _) => Task.CompletedTask);
         }
@@ -601,7 +601,7 @@ public class ApplicationBaseTests {
     private sealed class TestApplication(string[] args, IServiceCollection services)
         : ApplicationBase<TestApplication, TestApplicationBuilder, ApplicationSettings>(args, services) {
         internal override Task Run(CancellationToken ct = default)
-            => Result.Task.FromResult(Success());
+            => Task.FromResult(Result.Success());
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local - Used for tests.

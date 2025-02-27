@@ -3,8 +3,8 @@
 public interface IApplication
     : IHasChildren,
       IAsyncDisposable {
-    public const int DefaultExitCode = 0;
-    public const int DefaultErrorCode = 1;
+    const int DefaultExitCode = 0;
+    const int DefaultErrorCode = 1;
     int ExitCode { get; }
 
     string Version { get; }

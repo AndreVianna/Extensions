@@ -1,6 +1,6 @@
 ﻿namespace DotNetToolbox.Results;
 
 public interface IHasErrors {
-    IReadOnlySet<IError> Errors { get; }
+    IReadOnlySet<Error> Errors { get; }
     bool HasErrors { get; }
 }

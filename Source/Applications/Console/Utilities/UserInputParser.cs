@@ -10,5 +10,5 @@ internal static class UserInputParser {
                                               "[^"]+"|\S+
                                               """, _parserOptions);
     public static string[] Parse(string input)
-        => _word.Matches(input).Select(m => m.Value).ToArray();
+        => [.. _word.Matches(input).Select(static m => m.Value)];
 }

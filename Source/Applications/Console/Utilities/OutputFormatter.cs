@@ -9,7 +9,7 @@ internal static class OutputFormatter {
         return builder.ToString();
     }
 
-    public static string ToText(this IEnumerable<IError> errors) {
+    public static string ToText(this IEnumerable<Error> errors) {
         var builder = new StringBuilder();
         foreach (var error in errors)
             builder.AppendLine($"Validation error: {error.Message}");
@@ -95,10 +95,8 @@ internal static class OutputFormatter {
     private static void ShowStackTrace(StringBuilder builder, Exception ex, byte indent) {
         if (string.IsNullOrEmpty(ex.StackTrace)) return;
         builder.Append(' ', indent * _indentSize).AppendLine("Stack Trace:");
-        var lines = ex.StackTrace.Split(System.Environment.NewLine);
-#pragma warning disable CA1806 // Do not ignore method results - contains side effects
-        lines.Aggregate(builder, (s, l) => s.Append(' ', (indent + 1) * _indentSize).AppendLine(l));
-#pragma warning restore CA1806 // Do not ignore method results
+        foreach (var line in ex.StackTrace.Split(System.Environment.NewLine))
+            builder.Append(' ', (indent + 1) * _indentSize).AppendLine(line);
     }
 
     private static void AppendItem(StringBuilder builder, INode node) {

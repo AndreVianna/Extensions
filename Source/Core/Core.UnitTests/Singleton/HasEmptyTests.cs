@@ -3,7 +3,10 @@
 namespace DotNetToolbox.Singleton;
 
 public class HasEmptyTests {
-    private sealed class ClassWithEmpty : HasEmpty<ClassWithEmpty>;
+    private sealed class ClassWithEmpty
+        : IHasEmpty<ClassWithEmpty> {
+        public static ClassWithEmpty Empty { get; } = new();
+    }
 
     [Fact]
     public void Static_Empty_ReturnsSingleton() {

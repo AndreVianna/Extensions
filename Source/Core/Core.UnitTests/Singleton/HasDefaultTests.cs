@@ -3,7 +3,10 @@
 namespace DotNetToolbox.Singleton;
 
 public class HasDefaultTests {
-    private sealed class ClassHasDefault : HasDefault<ClassHasDefault>;
+    private sealed class ClassHasDefault
+        : IHasDefault<ClassHasDefault> {
+        public static ClassHasDefault Default => new();
+    }
 
     [Fact]
     public void Static_Default_ReturnsSingleton() {

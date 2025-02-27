@@ -3,7 +3,7 @@
 namespace DotNetToolbox.AI.Agents;
 
 public interface IAgentSettings : IValidatable {
-    public static readonly JsonSerializerOptions SerializerOptions = new() {
+    static readonly JsonSerializerOptions SerializerOptions = new() {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,

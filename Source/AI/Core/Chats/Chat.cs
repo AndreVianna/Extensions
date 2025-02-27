@@ -5,11 +5,11 @@ namespace DotNetToolbox.AI.Chats;
 public class Chat(string id, IEnumerable<Message>? messages = null)
         : List<Message>(messages ?? []),
       IChat {
-    public Chat(IStringGuidProvider guid, IEnumerable<Message>? messages = null)
-        : this(guid.CreateSortable(), messages) {
+    public Chat(IGuidProvider guid, IEnumerable<Message>? messages = null)
+        : this(guid.CreateSortable().ToString(), messages) {
     }
     public Chat(IEnumerable<Message>? messages = null)
-        : this(StringGuidProvider.Default, messages) {
+        : this(GuidProvider.Default, messages) {
     }
 
     public string Id { get; } = IsNotNull(id);

@@ -18,13 +18,13 @@ public class ArgumentsParserTests {
         _flag = new Flag(_app, "Flag", f => f.Aliases = ["f"]);
         _requiredParameter = new Parameter(_app, "Name");
         _parameter = new Parameter(_app, "Age", p => p.DefaultValue = "18");
-        _command = new(_app, "Say", c => c.Aliases = ["s"], (_, _) => Result.Task.FromResult(Success()));
+        _command = new(_app, "Say", c => c.Aliases = ["s"], (_, _) => Task.FromResult(Result.Success()));
     }
 
     [Fact]
     public async Task Read_WithNoArguments_ShouldReturnSuccess() {
         // Arrange & Act
-        var result = await ArgumentsParser.Parse(_app, [], default);
+        var result = await ArgumentsParser.Parse(_app, [], CancellationToken.None);
 
         // Assert
         result.Should().BeEquivalentTo(Result.Success());
@@ -37,11 +37,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Unknown argument 'unknown'. For a list of available arguments use '--help'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -51,11 +51,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Unknown argument '--unknown'. For a list of available arguments use '--help'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -65,11 +65,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Unknown argument '-u'. For a list of available arguments use '--help'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_flag]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -93,7 +93,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_flag]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -108,11 +108,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Missing value for option '--option'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -136,7 +136,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -152,7 +152,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -166,7 +166,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -180,7 +180,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -195,7 +195,7 @@ public class ArgumentsParserTests {
         _app.Parameters.Returns([_parameter]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -210,7 +210,7 @@ public class ArgumentsParserTests {
         _app.Parameters.Returns([_requiredParameter, _parameter]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -227,11 +227,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Unknown argument '-o'. For a list of available arguments use '--help'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -242,7 +242,7 @@ public class ArgumentsParserTests {
         _app.Parameters.Returns([_parameter]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -257,7 +257,7 @@ public class ArgumentsParserTests {
         _app.Parameters.Returns([_parameter]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -272,7 +272,7 @@ public class ArgumentsParserTests {
         _app.Parameters.Returns([_parameter]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -291,11 +291,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Required parameter is missing: 'Name'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -310,7 +310,7 @@ public class ArgumentsParserTests {
         _app.Context.Returns(new Map());
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -329,11 +329,11 @@ public class ArgumentsParserTests {
         const string expectedMessage = "Required parameter is missing: 'Name'.";
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
-        result.IsInvalid.Should().BeTrue();
-        result.Errors[0].Message.Should().Be(expectedMessage);
+        result.IsFailure.Should().BeTrue();
+        result.Errors.First().Message.Should().Be(expectedMessage);
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_command]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -356,7 +356,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_command]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -374,7 +374,7 @@ public class ArgumentsParserTests {
         _command.AddParameter("Second", "2");
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
@@ -387,7 +387,7 @@ public class ArgumentsParserTests {
         _app.Children.Returns([_option]);
 
         // Act
-        var result = await ArgumentsParser.Parse(_app, arguments, default);
+        var result = await ArgumentsParser.Parse(_app, arguments, CancellationToken.None);
 
         // Assert
         result.IsSuccessful.Should().BeTrue();

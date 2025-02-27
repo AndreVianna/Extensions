@@ -4,12 +4,12 @@ public interface IApplicationCreator<out TApplication, out TBuilder, out TSettin
     where TApplication : class, IApplication<TApplication, TBuilder, TSettings>
     where TBuilder : class, IApplicationBuilder<TApplication, TBuilder, TSettings>
     where TSettings : ApplicationSettings, new() {
-    public static abstract TApplication Create(string[] args, Action<IConfigurationBuilder> setConfiguration, Action<TBuilder> configureBuilder);
-    public static abstract TApplication Create(Action<IConfigurationBuilder> setConfiguration, Action<TBuilder> configureBuilder);
-    public static abstract TApplication Create(string[] args, Action<TBuilder> configureBuilder);
-    public static abstract TApplication Create(Action<TBuilder> configureBuilder);
-    public static abstract TApplication Create(string[] args, Action<IConfigurationBuilder> setConfiguration);
-    public static abstract TApplication Create(Action<IConfigurationBuilder> setConfiguration);
-    public static abstract TApplication Create(string[] args);
-    public static abstract TApplication Create();
+    static abstract TApplication Create(string[] args, Action<IConfigurationBuilder> setConfiguration, Action<TBuilder> configureBuilder);
+    static abstract TApplication Create(Action<IConfigurationBuilder> setConfiguration, Action<TBuilder> configureBuilder);
+    static abstract TApplication Create(string[] args, Action<TBuilder> configureBuilder);
+    static abstract TApplication Create(Action<TBuilder> configureBuilder);
+    static abstract TApplication Create(string[] args, Action<IConfigurationBuilder> setConfiguration);
+    static abstract TApplication Create(Action<IConfigurationBuilder> setConfiguration);
+    static abstract TApplication Create(string[] args);
+    static abstract TApplication Create();
 }

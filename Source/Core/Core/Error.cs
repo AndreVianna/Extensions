@@ -1,15 +1,6 @@
 ﻿namespace DotNetToolbox;
 
-public record Error
-    : IError {
-    public Error(string message, params IReadOnlyList<string> sources) {
-        Message = message;
-        Sources = sources ?? [];
-    }
-
-    public string Message { get; }
-    public IReadOnlyList<string> Sources { get; }
-
+public record Error(string Message, params IReadOnlyList<string> Sources) {
     public static implicit operator Error(string message) => new(message);
 
     public void Deconstruct(out string message, out IReadOnlyList<string>? sources) {
@@ -18,16 +9,8 @@ public record Error
     }
 }
 
-public record Error<TCode>
-    : Error
-    , IError<TCode> {
-    public Error(TCode code, string message, params IReadOnlyList<string> sources)
-        : base(message, sources){
-        Code = code;
-    }
-
-    public TCode Code { get; }
-
+public record Error<TCode>(TCode Code, string Message, params IReadOnlyList<string> Sources)
+    : Error(Message, Sources) {
     public void Deconstruct(out TCode code, out string message, out IReadOnlyList<string>? sources) {
         code = Code;
         message = Message;

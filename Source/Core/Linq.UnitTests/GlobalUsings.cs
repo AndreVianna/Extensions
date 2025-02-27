@@ -14,4 +14,4 @@ global using NSubstitute;
 
 global using Xunit;
 
-global using static System.Ensure;
+global using static DotNetToolbox.Ensure;

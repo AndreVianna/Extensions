@@ -3,10 +3,10 @@ namespace DotNetToolbox.Data.File;
 public abstract class JsonFilePerRecordStorage<TItem>(string name, IConfiguration configuration, IList<TItem>? data = null)
     : JsonFilePerRecordStorage<TItem, uint>(name, configuration, data)
     where TItem : class, IEntity<uint> {
-    protected override uint FirstKey { get; } = 1;
+    protected override uint FirstKey => 1;
 
     protected override bool TryGenerateNextKey(out uint next) {
-        next = LastUsedKey == default ? FirstKey : ++LastUsedKey;
+        next = LastUsedKey == 0 ? FirstKey : ++LastUsedKey;
         return true;
     }
 }
@@ -124,7 +124,7 @@ public abstract class JsonFilePerRecordStorage<TItem, TKey>
         context ??= new Map();
         context[nameof(EntityAction)] = EntityAction.Update;
         var entry = Data.Index().FirstOrDefault(i => i.Item.Id.Equals(updatedItem.Id));
-        if (entry.Item is null) return new ValidationError($"Item '{updatedItem.Id}' not found", nameof(updatedItem));
+        if (entry.Item is null) return new Error($"Item '{updatedItem.Id}' not found", nameof(updatedItem));
         var result = updatedItem.Validate(context);
         if (!result.IsSuccessful) return result;
         Data[entry.Index] = updatedItem;
@@ -134,7 +134,7 @@ public abstract class JsonFilePerRecordStorage<TItem, TKey>
 
     public override Result Remove(TKey key) {
         var entry = Data.Index().FirstOrDefault(i => i.Item.Id.Equals(key));
-        if (entry.Item is null) return new ValidationError($"Item '{key}' not found", nameof(key));
+        if (entry.Item is null) return new Error($"Item '{key}' not found", nameof(key));
         Data.RemoveAt(entry.Index);
 
         var filePath = GetFilePath(key);

@@ -12,7 +12,7 @@ public interface INode {
     string Description { get; }
     string Help { get; }
 
-    public string Path => this switch {
+    string Path => this switch {
         IApplication app => app.AssemblyName,
         IHasParent { Parent: not IRunAsShell } node => $"{node.Parent.Path} {Name}".Trim(),
         _ => Name,
