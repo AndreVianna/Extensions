@@ -62,14 +62,14 @@ public abstract class Agent<TAgent, TRequest, TResponse>
             case HttpStatusCode.Unauthorized:
             case HttpStatusCode.Forbidden:
                 _logger.LogDebug("Authentication failed.");
-                return TypedResult.For<Message>().As(httpResponse.StatusCode, "Authentication failed.");
+                return TypedResult.As(httpResponse.StatusCode, [new("Authentication failed.")]).WithNo<Message>();
             case HttpStatusCode.NotFound:
                 _logger.LogDebug("Agent endpoint not found.");
-                return TypedResult.For<Message>().As(httpResponse.StatusCode, "Agent endpoint not found.");
+                return TypedResult.As(httpResponse.StatusCode, [new("Agent endpoint not found.")]).WithNo<Message>();
             case HttpStatusCode.BadRequest:
                 _logger.LogDebug("Invalid request.");
                 var badContent = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-                return TypedResult.For<Message>().As(httpResponse.StatusCode, new Error($"Invalid request.{System.Environment.NewLine}{badContent}"));
+                return TypedResult.As(httpResponse.StatusCode, [new($"Invalid request.{System.Environment.NewLine}{badContent}")]).WithNo<Message>();
             default:
                 _logger.LogDebug("Response received.");
                 var content = await httpResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);

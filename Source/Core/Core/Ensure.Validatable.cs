@@ -18,7 +18,7 @@ public static partial class Ensure {
     }
 
     [return: NotNull]
-    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument, IResult> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
+    public static TArgument IsValid<TArgument>([NotNull] TArgument? argument, Func<TArgument, Result> validate, [CallerArgumentExpression(nameof(argument))] string? paramName = null) {
         var result = validate(IsNotNull(argument, paramName));
         return result.IsSuccessful
                    ? argument

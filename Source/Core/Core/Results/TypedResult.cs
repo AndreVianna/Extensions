@@ -21,41 +21,18 @@ public static class TypedResult {
     public static TypedResult<TStatus, TValue> As<TStatus, TValue>(TStatus status, TValue value, params IEnumerable<Error> errors)
         where TStatus : Enum
         => new(status, value, errors);
-
-    /// <summary>
-    /// Creates a typed result with at least one error.
-    /// </summary>
-    /// <param name="status">The status of the result. </param>
-    /// <param name="errors">Optional errors (null errors are ignored).</param>
-    /// <returns>A typed result with a unique set of errors.</returns>
-    public static TypedResult<TStatus, TValue> As<TStatus, TValue>(TStatus status, params IEnumerable<Error> errors)
-        where TStatus : Enum
-        => new(status, default!, errors);
-
-    /// <summary>
-    /// Creates a typed result builder.
-    /// </summary>
-    public static FailedTypedResultBuilder<TValue> For<TValue>()
-        => new();
 }
 
-public sealed class FailedTypedResultBuilder<TValue> {
-    public TypedResult<TStatus, TValue> As<TStatus>(TStatus status, params IEnumerable<Error> errors)
-        where TStatus : Enum
-        => new(status, default!, errors);
-}
-
-public record TypedResult<TStatus>
-    : Result
-    , IMergeResult<TypedResult<TStatus>>
-    , ITypedResult<TStatus>
+public abstract record TypedResultBase<TStatus>
+    : ResultBase
+    , ITypedResultBase<TStatus>
     where TStatus : Enum {
-    internal TypedResult(TStatus status, IEnumerable<Error>? errors = null)
+    protected TypedResultBase(TStatus status, IEnumerable<Error>? errors = null)
         : base(errors) {
         Status = status;
     }
 
-    protected TStatus Status { get; }
+    public TStatus Status { get; }
 
     /// <summary>
     /// Check if the result is of a specific status.
@@ -67,6 +44,22 @@ public record TypedResult<TStatus>
     public void EnsureIs(TStatus status) {
         if (!Is(status)) throw new OperationFailureException(Errors);
     }
+}
+
+public record TypedResult<TStatus>
+    : TypedResultBase<TStatus>
+    , IMergeResult<TypedResult<TStatus>>
+    , ITypedResult<TStatus>
+    where TStatus : Enum {
+    internal TypedResult(TStatus status, IEnumerable<Error>? errors = null)
+        : base(status, errors) {
+    }
+
+    public virtual TypedResult<TStatus, TValue> With<TValue>(TValue value)
+        => new(Status, value, Errors);
+
+    public virtual TypedResult<TStatus, TValue> WithNo<TValue>()
+        => new(Status, default!, Errors);
 
     public virtual bool Equals(TypedResult<TStatus>? other)
         => base.Equals(other) && other.Is(Status);
@@ -129,7 +122,7 @@ public record TypedResult<TStatus>
 }
 
 public sealed record TypedResult<TStatus, TValue>
-    : TypedResult<TStatus>
+    : TypedResultBase<TStatus>
     , IMergeResult<TypedResult<TStatus, TValue>>
     , ITypedResult<TStatus, TValue>
     where TStatus : Enum {
@@ -192,4 +185,12 @@ public sealed record TypedResult<TStatus, TValue>
 
     public override int GetHashCode()
         => HashCode.Combine(base.GetHashCode(), Status.GetHashCode());
+
+    /// <summary>
+    /// Implicitly converts a HashSet of Errors to a Result.
+    /// </summary>
+    public static implicit operator TypedResult<TStatus>(TypedResult<TStatus, TValue>? result) {
+        ArgumentNullException.ThrowIfNull(result);
+        return new(result.Status, result.Errors);
+    }
 }

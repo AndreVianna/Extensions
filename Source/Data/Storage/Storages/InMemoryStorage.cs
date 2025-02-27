@@ -17,13 +17,14 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     public override Result Load() {
         var result = _keylessStrategy.Load();
-        result += LoadLastUsedKey();
-        return result;
+        return result.IsFailure
+                   ? result
+                   : base.Load();
     }
 
-    protected override Result LoadLastUsedKey() {
+    protected override Result<TKey?> LoadLastUsedKey() {
         LastUsedKey = Data.Count != 0
-            ? Data.Max(item => item.Id)
+            ? Data.Max(static item => item.Id)
             : default;
         return Success(LastUsedKey);
     }
@@ -102,9 +103,9 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
         var result = updatedItem.Validate(validationContext);
         if (!result.IsSuccessful) return result;
         result += Remove(updatedItem.Id);
-        return (Result)(!result.IsSuccessful
-            ? result
-            : _keylessStrategy.Add(updatedItem, validationContext));
+        return !result.IsSuccessful
+                   ? result
+                   : _keylessStrategy.Add(updatedItem, validationContext);
     }
 
     public override Result AddOrUpdateMany(IEnumerable<TItem> updatedItems, IMap? validationContext = null) {
@@ -139,9 +140,9 @@ public class InMemoryStorage<TItem, TKey>(IList<TItem>? data = null)
 
     #region Async
 
-    protected override async Task<Result> LoadLastUsedKeyAsync(CancellationToken ct = default) {
+    protected override async Task<Result<TKey?>> LoadLastUsedKeyAsync(CancellationToken ct = default) {
         LastUsedKey = await Data.AsAsyncQueryable().AnyAsync(ct)
-            ? await Data.AsAsyncQueryable().MaxAsync(item => item.Id, ct)
+            ? await Data.AsAsyncQueryable().MaxAsync(static item => item.Id, ct)
             : default;
         return Success(LastUsedKey);
     }
@@ -380,11 +381,11 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override Result Patch(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null) {
         var itemToPatch = Data.AsQueryable().FirstOrDefault(predicate);
-        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure(new Error("Item not found.", nameof(predicate)));
         setItem(itemToPatch);
-        return (Result)(itemToPatch is IValidatable validatable
-            ? validatable.Validate(validationContext)
-            : Success());
+        return itemToPatch is IValidatable validatable
+                   ? validatable.Validate(validationContext)
+                   : Success();
     }
     public override Result PatchMany(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null) {
         var itemsToPatch = Data.AsQueryable().Where(predicate);
@@ -537,19 +538,19 @@ public class InMemoryStorage<TItem>(IList<TItem>? data = null)
 
     public override async Task<Result> PatchAsync(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemToPatch = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
-        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure(new Error("Item not found.", nameof(predicate)));
         setItem(itemToPatch);
-        return (Result)(itemToPatch is IValidatable validatable
-            ? validatable.Validate(validationContext)
-            : Success());
+        return itemToPatch is IValidatable validatable
+                   ? validatable.Validate(validationContext)
+                   : Success();
     }
     public override async Task<Result> PatchAsync(Expression<Func<TItem, bool>> predicate, Func<TItem, CancellationToken, Task> setItem, IMap? validationContext = null, CancellationToken ct = default) {
         var itemToPatch = await Data.AsAsyncQueryable().FirstOrDefaultAsync(predicate, ct);
-        if (itemToPatch is null) return Failure("Item not found.", nameof(predicate));
+        if (itemToPatch is null) return Failure(new Error("Item not found.", nameof(predicate)));
         await setItem(itemToPatch, ct);
-        return (Result)(itemToPatch is IValidatable validatable
-            ? validatable.Validate(validationContext)
-            : Success());
+        return itemToPatch is IValidatable validatable
+                   ? validatable.Validate(validationContext)
+                   : Success();
     }
 
     public override async Task<Result> PatchManyAsync(Expression<Func<TItem, bool>> predicate, Action<TItem> setItem, IMap? validationContext = null, CancellationToken ct = default) {

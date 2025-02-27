@@ -1,11 +1,8 @@
 ﻿namespace DotNetToolbox.Results;
 
-public record Result
-    : IResult
-    , IHasDefault<Result>
-    , IMergeResult<Result>
-    , IConvertToResult<Result> {
-    internal Result(IEnumerable<Error>? errors = null) {
+public abstract record ResultBase
+    : IResultBase {
+    protected ResultBase(IEnumerable<Error>? errors = null) {
         Errors = errors as HashSet<Error> ?? errors?.ToHashSet() ?? [];
     }
 
@@ -32,6 +29,23 @@ public record Result
     public void EnsureIsSuccess() {
         if (IsFailure) throw new OperationFailureException(Errors);
     }
+}
+
+public record Result
+    : ResultBase
+    , IResult
+    , IHasDefault<Result>
+    , IMergeResult<Result>
+    , IConvertToResult<Result> {
+    internal Result(IEnumerable<Error>? errors = null)
+        : base(errors) {
+    }
+
+    public virtual Result<TValue> With<TValue>(TValue value)
+        => new(value, Errors);
+
+    public virtual Result<TValue> WithNo<TValue>()
+        => new(default!, Errors);
 
     public virtual bool Equals(Result? other)
         => other?.Errors.SequenceEqual(Errors) ?? false;
@@ -152,7 +166,10 @@ public record Result
     /// <summary>
     /// Implicitly converts an Error to a Result.
     /// </summary>
-    public static implicit operator Result(Error error) => new([error]);
+    public static implicit operator Result(Error error) {
+        ArgumentNullException.ThrowIfNull(error);
+        return new([error]);
+    }
 
     /// <summary>
     /// Implicitly converts an array of Errors to a Result.
@@ -180,9 +197,10 @@ public record Result
 }
 
 public record Result<TValue>
-    : Result
+    : ResultBase
     , IResult<TValue>
-    , IMergeResult<Result<TValue>> {
+    , IMergeResult<Result<TValue>>
+    , IConvertToResult<Result<TValue>> {
     internal Result(TValue value, IEnumerable<Error>? errors = null)
         : base(errors) {
         Value = value;
@@ -249,4 +267,54 @@ public record Result<TValue>
     /// Implicitly converts a value to a Success Result.
     /// </summary>
     public static implicit operator Result<TValue>(TValue value) => new(value);
+
+    // Implicit conversions
+
+    /// <summary>
+    /// Implicitly converts an Error to a Result.
+    /// </summary>
+    public static implicit operator Result<TValue>(Error error) {
+        ArgumentNullException.ThrowIfNull(error);
+        return new(default!, [error]);
+    }
+
+    /// <summary>
+    /// Implicitly converts an array of Errors to a Result.
+    /// </summary>
+    public static implicit operator Result<TValue>(Error[]? errors) {
+        ArgumentNullException.ThrowIfNull(errors);
+        return new(default!, errors.AsEnumerable());
+    }
+
+    /// <summary>
+    /// Implicitly converts a List of Errors to a Result.
+    /// </summary>
+    public static implicit operator Result<TValue>(List<Error>? errors) {
+        ArgumentNullException.ThrowIfNull(errors);
+        return new(default!, errors.AsEnumerable());
+    }
+
+    /// <summary>
+    /// Implicitly converts a HashSet of Errors to a Result.
+    /// </summary>
+    public static implicit operator Result<TValue>(HashSet<Error>? errors) {
+        ArgumentNullException.ThrowIfNull(errors);
+        return new(default!, errors.AsEnumerable());
+    }
+
+    /// <summary>
+    /// Implicitly converts a Result to a Result of Value.
+    /// </summary>
+    public static implicit operator Result<TValue>(Result? result) {
+        ArgumentNullException.ThrowIfNull(result);
+        return new(default!, result.Errors);
+    }
+
+    /// <summary>
+    /// Implicitly converts a HashSet of Errors to a Result.
+    /// </summary>
+    public static implicit operator Result(Result<TValue>? result) {
+        ArgumentNullException.ThrowIfNull(result);
+        return new(result.Errors);
+    }
 }

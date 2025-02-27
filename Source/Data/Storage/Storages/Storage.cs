@@ -11,7 +11,14 @@ public abstract class Storage<TStorage, TItem, TKey>(IList<TItem>? data = null)
     protected virtual TKey FirstKey { get; } = default!;
     protected virtual TKey? LastUsedKey { get; set; }
 
-    protected virtual Result LoadLastUsedKey()
+    public override Result Load() {
+        var result = LoadLastUsedKey();
+        if (!result.IsSuccessful) return result;
+        LastUsedKey = result.Value;
+        return Result.Success();
+    }
+
+    protected virtual Result<TKey?> LoadLastUsedKey()
         => throw new NotImplementedException();
 
     protected virtual bool TryGenerateNextKey([MaybeNullWhen(false)] out TKey next)
@@ -51,7 +58,14 @@ public abstract class Storage<TStorage, TItem, TKey>(IList<TItem>? data = null)
 
     #region Async
 
-    protected virtual Task<Result> LoadLastUsedKeyAsync(CancellationToken ct = default)
+    public override async Task<Result> LoadAsync(CancellationToken ct = default) {
+        var result = await LoadLastUsedKeyAsync(ct);
+        if (!result.IsSuccessful) return result;
+        LastUsedKey = result.Value;
+        return Result.Success();
+    }
+
+    protected virtual Task<Result<TKey?>> LoadLastUsedKeyAsync(CancellationToken ct = default)
         => throw new NotImplementedException();
 
     protected virtual Task<Result<TKey>> GenerateNextKeyAsync(CancellationToken ct = default)

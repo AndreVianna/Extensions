@@ -1,10 +1,16 @@
 ﻿namespace DotNetToolbox.Results;
 
-public interface IResult
+public interface IResultBase
     : IHasErrors {
     bool IsSuccessful { get; }
     bool IsFailure { get; }
     void EnsureIsSuccess();
+}
+
+public interface IResult
+    : IResultBase {
+    Result<TValue> With<TValue>(TValue value);
+    Result<TValue> WithNo<TValue>();
 }
 
 public interface IMergeResult<TSelf>
@@ -24,5 +30,5 @@ public interface IConvertToResult<out TSelf>
 }
 
 public interface IResult<out TValue>
-    : IResult
+    : IResultBase
     , IHasValue<TValue>;
