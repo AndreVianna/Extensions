@@ -108,7 +108,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolbox.Environment",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolbox.Threading", "Core\Threading\DotNetToolbox.Threading.csproj", "{BC8BF23E-3398-4BDB-8ABC-B9BFD0512A52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolbox.Domain", "Domain\DotNetToolbox.Domain.csproj", "{6EC6730A-B88E-45C6-91BD-5C5195395C98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolbox.Domain", "Data\Domain\DotNetToolbox.Domain.csproj", "{6EC6730A-B88E-45C6-91BD-5C5195395C98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetToolbox.Threading.UnitTests", "Core\Threading.UnitTests\DotNetToolbox.Threading.UnitTests.csproj", "{878C211D-8894-49CD-BF90-D635D95CA300}"
 EndProject

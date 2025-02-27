@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\icon.png">
+    <None Include="..\..\..\icon.png">
       <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -53,14 +53,14 @@
       <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\..\LICENSE">
+    <None Include="..\..\..\LICENSE">
       <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Core\Core\DotNetToolbox.Core.csproj" />
+    <ProjectReference Include="..\..\Core\Core\DotNetToolbox.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Release'">

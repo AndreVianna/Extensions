@@ -3,14 +3,14 @@
 public class Awaiter(int timeoutInMilliseconds = 5000, int delayInMilliseconds = 100, ILogger<Awaiter>? logger = null)
     : Awaiter<Awaiter>(timeoutInMilliseconds, delayInMilliseconds, logger);
 
-public abstract class Awaiter<TWaiter>(int timeoutInMilliseconds = 5000, int delayInMilliseconds = 100, ILogger<TWaiter>? logger = null)
+public abstract class Awaiter<TSelf>(int timeoutInMilliseconds = 5000, int delayInMilliseconds = 100, ILogger<TSelf>? logger = null)
     : IAwaiter
-    where TWaiter : Awaiter<TWaiter> {
+    where TSelf : Awaiter<TSelf> {
     private bool _stopWaiting;
     public bool IsWaiting => _stopwatch.IsRunning;
     public void StopWaiting() => _stopwatch.Stop();
 
-    protected ILogger<TWaiter> Logger { get; } = logger ?? NullLogger<TWaiter>.Instance;
+    protected ILogger<TSelf> Logger { get; } = logger ?? NullLogger<TSelf>.Instance;
     private readonly Stopwatch _stopwatch = new();
 
     public async Task StartWait(CancellationToken ct) {

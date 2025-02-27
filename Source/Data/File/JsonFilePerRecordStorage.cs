@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace DotNetToolbox.Data.File;
 
 public abstract class JsonFilePerRecordStorage<TItem>(string name, IConfiguration configuration, IList<TItem>? data = null)
